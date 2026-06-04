@@ -21,6 +21,7 @@ const NAV_ITEMS = [
   { label: "Credit Cards", href: "/credit-card/india" },
   { label: "Brokers",      href: "/brokers/india" },
   { label: "Payment Apps", href: "/payment-apps/india" },
+  { label: "Crypto Apps",  href: "/crypto/india" },
   { label: "Calculators",  href: "/calculator" },
 ];
 
