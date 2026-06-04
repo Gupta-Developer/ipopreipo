@@ -22,6 +22,7 @@ const NAV_ITEMS = [
   { label: "Brokers",      href: "/brokers/india" },
   { label: "Payment Apps", href: "/payment-apps/india" },
   { label: "Crypto Apps",  href: "/crypto/india" },
+  { label: "Compare",      href: "/compare" },
   { label: "Calculators",  href: "/calculator" },
 ];
 
