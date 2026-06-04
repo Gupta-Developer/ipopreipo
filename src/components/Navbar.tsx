@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
+
 
 const THEMES = [
   { id: "indigo",  name: "Indigo",  primary: "99, 102, 241",  light: "129, 140, 248", color: "#6366f1" },
@@ -24,15 +26,18 @@ const NAV_ITEMS = [
 
 export default function Navbar() {
   const pathname = usePathname();
+  const { user, logout } = useAuth();
   const [currentTheme, setCurrentTheme] = useState("indigo");
   const [themeMode, setThemeMode]       = useState("light");
   const [showThemeMenu, setShowThemeMenu] = useState(false);
+  const [showUserMenu, setShowUserMenu]   = useState(false);
   const [searchOpen, setSearchOpen]     = useState(false);
   const [scrolled, setScrolled]         = useState(false);
   const [mobileOpen, setMobileOpen]     = useState(false);
 
   const searchRef    = useRef<HTMLInputElement>(null);
   const themeMenuRef = useRef<HTMLDivElement>(null);
+  const userMenuRef  = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("site-theme") || "indigo";
@@ -53,6 +58,8 @@ export default function Navbar() {
     const handler = (e: MouseEvent) => {
       if (themeMenuRef.current && !themeMenuRef.current.contains(e.target as Node))
         setShowThemeMenu(false);
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node))
+        setShowUserMenu(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -208,17 +215,46 @@ export default function Navbar() {
             {/* Divider */}
             <div className="nb-divider" />
 
-            {/* User */}
-            <button className="nb-user-btn" aria-label="Account">
-              <span className="nb-avatar">M</span>
-              <span className="nb-user-info">
-                <span className="nb-user-name">Mayank</span>
-                <span className="nb-user-badge">PRO</span>
-              </span>
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{color:"var(--text-muted)"}}>
-                <path d="m6 9 6 6 6-6"/>
-              </svg>
-            </button>
+            {/* User Profile / Auth State */}
+            {user ? (
+              <div ref={userMenuRef} style={{ position: "relative" }}>
+                <button 
+                  className="nb-user-btn" 
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  aria-label="Account"
+                  aria-expanded={showUserMenu}
+                >
+                  <span className="nb-avatar">{user.name.charAt(0).toUpperCase()}</span>
+                  <span className="nb-user-info">
+                    <span className="nb-user-name">{user.name}</span>
+                    <span className="nb-user-badge">{user.role}</span>
+                  </span>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{color:"var(--text-muted)"}}>
+                    <path d="m6 9 6 6 6-6"/>
+                  </svg>
+                </button>
+                {showUserMenu && (
+                  <div className="nb-dropdown" style={{ right: 0, minWidth: "180px" }}>
+                    <div className="nb-dropdown-label">Session: {user.email}</div>
+                    <button 
+                      className="nb-dropdown-item" 
+                      onClick={() => {
+                        logout();
+                        setShowUserMenu(false);
+                      }}
+                      style={{ color: "var(--danger)" }}
+                    >
+                      <span style={{ fontSize: "0.9rem" }}>🚪</span>
+                      <span className="nb-dropdown-item-label" style={{ color: "var(--danger)", fontWeight: 600 }}>Log Out</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link href="/login" className="btn btn-primary" style={{ padding: "0.45rem 1rem", fontSize: "0.82rem", borderRadius: "8px", textDecoration: "none", fontWeight: 700, display: "inline-flex", alignItems: "center" }}>
+                Sign In
+              </Link>
+            )}
 
             {/* Mobile hamburger */}
             <button
@@ -271,10 +307,46 @@ export default function Navbar() {
               <Link key={item.href} href={item.href} className={`nb-drawer-link${active ? " nb-drawer-link-active" : ""}`}>
                 <span style={{ width: 6, height: 6, borderRadius: "50%", background: active ? `rgb(var(--primary-rgb))` : "var(--text-muted)", flexShrink: 0, display: "block", marginTop: 1 }} />
                 {item.label}
-                {active && <span style={{ marginLeft: "auto", fontSize: "0.7rem", color: `rgb(var(--primary-rgb))`, fontWeight: 700 }}>Active</span>}
+                {user && <span style={{ marginLeft: "auto", fontSize: "0.7rem", color: `rgb(var(--primary-rgb))`, fontWeight: 700 }}>Active</span>}
               </Link>
             );
           })}
+
+          <div style={{ height: "1px", background: "var(--border-color)", margin: "1rem 0.5rem", opacity: 0.5 }} />
+
+          <div className="nb-drawer-section-label">Account</div>
+          {user ? (
+            <div style={{ padding: "0 0.5rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                <span className="nb-avatar" style={{ width: 32, height: 32, borderRadius: "6px" }}>{user.name.charAt(0).toUpperCase()}</span>
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  <span style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--text-primary)" }}>{user.name}</span>
+                  <span style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>{user.email}</span>
+                </div>
+              </div>
+              <button 
+                className="nb-pref-toggle" 
+                onClick={() => {
+                  logout();
+                  setMobileOpen(false);
+                }}
+                style={{ width: "100%", color: "var(--danger)", borderColor: "rgba(239, 68, 68, 0.25)", background: "rgba(239, 68, 68, 0.05)" }}
+              >
+                Log Out
+              </button>
+            </div>
+          ) : (
+            <div style={{ padding: "0 0.5rem" }}>
+              <Link 
+                href="/login" 
+                className="btn btn-primary" 
+                onClick={() => setMobileOpen(false)}
+                style={{ display: "block", textAlign: "center", textDecoration: "none", padding: "0.55rem", borderRadius: "8px", fontSize: "0.85rem", fontWeight: 700 }}
+              >
+                Sign In
+              </Link>
+            </div>
+          )}
         </nav>
 
         <div className="nb-drawer-footer">
