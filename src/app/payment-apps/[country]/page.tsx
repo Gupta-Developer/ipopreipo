@@ -130,7 +130,6 @@ export default function PaymentAppsCountryPage() {
           <div
             key={app.slug}
             className="premium-row-card"
-            style={{ gridTemplateColumns: "130px 1fr" }}
           >
             {/* Left Column Logo */}
             <div style={{ display: "flex", justifyContent: "center" }}>

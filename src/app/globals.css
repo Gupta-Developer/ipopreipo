@@ -1030,3 +1030,15 @@ hr {
   }
 }
 
+@media (max-width: 480px) {
+  .credit-card-mockup {
+    width: 280px;
+    height: 172px;
+    padding: 1rem;
+  }
+  .credit-card-mockup .value {
+    font-size: 0.68rem;
+  }
+}
+
+

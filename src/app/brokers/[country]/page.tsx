@@ -161,7 +161,6 @@ export default function BrokersCountryPage() {
           <div
             key={broker.slug}
             className="premium-row-card"
-            style={{ gridTemplateColumns: "130px 1fr" }}
           >
             {/* Left Column */}
             <div style={{ display: "flex", justifyContent: "center" }}>
