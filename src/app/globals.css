@@ -981,9 +981,15 @@ hr {
 /* =====================================================
    RESPONSIVE HELPERS
    ===================================================== */
+@media (max-width: 768px) {
+  .m-flex-column {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1.5rem !important;
+  }
+}
 @media (max-width: 640px) {
   .app-container { padding: 1.5rem 1rem; }
-  .m-flex-column { flex-direction: column !important; }
   h1 { font-size: 1.8rem !important; }
 }
 
