@@ -253,7 +253,7 @@ export default function CalculatorHub() {
       </header>
 
       {/* ── Layout ──────────────────────────────────────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "280px 1fr", gap: "2rem", alignItems: "start" }}>
+      <div className="calc-layout">
 
         {/* ── Sidebar Calculator Nav ──────────────────────────────────────── */}
         <nav style={{ display: "flex", flexDirection: "column", gap: "0.5rem", position: "sticky", top: 88 }}>
@@ -305,7 +305,7 @@ export default function CalculatorHub() {
 
           {/* ════════ SIP ════════ */}
           {activeTab === "sip" && (
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+            <div className="calc-grid">
               <div className="card" style={{ padding: "1.75rem" }}>
                 <h3 style={{ fontSize: "0.9rem", fontWeight: 700, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "1.75rem" }}>Parameters</h3>
                 <RangeSlider label="Monthly SIP Amount" value={sipMonthly} min={500} max={100000} step={500} onChange={setSipMonthly} display={`₹${sipMonthly.toLocaleString("en-IN")}`} color="#6366f1" />
@@ -325,7 +325,7 @@ export default function CalculatorHub() {
 
           {/* ════════ LUMP SUM ════════ */}
           {activeTab === "lumpsum" && (
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+            <div className="calc-grid">
               <div className="card" style={{ padding: "1.75rem" }}>
                 <h3 style={{ fontSize: "0.9rem", fontWeight: 700, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "1.75rem" }}>Parameters</h3>
                 <RangeSlider label="One-time Investment" value={lsAmount} min={10000} max={5000000} step={10000} onChange={setLsAmount} display={`₹${lsAmount.toLocaleString("en-IN")}`} color="#10b981" />
@@ -345,7 +345,7 @@ export default function CalculatorHub() {
 
           {/* ════════ EMI ════════ */}
           {activeTab === "emi" && (
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+            <div className="calc-grid">
               <div className="card" style={{ padding: "1.75rem" }}>
                 <h3 style={{ fontSize: "0.9rem", fontWeight: 700, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "1.75rem" }}>Loan Parameters</h3>
                 <RangeSlider label="Loan Amount" value={loanAmount} min={100000} max={10000000} step={100000} onChange={setLoanAmount} display={`₹${loanAmount.toLocaleString("en-IN")}`} color="#f59e0b" />
@@ -369,7 +369,7 @@ export default function CalculatorHub() {
 
           {/* ════════ FD ════════ */}
           {activeTab === "fd" && (
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+            <div className="calc-grid">
               <div className="card" style={{ padding: "1.75rem" }}>
                 <h3 style={{ fontSize: "0.9rem", fontWeight: 700, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "1.75rem" }}>FD Parameters</h3>
                 <RangeSlider label="Deposit Amount" value={fdAmount} min={1000} max={5000000} step={1000} onChange={setFdAmount} display={`₹${fdAmount.toLocaleString("en-IN")}`} color="#0ea5e9" />
@@ -400,7 +400,7 @@ export default function CalculatorHub() {
 
           {/* ════════ BROKERAGE ════════ */}
           {activeTab === "brokerage" && (
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+            <div className="calc-grid">
               <div className="card" style={{ padding: "1.75rem" }}>
                 <h3 style={{ fontSize: "0.9rem", fontWeight: 700, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "1.5rem" }}>Transaction Details</h3>
                 <div style={{ marginBottom: "1.25rem" }}>
@@ -459,7 +459,7 @@ export default function CalculatorHub() {
 
           {/* ════════ IPO ════════ */}
           {activeTab === "ipo" && (
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+            <div className="calc-grid">
               <div className="card" style={{ padding: "1.75rem" }}>
                 <h3 style={{ fontSize: "0.9rem", fontWeight: 700, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "1.75rem" }}>Allotment Parameters</h3>
                 <RangeSlider label="Oversubscription Rate" value={subscriptionRate} min={2} max={200} step={1} onChange={setSubscriptionRate} display={`${subscriptionRate}x`} color="#ef4444" />
@@ -513,7 +513,7 @@ export default function CalculatorHub() {
 
           {/* ════════ CAGR ════════ */}
           {activeTab === "cagr" && (
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+            <div className="calc-grid">
               <div className="card" style={{ padding: "1.75rem" }}>
                 <h3 style={{ fontSize: "0.9rem", fontWeight: 700, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "1.5rem" }}>Growth Variables</h3>
                 <div style={{ marginBottom: "1.25rem" }}>
@@ -543,7 +543,7 @@ export default function CalculatorHub() {
 
           {/* ════════ PPF ════════ */}
           {activeTab === "ppf" && (
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+            <div className="calc-grid">
               <div className="card" style={{ padding: "1.75rem" }}>
                 <h3 style={{ fontSize: "0.9rem", fontWeight: 700, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "1.75rem" }}>PPF Parameters</h3>
                 <div style={{ background: "rgba(132,204,22,0.07)", border: "1px solid rgba(132,204,22,0.2)", borderRadius: 10, padding: "0.85rem", marginBottom: "1.5rem" }}>

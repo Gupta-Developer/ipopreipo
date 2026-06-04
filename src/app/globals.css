@@ -986,3 +986,41 @@ hr {
   .m-flex-column { flex-direction: column !important; }
   h1 { font-size: 1.8rem !important; }
 }
+
+/* =====================================================
+   CALCULATOR RESPONSIVE UTILITIES
+   ===================================================== */
+.calc-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+.calc-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+  .calc-layout {
+    grid-template-columns: 1fr;
+  }
+  .calc-layout nav {
+    position: static !important;
+    flex-direction: row !important;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+  .calc-layout nav button {
+    flex-shrink: 0;
+    width: auto !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .calc-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
