@@ -25,7 +25,7 @@ const NAV_ITEMS = [
 export default function Navbar() {
   const pathname = usePathname();
   const [currentTheme, setCurrentTheme] = useState("indigo");
-  const [themeMode, setThemeMode]       = useState("dark");
+  const [themeMode, setThemeMode]       = useState("light");
   const [showThemeMenu, setShowThemeMenu] = useState(false);
   const [searchOpen, setSearchOpen]     = useState(false);
   const [scrolled, setScrolled]         = useState(false);
@@ -36,7 +36,7 @@ export default function Navbar() {
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("site-theme") || "indigo";
-    const savedMode  = localStorage.getItem("site-theme-mode") || "dark";
+    const savedMode  = localStorage.getItem("site-theme-mode") || "light";
     setCurrentTheme(savedTheme);
     setThemeMode(savedMode);
     applyTheme(savedTheme);
