@@ -16,7 +16,17 @@ const THEMES = [
 
 const NAV_ITEMS = [
   { label: "Home",         href: "/" },
-  { label: "Select",       href: "/select" },
+  { 
+    label: "Select",       
+    href: "/select",
+    subItems: [
+      { label: "Bank Accounts", href: "/bank-accounts" },
+      { label: "Credit Cards", href: "/credit-card" },
+      { label: "Brokers",      href: "/brokers" },
+      { label: "Payment Apps", href: "/payment-apps" },
+      { label: "Crypto Apps",  href: "/crypto" }
+    ]
+  },
   { label: "IPO Tracker",  href: "/ipo" },
   { label: "Pre-IPO",      href: "/preipo" },
   { label: "Compare",      href: "/compare" },
@@ -140,6 +150,36 @@ export default function Navbar() {
             {NAV_ITEMS.map((item) => {
               const dynamicHref = getDynamicHref(item.href);
               const active = pathname === dynamicHref || (dynamicHref !== "/" && pathname.startsWith(dynamicHref));
+              
+              if (item.subItems) {
+                return (
+                  <div key={item.href} className="nb-nav-item-container">
+                    <Link
+                      href={dynamicHref}
+                      className={`nb-link${active ? " nb-link-active" : ""}`}
+                      style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem" }}
+                    >
+                      {item.label}
+                      <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginTop: "1.25px", opacity: 0.8 }}>
+                        <path d="m6 9 6 6 6-6"/>
+                      </svg>
+                      {active && <span className="nb-link-pip" />}
+                    </Link>
+                    <div className="nb-nav-dropdown">
+                      {item.subItems.map((sub) => (
+                        <Link
+                          key={sub.href}
+                          href={getDynamicHref(sub.href)}
+                          className="nb-nav-dropdown-item"
+                        >
+                          {sub.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
+
               return (
                 <Link
                   key={item.href}
@@ -314,11 +354,28 @@ export default function Navbar() {
             const dynamicHref = getDynamicHref(item.href);
             const active = pathname === dynamicHref || (dynamicHref !== "/" && pathname.startsWith(dynamicHref));
             return (
-              <Link key={item.href} href={dynamicHref} className={`nb-drawer-link${active ? " nb-drawer-link-active" : ""}`}>
-                <span style={{ width: 6, height: 6, borderRadius: "50%", background: active ? `rgb(var(--primary-rgb))` : "var(--text-muted)", flexShrink: 0, display: "block", marginTop: 1 }} />
-                {item.label}
-                {user && <span style={{ marginLeft: "auto", fontSize: "0.7rem", color: `rgb(var(--primary-rgb))`, fontWeight: 700 }}>Active</span>}
-              </Link>
+              <React.Fragment key={item.href}>
+                <Link href={dynamicHref} className={`nb-drawer-link${active ? " nb-drawer-link-active" : ""}`}>
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: active ? `rgb(var(--primary-rgb))` : "var(--text-muted)", flexShrink: 0, display: "block", marginTop: 1 }} />
+                  {item.label}
+                  {user && <span style={{ marginLeft: "auto", fontSize: "0.7rem", color: `rgb(var(--primary-rgb))`, fontWeight: 700 }}>Active</span>}
+                </Link>
+                {item.subItems && item.subItems.map((sub) => {
+                  const subHref = getDynamicHref(sub.href);
+                  const subActive = pathname === subHref || pathname.startsWith(subHref);
+                  return (
+                    <Link
+                      key={sub.href}
+                      href={subHref}
+                      className={`nb-drawer-link${subActive ? " nb-drawer-link-active" : ""}`}
+                      style={{ paddingLeft: "2rem", fontSize: "0.82rem" }}
+                    >
+                      <span style={{ width: 4, height: 4, borderRadius: "50%", background: subActive ? `rgb(var(--primary-rgb))` : "var(--text-muted)", flexShrink: 0, display: "block", marginTop: 1 }} />
+                      {sub.label}
+                    </Link>
+                  );
+                })}
+              </React.Fragment>
             );
           })}
 
@@ -508,6 +565,60 @@ export default function Navbar() {
           height: 2px;
           border-radius: 99px;
           background: rgb(var(--primary-rgb));
+        }
+
+        /* ─── Dropdown Menu under Nav Items ─── */
+        .nb-nav-item-container {
+          position: relative;
+          display: inline-flex;
+          align-items: center;
+        }
+        .nb-nav-dropdown {
+          position: absolute;
+          top: calc(100% + 4px);
+          left: 0;
+          z-index: 500;
+          min-width: 180px;
+          border-radius: 8px;
+          padding: 0.5rem;
+          display: none;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+        }
+        .nb-nav-dropdown::before {
+          content: '';
+          position: absolute;
+          top: -10px;
+          left: 0;
+          right: 0;
+          height: 10px;
+        }
+        :root:not([data-theme="light"]) .nb-nav-dropdown {
+          background: #111520;
+          border: 1px solid rgba(255,255,255,0.07);
+        }
+        [data-theme="light"] .nb-nav-dropdown {
+          background: #ffffff;
+          border: 1px solid rgba(15,23,42,0.09);
+        }
+        .nb-nav-item-container:hover .nb-nav-dropdown {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+        }
+        .nb-nav-dropdown-item {
+          display: flex;
+          align-items: center;
+          padding: 0.45rem 0.75rem;
+          border-radius: 6px;
+          font-size: 0.85rem;
+          font-weight: 500;
+          color: var(--text-secondary);
+          text-decoration: none;
+          transition: background 0.12s, color 0.12s;
+        }
+        .nb-nav-dropdown-item:hover {
+          background: var(--spec-bg);
+          color: var(--text-primary);
         }
 
         /* ─── Right controls ─── */
