@@ -46,7 +46,7 @@ export default function CreditCardCountryPage() {
   const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value;
     const slug = val.toLowerCase().replace(/\s+/g, "-");
-    router.push(`/credit-card/${slug}`);
+    router.push(`/${slug}/credit-card`);
   };
 
   return (
@@ -186,7 +186,7 @@ export default function CreditCardCountryPage() {
                     </div>
                   </div>
 
-                  <Link href={`/credit-card/${countrySlug}/${card.slug}`} className="btn btn-primary" style={{ padding: "0.6rem 1.4rem", fontSize: "0.85rem", borderRadius: "10px", textDecoration: "none" }}>
+                  <Link href={`/${countrySlug}/credit-card/${card.slug}`} className="btn btn-primary" style={{ padding: "0.6rem 1.4rem", fontSize: "0.85rem", borderRadius: "10px", textDecoration: "none" }}>
                     Full Details
                   </Link>
                 </div>

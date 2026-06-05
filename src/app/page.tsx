@@ -227,7 +227,7 @@ export default function Home() {
                 ))}
               </div>
 
-              <Link href="/payment-apps/india" className="btn btn-secondary" style={{ width: "100%", marginTop: "0.5rem" }}>
+              <Link href="/india/payment-apps" className="btn btn-secondary" style={{ width: "100%", marginTop: "0.5rem" }}>
                 Compare Payment Apps →
               </Link>
             </div>
@@ -309,7 +309,7 @@ export default function Home() {
                 ))}
               </div>
 
-              <Link href="/credit-card/india" className="btn btn-secondary" style={{ width: "100%" }}>
+              <Link href="/india/credit-card" className="btn btn-secondary" style={{ width: "100%" }}>
                 Compare Premium Cards →
               </Link>
             </div>
@@ -332,7 +332,7 @@ export default function Home() {
                 ))}
               </div>
 
-              <Link href="/brokers/india" className="btn btn-secondary" style={{ width: "100%" }}>
+              <Link href="/india/brokers" className="btn btn-secondary" style={{ width: "100%" }}>
                 Compare Demat Brokers →
               </Link>
             </div>

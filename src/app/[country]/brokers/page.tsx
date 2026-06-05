@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { BROKERS_DATA } from "../../../data/brokersData";
+import { BROKERS_DATA } from "@/data/brokersData";
 
 const COUNTRY_MAP: Record<string, { code: string; name: string; title: string }> = {
   "india": { code: "IN", name: "India", title: "India" },
@@ -44,7 +44,7 @@ export default function BrokersCountryPage() {
       {/* Country Selection Tabs — now links for SEO */}
       <div style={{ display: "flex", gap: "1rem", marginBottom: "2.25rem", flexWrap: "wrap" }}>
         <Link
-          href="/brokers/india"
+          href="/india/brokers"
           className="btn"
           style={{
             background: selectedCountry === "IN" ? "rgba(var(--primary-rgb), 0.08)" : "rgba(255,255,255,0.01)",
@@ -63,7 +63,7 @@ export default function BrokersCountryPage() {
           🇮🇳 India Brokers
         </Link>
         <Link
-          href="/brokers/united-states"
+          href="/united-states/brokers"
           className="btn"
           style={{
             background: selectedCountry === "US" ? "rgba(var(--primary-rgb), 0.08)" : "rgba(255,255,255,0.01)",
@@ -82,7 +82,7 @@ export default function BrokersCountryPage() {
           🇺🇸 United States Brokers
         </Link>
         <Link
-          href="/brokers/united-kingdom"
+          href="/united-kingdom/brokers"
           className="btn"
           style={{
             background: selectedCountry === "UK" ? "rgba(var(--primary-rgb), 0.08)" : "rgba(255,255,255,0.01)",
@@ -198,7 +198,7 @@ export default function BrokersCountryPage() {
                   </span>
                 </div>
                 <Link 
-                  href={`/brokers/${countrySlug}/${broker.slug}`}
+                  href={`/${countrySlug}/brokers/${broker.slug}`}
                   className="btn btn-primary"
                   style={{ padding: "0.45rem 1rem", fontSize: "0.8rem", borderRadius: "8px", textDecoration: "none" }}
                 >

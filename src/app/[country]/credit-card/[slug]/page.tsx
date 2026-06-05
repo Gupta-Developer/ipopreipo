@@ -29,7 +29,7 @@ export default function CardReviewPage() {
       <div className="app-container" style={{ padding: "4rem 2rem", textAlign: "center" }}>
         <h2 style={{ color: "var(--text-primary)" }}>Loading Credit Card Details...</h2>
         <p style={{ color: "var(--text-secondary)", marginTop: "1rem" }}>Searching the select registry for {slug}</p>
-        <Link href={`/credit-card/${countrySlug}`} className="btn btn-primary" style={{ marginTop: "2rem" }}>
+        <Link href={`/${countrySlug}/credit-card`} className="btn btn-primary" style={{ marginTop: "2rem" }}>
           Back to Credit Cards
         </Link>
       </div>
@@ -66,7 +66,7 @@ export default function CardReviewPage() {
       {/* Breadcrumbs */}
       <nav style={{ marginBottom: "1.5rem", fontSize: "0.85rem", color: "var(--text-secondary)" }}>
         <Link href="/">Select</Link> &gt;{" "}
-        <Link href={`/credit-card/${countrySlug}`}>Credit Cards</Link> &gt;{" "}
+        <Link href={`/${countrySlug}/credit-card`}>Credit Cards</Link> &gt;{" "}
         <span style={{ color: "var(--text-primary)", fontWeight: "500" }}>{card.name}</span>
       </nav>
 

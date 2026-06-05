@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { PAYMENT_APPS_DATA } from "../../../data/paymentAppsData";
+import { PAYMENT_APPS_DATA } from "@/data/paymentAppsData";
 
 const COUNTRY_MAP: Record<string, { name: string; title: string }> = {
   "india": { name: "India", title: "India" },
@@ -39,7 +39,7 @@ export default function PaymentAppsCountryPage() {
       {/* Country Selection Tabs — now links for SEO */}
       <div style={{ display: "flex", gap: "1rem", marginBottom: "2.25rem", flexWrap: "wrap" }}>
         <Link
-          href="/payment-apps/india"
+          href="/india/payment-apps"
           className="btn"
           style={{
             background: countrySlug === "india" ? "rgba(var(--primary-rgb), 0.08)" : "rgba(255,255,255,0.01)",
@@ -58,7 +58,7 @@ export default function PaymentAppsCountryPage() {
           🇮🇳 India Apps
         </Link>
         <Link
-          href="/payment-apps/united-states"
+          href="/united-states/payment-apps"
           className="btn"
           style={{
             background: countrySlug === "united-states" ? "rgba(var(--primary-rgb), 0.08)" : "rgba(255,255,255,0.01)",
@@ -77,7 +77,7 @@ export default function PaymentAppsCountryPage() {
           🇺🇸 United States Apps
         </Link>
         <Link
-          href="/payment-apps/united-kingdom"
+          href="/united-kingdom/payment-apps"
           className="btn"
           style={{
             background: countrySlug === "united-kingdom" ? "rgba(var(--primary-rgb), 0.08)" : "rgba(255,255,255,0.01)",
@@ -167,7 +167,7 @@ export default function PaymentAppsCountryPage() {
                   </span>
                 </div>
                 <Link 
-                  href={`/payment-apps/${countrySlug}/${app.slug}`}
+                  href={`/${countrySlug}/payment-apps/${app.slug}`}
                   className="btn btn-primary"
                   style={{ padding: "0.45rem 1rem", fontSize: "0.8rem", borderRadius: "8px", textDecoration: "none" }}
                 >

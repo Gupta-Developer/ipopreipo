@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 
 
@@ -29,6 +29,15 @@ const NAV_ITEMS = [
 
 export default function Navbar() {
   const pathname = usePathname();
+  const params = useParams();
+  const country = (params?.country as string) || "india";
+
+  const getDynamicHref = (href: string) => {
+    if (href === "/") return "/";
+    const segment = href.split("/")[1];
+    return `/${country}/${segment}`;
+  };
+
   const { user, logout } = useAuth();
   const [currentTheme, setCurrentTheme] = useState("indigo");
   const [themeMode, setThemeMode]       = useState("light");
@@ -133,11 +142,12 @@ export default function Navbar() {
           {/* Desktop Nav */}
           <nav className="nb-nav" aria-label="Primary">
             {NAV_ITEMS.map((item) => {
-              const active = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href.substring(0, item.href.lastIndexOf("/"))));
+              const dynamicHref = getDynamicHref(item.href);
+              const active = pathname === dynamicHref || (dynamicHref !== "/" && pathname.startsWith(dynamicHref));
               return (
                 <Link
                   key={item.href}
-                  href={item.href}
+                  href={dynamicHref}
                   className={`nb-link${active ? " nb-link-active" : ""}`}
                 >
                   {item.label}
@@ -254,7 +264,7 @@ export default function Navbar() {
                 )}
               </div>
             ) : (
-              <Link href="/login" className="btn btn-primary" style={{ padding: "0.45rem 1rem", fontSize: "0.82rem", borderRadius: "8px", textDecoration: "none", fontWeight: 700, display: "inline-flex", alignItems: "center" }}>
+              <Link href={getDynamicHref("/login")} className="btn btn-primary" style={{ padding: "0.45rem 1rem", fontSize: "0.82rem", borderRadius: "8px", textDecoration: "none", fontWeight: 700, display: "inline-flex", alignItems: "center" }}>
                 Sign In
               </Link>
             )}
@@ -305,9 +315,10 @@ export default function Navbar() {
         <nav className="nb-drawer-nav">
           <div className="nb-drawer-section-label">Navigation</div>
            {NAV_ITEMS.map((item) => {
-            const active = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href.substring(0, item.href.lastIndexOf("/"))));
+            const dynamicHref = getDynamicHref(item.href);
+            const active = pathname === dynamicHref || (dynamicHref !== "/" && pathname.startsWith(dynamicHref));
             return (
-              <Link key={item.href} href={item.href} className={`nb-drawer-link${active ? " nb-drawer-link-active" : ""}`}>
+              <Link key={item.href} href={dynamicHref} className={`nb-drawer-link${active ? " nb-drawer-link-active" : ""}`}>
                 <span style={{ width: 6, height: 6, borderRadius: "50%", background: active ? `rgb(var(--primary-rgb))` : "var(--text-muted)", flexShrink: 0, display: "block", marginTop: 1 }} />
                 {item.label}
                 {user && <span style={{ marginLeft: "auto", fontSize: "0.7rem", color: `rgb(var(--primary-rgb))`, fontWeight: 700 }}>Active</span>}
@@ -341,7 +352,7 @@ export default function Navbar() {
           ) : (
             <div style={{ padding: "0 0.5rem" }}>
               <Link 
-                href="/login" 
+                href={getDynamicHref("/login")} 
                 className="btn btn-primary" 
                 onClick={() => setMobileOpen(false)}
                 style={{ display: "block", textAlign: "center", textDecoration: "none", padding: "0.55rem", borderRadius: "8px", fontSize: "0.85rem", fontWeight: 700 }}

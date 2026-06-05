@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { BANKS_DATA } from "../../../data/banksData";
+import { BANKS_DATA } from "@/data/banksData";
 
 const COUNTRY_MAP: Record<string, { code: string; name: string; title: string }> = {
   "india": { code: "india", name: "India", title: "India" },
@@ -39,7 +39,7 @@ export default function BankAccountsCountryPage() {
       {/* Country Selection Tabs */}
       <div style={{ display: "flex", gap: "1rem", marginBottom: "2.25rem", flexWrap: "wrap" }}>
         <Link
-          href="/bank-accounts/india"
+          href="/india/bank-accounts"
           className="btn"
           style={{
             background: selectedCountrySlug === "india" ? "rgba(var(--primary-rgb), 0.08)" : "rgba(255,255,255,0.01)",
@@ -58,7 +58,7 @@ export default function BankAccountsCountryPage() {
           🇮🇳 India Banks
         </Link>
         <Link
-          href="/bank-accounts/united-states"
+          href="/united-states/bank-accounts"
           className="btn"
           style={{
             background: selectedCountrySlug === "united-states" ? "rgba(var(--primary-rgb), 0.08)" : "rgba(255,255,255,0.01)",
@@ -77,7 +77,7 @@ export default function BankAccountsCountryPage() {
           🇺🇸 United States Banks
         </Link>
         <Link
-          href="/bank-accounts/united-kingdom"
+          href="/united-kingdom/bank-accounts"
           className="btn"
           style={{
             background: selectedCountrySlug === "united-kingdom" ? "rgba(var(--primary-rgb), 0.08)" : "rgba(255,255,255,0.01)",
@@ -183,7 +183,7 @@ export default function BankAccountsCountryPage() {
                   </span>
                 </div>
                 <Link 
-                  href={`/bank-accounts/${countrySlug}/${bank.slug}`}
+                  href={`/${countrySlug}/bank-accounts/${bank.slug}`}
                   className="btn btn-primary"
                   style={{ padding: "0.45rem 1rem", fontSize: "0.8rem", borderRadius: "8px", textDecoration: "none" }}
                 >

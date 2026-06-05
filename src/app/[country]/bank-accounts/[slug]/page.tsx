@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { BANKS_DATA } from "../../../../data/banksData";
+import { BANKS_DATA } from "@/data/banksData";
 
 export default function BankDetailPage() {
   const params = useParams();
@@ -21,7 +21,7 @@ export default function BankDetailPage() {
       <div className="app-container" style={{ padding: "4rem 2rem", textAlign: "center" }}>
         <h2 style={{ color: "var(--text-primary)" }}>Loading Bank Details...</h2>
         <p style={{ color: "var(--text-secondary)", marginTop: "1rem" }}>Searching Directory...</p>
-        <Link href={`/bank-accounts/${countrySlug}`} className="btn btn-primary" style={{ marginTop: "2rem" }}>
+        <Link href={`/${countrySlug}/bank-accounts`} className="btn btn-primary" style={{ marginTop: "2rem" }}>
           Back to Directory
         </Link>
       </div>
@@ -44,7 +44,7 @@ export default function BankDetailPage() {
       <nav style={{ display: "flex", gap: "0.5rem", fontSize: "0.8rem", color: "var(--text-secondary)", marginBottom: "1.5rem" }}>
         <Link href="/" style={{ color: "var(--primary)" }}>Select</Link>
         <span>&gt;</span>
-        <Link href={`/bank-accounts/${countrySlug}`} style={{ color: "var(--primary)" }}>Bank Accounts</Link>
+        <Link href={`/${countrySlug}/bank-accounts`} style={{ color: "var(--primary)" }}>Bank Accounts</Link>
         <span>&gt;</span>
         <span style={{ color: "var(--text-primary)", fontWeight: 600 }}>{bank.name} Review</span>
       </nav>
@@ -115,7 +115,7 @@ export default function BankDetailPage() {
             >
               ❤️ {likes} Likes
             </button>
-            <Link href={`/bank-accounts/${countrySlug}`} className="btn btn-secondary" style={{ flex: 1, padding: "0.5rem 0.5rem", fontSize: "0.85rem", textAlign: "center", textDecoration: "none" }}>
+            <Link href={`/${countrySlug}/bank-accounts`} className="btn btn-secondary" style={{ flex: 1, padding: "0.5rem 0.5rem", fontSize: "0.85rem", textAlign: "center", textDecoration: "none" }}>
               Back
             </Link>
           </div>

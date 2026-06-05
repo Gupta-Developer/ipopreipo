@@ -3,25 +3,25 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { PAYMENT_APPS_DATA } from "../../../../data/paymentAppsData";
+import { CRYPTO_APPS_DATA } from "@/data/cryptoAppsData";
 
-export default function PaymentAppDetailPage() {
+export default function CryptoAppDetailPage() {
   const params = useParams();
   const countrySlug = (params?.country as string) || "india";
   const slug = params?.slug as string;
-  const app = PAYMENT_APPS_DATA.find((a) => a.slug === slug);
+  const app = CRYPTO_APPS_DATA.find((a) => a.slug === slug);
 
   // Likes & Tabs states
   const [likes, setLikes] = useState(app ? app.likes : 0);
   const [liked, setLiked] = useState(false);
-  const [activeTab, setActiveTab] = useState<"specs" | "fees" | "reviews" >("specs");
+  const [activeTab, setActiveTab] = useState<"specs" | "fees" | "reviews">("specs");
 
   if (!app) {
     return (
       <div className="app-container" style={{ padding: "4rem 2rem", textAlign: "center" }}>
-        <h2 style={{ color: "var(--text-primary)" }}>Loading Payment App Details...</h2>
-        <p style={{ color: "var(--text-secondary)", marginTop: "1rem" }}>Searching Select Registry...</p>
-        <Link href={`/payment-apps/${countrySlug}`} className="btn btn-primary" style={{ marginTop: "2rem" }}>
+        <h2 style={{ color: "var(--text-primary)" }}>Loading Crypto App Details...</h2>
+        <p style={{ color: "var(--text-secondary)", marginTop: "1rem" }}>Searching Registry...</p>
+        <Link href={`/${countrySlug}/crypto`} className="btn btn-primary" style={{ marginTop: "2rem" }}>
           Back to Directory
         </Link>
       </div>
@@ -44,7 +44,7 @@ export default function PaymentAppDetailPage() {
       <nav style={{ display: "flex", gap: "0.5rem", fontSize: "0.8rem", color: "var(--text-secondary)", marginBottom: "1.5rem" }}>
         <Link href="/" style={{ color: "var(--primary)" }}>Select</Link>
         <span>&gt;</span>
-        <Link href={`/payment-apps/${countrySlug}`} style={{ color: "var(--primary)" }}>Payment Apps</Link>
+        <Link href={`/${countrySlug}/crypto`} style={{ color: "var(--primary)" }}>Crypto Apps</Link>
         <span>&gt;</span>
         <span style={{ color: "var(--text-primary)", fontWeight: 600 }}>{app.name} Review</span>
       </nav>
@@ -92,7 +92,7 @@ export default function PaymentAppDetailPage() {
               boxShadow: `0 10px 20px ${app.logoColor}30`
             }}
           >
-            Download {app.name} App
+            Open Verified Account
           </button>
           
           <div style={{ display: "flex", gap: "0.5rem" }}>
@@ -110,7 +110,7 @@ export default function PaymentAppDetailPage() {
             >
               ❤️ {likes} Likes
             </button>
-            <Link href={`/payment-apps/${countrySlug}`} className="btn btn-secondary" style={{ flex: 1, padding: "0.5rem 0.5rem", fontSize: "0.85rem", textAlign: "center", textDecoration: "none" }}>
+            <Link href={`/${countrySlug}/crypto`} className="btn btn-secondary" style={{ flex: 1, padding: "0.5rem 0.5rem", fontSize: "0.85rem", textAlign: "center", textDecoration: "none" }}>
               Back
             </Link>
           </div>
@@ -132,7 +132,7 @@ export default function PaymentAppDetailPage() {
             cursor: "pointer"
           }}
         >
-          Limits & specs
+          App parameters
         </button>
         <button 
           onClick={() => setActiveTab("fees")} 
@@ -147,7 +147,7 @@ export default function PaymentAppDetailPage() {
             cursor: "pointer"
           }}
         >
-          Fees & Charges
+          Fees & Limits
         </button>
         <button 
           onClick={() => setActiveTab("reviews")} 
@@ -174,29 +174,32 @@ export default function PaymentAppDetailPage() {
           {/* Main specifications grids */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }} className="m-flex-column">
             
-            {/* Spec Card: Transaction Limits */}
-            <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-              <h3 style={{ borderBottom: "1px solid var(--border-color)", paddingBottom: "0.5rem", fontSize: "1.1rem", color: "var(--primary)" }}>Transaction Limits</h3>
-              <div>
-                <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Daily Cumulative Limit</span>
-                <div style={{ fontSize: "1.1rem", fontWeight: "700", marginTop: "0.15rem", color: "var(--text-primary)" }}>{app.limits.dailyLimit}</div>
-              </div>
-              <div>
-                <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Per Transaction Ticket Limit</span>
-                <div style={{ fontSize: "1.1rem", fontWeight: "700", marginTop: "0.15rem", color: "var(--text-primary)" }}>{app.limits.transactionLimit}</div>
-              </div>
-            </div>
-
             {/* Spec Card: Technical & Support specs */}
             <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-              <h3 style={{ borderBottom: "1px solid var(--border-color)", paddingBottom: "0.5rem", fontSize: "1.1rem", color: "var(--warning)" }}>System Parameters</h3>
+              <h3 style={{ borderBottom: "1px solid var(--border-color)", paddingBottom: "0.5rem", fontSize: "1.1rem", color: "var(--primary)" }}>System Parameters</h3>
               <div>
                 <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Supported App Ecosystems</span>
                 <div style={{ fontSize: "1.1rem", fontWeight: "700", marginTop: "0.15rem" }}>{app.platforms.join(", ")}</div>
               </div>
               <div>
                 <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Target Country</span>
-                <div style={{ fontSize: "1.1rem", fontWeight: "700", marginTop: "0.15rem", color: "var(--warning)" }}>{app.country}</div>
+                <div style={{ fontSize: "1.1rem", fontWeight: "700", marginTop: "0.15rem", color: "var(--primary)" }}>{app.country}</div>
+              </div>
+            </div>
+
+            {/* Spec Card: Feature List */}
+            <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+              <h3 style={{ borderBottom: "1px solid var(--border-color)", paddingBottom: "0.5rem", fontSize: "1.1rem", color: "var(--warning)" }}>Feature Checklist</h3>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
+                {Object.entries(app.features).map(([key, value]) => {
+                  const formatted = key.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase());
+                  return (
+                    <div key={key} style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.85rem" }}>
+                      <span style={{ color: value ? "var(--success)" : "var(--danger)", fontWeight: "bold" }}>{value ? "✓" : "×"}</span>
+                      <span>{formatted}</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
@@ -231,24 +234,36 @@ export default function PaymentAppDetailPage() {
       )}
 
       {activeTab === "fees" && (
-        <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-          <h3 style={{ fontSize: "1.3rem" }}>Standard Transaction Charges</h3>
-          <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "-1rem" }}>
-            Charges billed dynamically to your account based on payment funding method.
-          </p>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }} className="m-flex-column">
+          <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+            <h3 style={{ fontSize: "1.3rem" }}>Standard Trading Charges</h3>
+            <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+              <div style={{ borderBottom: "1px solid var(--border-color)", paddingBottom: "0.75rem" }}>
+                <strong style={{ fontSize: "0.95rem", color: "var(--text-primary)" }}>Maker Trading Fee</strong>
+                <div style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "0.25rem" }}>{app.charges.makerFee}</div>
+              </div>
+              <div style={{ borderBottom: "1px solid var(--border-color)", paddingBottom: "0.75rem" }}>
+                <strong style={{ fontSize: "0.95rem", color: "var(--text-primary)" }}>Taker Trading Fee</strong>
+                <div style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "0.25rem" }}>{app.charges.takerFee}</div>
+              </div>
+              <div>
+                <strong style={{ fontSize: "0.95rem", color: "var(--text-primary)" }}>Withdrawal Fees</strong>
+                <div style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "0.25rem" }}>{app.charges.withdrawalFee}</div>
+              </div>
+            </div>
+          </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-            <div style={{ borderBottom: "1px solid var(--border-color)", paddingBottom: "0.75rem" }}>
-              <strong style={{ fontSize: "0.95rem", color: "var(--text-primary)" }}>Wallet Loading Charges</strong>
-              <div style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "0.25rem" }}>{app.charges.walletLoading}</div>
-            </div>
-            <div style={{ borderBottom: "1px solid var(--border-color)", paddingBottom: "0.75rem" }}>
-              <strong style={{ fontSize: "0.95rem", color: "var(--text-primary)" }}>Bank Transfer / Outgoing Payout Charges</strong>
-              <div style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "0.25rem" }}>{app.charges.bankTransfer}</div>
-            </div>
-            <div>
-              <strong style={{ fontSize: "0.95rem", color: "var(--text-primary)" }}>Card Transaction Charges</strong>
-              <div style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "0.25rem" }}>{app.charges.cardPayments}</div>
+          <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+            <h3 style={{ fontSize: "1.3rem" }}>Platform Limits</h3>
+            <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+              <div style={{ borderBottom: "1px solid var(--border-color)", paddingBottom: "0.75rem" }}>
+                <strong style={{ fontSize: "0.95rem", color: "var(--text-primary)" }}>Daily Outgoing/Withdrawal limit</strong>
+                <div style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "0.25rem" }}>{app.limits.dailyWithdrawal}</div>
+              </div>
+              <div>
+                <strong style={{ fontSize: "0.95rem", color: "var(--text-primary)" }}>Minimum Deposit Requirement</strong>
+                <div style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "0.25rem" }}>{app.limits.minimumDeposit}</div>
+              </div>
             </div>
           </div>
         </div>
@@ -262,7 +277,7 @@ export default function PaymentAppDetailPage() {
             <h3 style={{ fontSize: "1.2rem", borderBottom: "1px solid var(--border-color)", paddingBottom: "0.5rem" }}>Expert Rating Score</h3>
             <div>
               <div className="flex-between" style={{ fontSize: "0.85rem", marginBottom: "0.25rem" }}>
-                <span>Transaction Speed</span>
+                <span>Execution Speed</span>
                 <strong style={{ color: "var(--success)" }}>{app.categoryRatings.speed} / 5.0</strong>
               </div>
               <div style={{ height: "4px", background: "rgba(255,255,255,0.05)", borderRadius: "99px" }}>
@@ -280,7 +295,7 @@ export default function PaymentAppDetailPage() {
             </div>
             <div>
               <div className="flex-between" style={{ fontSize: "0.85rem", marginBottom: "0.25rem" }}>
-                <span>Security Infrastructure</span>
+                <span>Security Standards</span>
                 <strong style={{ color: "var(--warning)" }}>{app.categoryRatings.security} / 5.0</strong>
               </div>
               <div style={{ height: "4px", background: "rgba(255,255,255,0.05)", borderRadius: "99px" }}>
@@ -297,14 +312,14 @@ export default function PaymentAppDetailPage() {
             </div>
             <div className="card">
               <h4 style={{ color: "var(--success)", fontSize: "1.1rem", marginBottom: "0.5rem" }}>Charges & Fee Transparency</h4>
-              <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.5 }}>{app.detailedReview.charges}</p>
+              <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.5 }}>{app.detailedReview.fees}</p>
             </div>
             <div className="card">
               <h4 style={{ color: "var(--warning)", fontSize: "1.1rem", marginBottom: "0.5rem" }}>Onboarding & Setup Speed</h4>
               <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.5 }}>{app.detailedReview.onboarding}</p>
             </div>
             <div className="card">
-              <h4 style={{ color: "var(--text-primary)", fontSize: "1.1rem", marginBottom: "0.5rem" }}>Security Controls & Shielding</h4>
+              <h4 style={{ color: "var(--text-primary)", fontSize: "1.1rem", marginBottom: "0.5rem" }}>Security Controls & Auditing</h4>
               <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.5 }}>{app.detailedReview.security}</p>
             </div>
           </div>

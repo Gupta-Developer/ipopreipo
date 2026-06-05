@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { BROKERS_DATA } from "../../data/brokersData";
+import { BROKERS_DATA } from "@/data/brokersData";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type CalcId = "sip" | "lumpsum" | "emi" | "fd" | "brokerage" | "ipo" | "cagr" | "ppf";

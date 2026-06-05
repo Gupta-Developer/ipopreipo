@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { CRYPTO_APPS_DATA } from "../../../data/cryptoAppsData";
+import { CRYPTO_APPS_DATA } from "@/data/cryptoAppsData";
 
 const COUNTRY_MAP: Record<string, { name: string; title: string }> = {
   "india": { name: "India", title: "India" },
@@ -50,7 +50,7 @@ export default function CryptoAppsCountryPage() {
           return (
             <Link
               key={slug}
-              href={`/crypto/${slug}`}
+              href={`/${slug}/crypto`}
               className="btn"
               style={{
                 background: isActive ? "rgba(var(--primary-rgb), 0.08)" : "rgba(255,255,255,0.01)",
@@ -169,7 +169,7 @@ export default function CryptoAppsCountryPage() {
                   </span>
                 </div>
                 <Link 
-                  href={`/crypto/${countrySlug}/${app.slug}`}
+                  href={`/${countrySlug}/crypto/${app.slug}`}
                   className="btn btn-primary"
                   style={{ padding: "0.45rem 1rem", fontSize: "0.8rem", borderRadius: "8px", textDecoration: "none" }}
                 >
