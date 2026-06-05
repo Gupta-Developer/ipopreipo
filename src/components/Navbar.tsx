@@ -16,6 +16,7 @@ const THEMES = [
 
 const NAV_ITEMS = [
   { label: "Home",         href: "/" },
+  { label: "Select",       href: "/select" },
   { label: "IPO Tracker",  href: "/ipo" },
   { label: "Pre-IPO",      href: "/preipo" },
   { label: "Bank Accounts", href: "/bank-accounts/india" },
