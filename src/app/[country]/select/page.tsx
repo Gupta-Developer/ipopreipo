@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { BANKS_DATA } from "@/data/banksData";
 import { CREDIT_CARDS_CATALOG } from "@/data/cardsData";
 import { PAYMENT_APPS_DATA } from "@/data/paymentAppsData";
@@ -15,23 +15,22 @@ const COUNTRY_MAP: Record<string, { name: string; title: string; flag: string }>
   "united-kingdom": { name: "United Kingdom", title: "the United Kingdom", flag: "🇬🇧" }
 };
 
-export default function SelectFinologyPage() {
+export default function SelectFinologyDashboard() {
   const params = useParams();
-  const router = useRouter();
   const countrySlug = (params?.country as string) || "india";
   const countryInfo = COUNTRY_MAP[countrySlug] || COUNTRY_MAP["india"];
 
   const [searchQuery, setSearchQuery] = useState("");
   const [showResults, setShowResults] = useState(false);
 
-  // Filter products count
+  // Filter local country data
   const banks = BANKS_DATA.filter(b => b.countrySlug === countrySlug);
   const cards = CREDIT_CARDS_CATALOG.filter(c => c.country.toLowerCase() === countryInfo.name.toLowerCase());
   const payments = PAYMENT_APPS_DATA.filter(p => p.country.toLowerCase() === countryInfo.name.toLowerCase());
   const crypto = CRYPTO_APPS_DATA.filter(c => c.country.toLowerCase() === countryInfo.name.toLowerCase());
   const brokers = BROKERS_DATA.filter(b => b.countryName.toLowerCase() === countryInfo.name.toLowerCase());
 
-  // Universal search logic
+  // Universal search dropdown matching
   const allSearchable = [
     ...banks.map(b => ({ name: b.name, category: "Bank Account", link: `/${countrySlug}/bank-accounts/${b.slug}` })),
     ...cards.map(c => ({ name: c.name, category: "Credit Card", link: `/${countrySlug}/credit-card/${c.slug}` })),
@@ -45,7 +44,6 @@ export default function SelectFinologyPage() {
     : [];
 
   const handleCountryChange = (slug: string) => {
-    // Determine dynamic link
     if (typeof window !== "undefined") {
       const hostname = window.location.hostname;
       const isLocal = hostname.includes("localhost");
@@ -55,324 +53,453 @@ export default function SelectFinologyPage() {
     }
   };
 
-  const productSuites = [
-    {
-      title: "Credit Cards",
-      description: "Compare reward points value, cash back waivers & lounge access.",
-      count: cards.length,
-      icon: "💳",
-      link: `/${countrySlug}/credit-card`,
-      color: "#6366f1",
-      badge: "Rewards & Miles"
-    },
-    {
-      title: "Bank Accounts",
-      description: "Compare high-yield interest rates, digital onboarding & minimum balance.",
-      count: banks.length,
-      icon: "🏦",
-      link: `/${countrySlug}/bank-accounts`,
-      color: "#10b981",
-      badge: "Savings & Digital"
-    },
-    {
-      title: "Payment Apps",
-      description: "Compare wallet charges, daily limits, UPI channels & app speed.",
-      count: payments.length,
-      icon: "📱",
-      link: `/${countrySlug}/payment-apps`,
-      color: "#f59e0b",
-      badge: "UPI & Wallets"
-    },
-    {
-      title: "Crypto Apps",
-      description: "Compare maker/taker commissions, deposit thresholds & security compliance.",
-      count: crypto.length,
-      icon: "🪙",
-      link: `/${countrySlug}/crypto`,
-      color: "#ef4444",
-      badge: "Exchanges & Wallets"
-    }
-  ];
-
-  // Top Pick selections for display
-  const topCard = cards[0];
-  const topBank = banks[0];
-  const topBroker = brokers[0];
-
   return (
     <div className="app-container" style={{ paddingTop: "2.5rem" }}>
       
-      {/* Dynamic Subdomain Header */}
-      <section style={{ textAlign: "center", marginBottom: "3.5rem", position: "relative" }}>
-        {/* Glow grid background */}
+      {/* ── Finology Select Style Header ────────────────────────────────────────── */}
+      <section style={{ marginBottom: "4rem", position: "relative" }}>
+        
+        {/* Glow behind */}
         <div style={{
           position: "absolute",
           top: "-50px",
-          left: "50%",
-          transform: "translateX(-50%)",
-          width: "100%",
-          maxWidth: "800px",
-          height: "260px",
-          background: "radial-gradient(circle, rgba(var(--primary-rgb), 0.08) 0%, transparent 68%)",
-          filter: "blur(40px)",
-          pointerEvents: "none",
-          zIndex: 0
+          left: "20%",
+          width: "450px",
+          height: "220px",
+          background: "radial-gradient(circle, rgba(var(--primary-rgb), 0.08) 0%, transparent 70%)",
+          filter: "blur(50px)",
+          pointerEvents: "none"
         }} />
 
-        <div style={{ position: "relative", zIndex: 1 }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", background: "rgba(var(--primary-rgb), 0.05)", border: "1px solid rgba(var(--primary-rgb), 0.15)", padding: "0.4rem 1.25rem", borderRadius: "99px", marginBottom: "1.25rem" }}>
-            <span style={{ color: "var(--primary)", fontWeight: "bold", fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-              ⭐ Finology Inspired Select Hub
-            </span>
-          </div>
-
-          <h1 style={{ fontSize: "3.2rem", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.15 }}>
-            Which financial product are <br/>
-            you looking to <span className="text-gradient-purple">select today?</span>
-          </h1>
-          <p style={{ color: "var(--text-secondary)", fontSize: "1.1rem", marginTop: "1rem", maxWidth: "600px", margin: "1rem auto 2.5rem auto", lineHeight: 1.5 }}>
-            Unbiased reviews, transparent comparison metrics, and rate trackers. Choose your product suite to begin.
-          </p>
-
-          {/* Search bar inspired by Finology */}
-          <div style={{ maxWidth: "580px", margin: "0 auto", position: "relative" }}>
-            <div style={{ position: "relative", boxShadow: "0 8px 30px rgba(0,0,0,0.12)", borderRadius: "14px" }}>
-              <span style={{ position: "absolute", left: "1.25rem", top: "50%", transform: "translateY(-50%)", fontSize: "1.1rem" }}>🔍</span>
-              <input
-                type="text"
-                placeholder="Search for credit cards, banks, brokers (e.g. SBI, Groww)..."
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setShowResults(true);
-                }}
-                onFocus={() => setShowResults(true)}
-                className="input-field"
-                style={{ paddingLeft: "3rem", paddingRight: "1.25rem", paddingTop: "0.95rem", paddingBottom: "0.95rem", fontSize: "0.95rem", borderRadius: "14px", border: "1px solid var(--border-color)", background: "var(--card-bg)" }}
-              />
-            </div>
-
-            {/* Live Dropdown search results */}
-            {showResults && searchQuery && (
-              <div 
-                className="card"
-                style={{ 
-                  position: "absolute", 
-                  top: "105%", 
-                  left: 0, 
-                  right: 0, 
-                  zIndex: 200, 
-                  padding: "0.75rem", 
-                  textAlign: "left",
-                  boxShadow: "0 12px 40px rgba(0,0,0,0.2)"
-                }}
-              >
-                <div style={{ fontSize: "0.7rem", textTransform: "uppercase", color: "var(--text-muted)", padding: "0.25rem 0.5rem", letterSpacing: "0.05em", fontWeight: 700 }}>
-                  Matching Products
-                </div>
-                {searchResults.length === 0 ? (
-                  <div style={{ padding: "0.75rem 0.5rem", color: "var(--text-secondary)", fontSize: "0.85rem" }}>
-                    No matching products found. Try another query.
-                  </div>
-                ) : (
-                  searchResults.map((item, index) => (
-                    <Link
-                      key={index}
-                      href={item.link}
-                      onClick={() => setShowResults(false)}
-                      style={{ 
-                        display: "flex", 
-                        justifyContent: "space-between", 
-                        alignItems: "center", 
-                        padding: "0.6rem 0.5rem", 
-                        borderRadius: "8px", 
-                        textDecoration: "none",
-                        transition: "background 0.15s"
-                      }}
-                      className="search-result-item"
-                    >
-                      <strong style={{ fontSize: "0.9rem", color: "var(--text-primary)" }}>{item.name}</strong>
-                      <span className="badge badge-primary" style={{ fontSize: "0.65rem" }}>{item.category}</span>
-                    </Link>
-                  ))
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Country flag switches */}
-          <div style={{ display: "flex", justifyContent: "center", gap: "0.75rem", marginTop: "2rem", flexWrap: "wrap" }}>
-            {Object.entries(COUNTRY_MAP).map(([slug, info]) => (
-              <button
-                key={slug}
-                onClick={() => handleCountryChange(slug)}
-                className="btn"
-                style={{
-                  background: countrySlug === slug ? "rgba(var(--primary-rgb), 0.08)" : "rgba(255,255,255,0.01)",
-                  borderColor: countrySlug === slug ? "var(--primary)" : "rgba(255,255,255,0.06)",
-                  borderStyle: "solid",
-                  borderWidth: "1px",
-                  color: countrySlug === slug ? "var(--text-primary)" : "var(--text-secondary)",
-                  padding: "0.45rem 1.1rem",
-                  fontSize: "0.82rem",
-                  borderRadius: "99px",
-                  fontWeight: countrySlug === slug ? "700" : "500",
-                  cursor: "pointer"
-                }}
-              >
-                {info.flag} {info.name}
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Grid Suite Products */}
-      <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "1.75rem", marginBottom: "4rem" }}>
-        {productSuites.map((s, idx) => (
-          <div 
-            key={idx} 
-            className="card select-product-card"
-            style={{ 
-              padding: "1.75rem", 
-              display: "flex", 
-              flexDirection: "column", 
-              justifyContent: "space-between",
-              height: "100%",
-              transition: "transform 0.2s, box-shadow 0.2s"
-            }}
-          >
-            <div>
-              <div className="flex-between" style={{ marginBottom: "1.25rem" }}>
-                <div style={{ width: "46px", height: "46px", borderRadius: "10px", background: `${s.color}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.6rem", color: s.color, border: `1px solid ${s.color}25` }}>
-                  {s.icon}
-                </div>
-                <span className="badge badge-secondary" style={{ fontSize: "0.65rem", padding: "0.2rem 0.5rem" }}>{s.badge}</span>
-              </div>
-              <h3 style={{ fontSize: "1.35rem", fontWeight: 800, color: "var(--text-primary)" }}>{s.title}</h3>
-              <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", lineHeight: 1.45, marginTop: "0.4rem" }}>{s.description}</p>
-            </div>
-
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderTop: "1px solid var(--border-color)", paddingTop: "1rem", marginTop: "1.5rem" }}>
-              <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 600 }}>{s.count} Products Listed</span>
-              <Link
-                href={s.link}
-                className="btn btn-secondary"
-                style={{ padding: "0.4rem 1rem", fontSize: "0.78rem", borderRadius: "8px", textDecoration: "none" }}
-              >
-                Explore →
-              </Link>
-            </div>
-          </div>
-        ))}
-      </section>
-
-      {/* Handpicked Picks - Curated Recommendations */}
-      <section style={{ marginBottom: "4rem" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "1.75rem", flexWrap: "wrap", gap: "0.5rem" }}>
-          <div>
-            <h2 style={{ fontSize: "1.6rem", fontWeight: 800 }}>Handpicked Recommendations</h2>
-            <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>Top rated items curated for you in {countryInfo.title}</p>
-          </div>
-          <Link href={`/${countrySlug}/compare`} style={{ fontSize: "0.85rem", color: "var(--primary)", fontWeight: 700, textDecoration: "none" }}>
-            Open Comparison Hub →
-          </Link>
-        </div>
-
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "1.5rem" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "3rem", alignItems: "center", position: "relative", zIndex: 1 }}>
           
-          {/* Pick 1: Card */}
-          {topCard && (
-            <div className="card" style={{ padding: "1.5rem", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-              <div>
-                <div className="flex-between">
-                  <span style={{ fontSize: "0.65rem", textTransform: "uppercase", color: "var(--text-muted)", fontWeight: 700, letterSpacing: "0.05em" }}>Top Pick Credit Card</span>
-                  <span className="badge badge-success" style={{ fontSize: "0.6rem" }}>★ {topCard.overallRating} Rating</span>
-                </div>
-                <h4 style={{ fontSize: "1.15rem", fontWeight: 800, marginTop: "0.75rem" }}>{topCard.name}</h4>
-                <p style={{ color: "var(--text-secondary)", fontSize: "0.78rem", marginTop: "0.25rem" }}>{topCard.description.slice(0, 110)}...</p>
-              </div>
-              <div className="flex-between" style={{ marginTop: "1.25rem", borderTop: "1px solid var(--border-color)", paddingTop: "0.75rem" }}>
-                <span style={{ fontSize: "0.75rem", color: "var(--text-primary)" }}>Fee: <strong>{topCard.fees.annualFee}</strong></span>
-                <Link href={`/${countrySlug}/credit-card/${topCard.slug}`} style={{ fontSize: "0.78rem", color: "var(--primary)", fontWeight: 700, textDecoration: "none" }}>
-                  View Deal →
-                </Link>
-              </div>
+          {/* Left Hero Content */}
+          <div>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", background: "rgba(16, 185, 129, 0.08)", border: "1px solid rgba(16, 185, 129, 0.2)", padding: "0.35rem 1rem", borderRadius: "99px", marginBottom: "1.5rem" }}>
+              <span style={{ fontSize: "0.75rem", fontWeight: "800", color: "#10b981", letterSpacing: "0.05em", textTransform: "uppercase" }}>
+                🎯 Independent Financial Reviews
+              </span>
             </div>
-          )}
 
-          {/* Pick 2: Bank Account */}
-          {topBank && (
-            <div className="card" style={{ padding: "1.5rem", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-              <div>
-                <div className="flex-between">
-                  <span style={{ fontSize: "0.65rem", textTransform: "uppercase", color: "var(--text-muted)", fontWeight: 700, letterSpacing: "0.05em" }}>Top Pick Bank Account</span>
-                  <span className="badge badge-success" style={{ fontSize: "0.6rem" }}>★ {topBank.rating} Rating</span>
-                </div>
-                <h4 style={{ fontSize: "1.15rem", fontWeight: 800, marginTop: "0.75rem" }}>{topBank.name}</h4>
-                <p style={{ color: "var(--text-secondary)", fontSize: "0.78rem", marginTop: "0.25rem" }}>Compare savings yields, neobank digital portals and ATM charge exemptions.</p>
-              </div>
-              <div className="flex-between" style={{ marginTop: "1.25rem", borderTop: "1px solid var(--border-color)", paddingTop: "0.75rem" }}>
-                <span style={{ fontSize: "0.75rem", color: "var(--success)", fontWeight: 700 }}>{topBank.interestRate} Interest</span>
-                <Link href={`/${countrySlug}/bank-accounts/${topBank.slug}`} style={{ fontSize: "0.78rem", color: "var(--primary)", fontWeight: 700, textDecoration: "none" }}>
-                  View Deal →
-                </Link>
-              </div>
+            <h1 style={{ fontSize: "3rem", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.15 }}>
+              Don't be a sales target.
+            </h1>
+            <p style={{ color: "var(--text-secondary)", fontSize: "1.1rem", marginTop: "1rem", lineHeight: 1.5 }}>
+              Cut the time-taking fuss with in-depth reviews, comparative metrics and verification checklists that make you go <strong>#BigOnLife</strong>.
+            </p>
+            
+            <div style={{ display: "flex", gap: "1rem", marginTop: "2rem" }}>
+              <a href="#featuredbrokers" className="btn btn-primary" style={{ padding: "0.75rem 1.75rem", fontSize: "0.88rem", borderRadius: "10px", textDecoration: "none" }}>
+                📈 Featured Brokers
+              </a>
+              <a href="#featuredcards" className="btn btn-secondary" style={{ padding: "0.75rem 1.75rem", fontSize: "0.88rem", borderRadius: "10px", textDecoration: "none" }}>
+                💳 Featured Cards
+              </a>
             </div>
-          )}
+          </div>
 
-          {/* Pick 3: Stock Broker */}
-          {topBroker && (
-            <div className="card" style={{ padding: "1.5rem", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-              <div>
-                <div className="flex-between">
-                  <span style={{ fontSize: "0.65rem", textTransform: "uppercase", color: "var(--text-muted)", fontWeight: 700, letterSpacing: "0.05em" }}>Top Pick Broker</span>
-                  <span className="badge badge-success" style={{ fontSize: "0.6rem" }}>★ {topBroker.rating} Rating</span>
-                </div>
-                <h4 style={{ fontSize: "1.15rem", fontWeight: 800, marginTop: "0.75rem" }}>{topBroker.name}</h4>
-                <p style={{ color: "var(--text-secondary)", fontSize: "0.78rem", marginTop: "0.25rem" }}>Leading {topBroker.type} stockbroker. Active userbase count of {topBroker.activeClients}.</p>
+          {/* Right Metrics & Trust Box */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+            
+            {/* Search Box */}
+            <div style={{ position: "relative", width: "100%" }}>
+              <strong style={{ fontSize: "0.75rem", color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.05em", display: "block", marginBottom: "0.5rem" }}>
+                Quick Search Products:
+              </strong>
+              <div style={{ position: "relative" }}>
+                <span style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)", fontSize: "1rem", opacity: 0.7 }}>🔍</span>
+                <input
+                  type="text"
+                  placeholder="Search brokers, credit cards, banks..."
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setShowResults(true);
+                  }}
+                  onFocus={() => setShowResults(true)}
+                  className="input-field"
+                  style={{ paddingLeft: "2.75rem", borderRadius: "12px", border: "1px solid var(--border-color)", paddingRight: "1rem", background: "var(--card-bg)" }}
+                />
               </div>
-              <div className="flex-between" style={{ marginTop: "1.25rem", borderTop: "1px solid var(--border-color)", paddingTop: "0.75rem" }}>
-                <span style={{ fontSize: "0.75rem", color: "var(--text-primary)" }}>Delivery: <strong>{topBroker.brokerage.delivery}</strong></span>
-                <Link href={`/${countrySlug}/brokers/${topBroker.slug}`} style={{ fontSize: "0.78rem", color: "var(--primary)", fontWeight: 700, textDecoration: "none" }}>
-                  View Deal →
-                </Link>
+
+              {/* Search dropdown */}
+              {showResults && searchQuery && (
+                <div className="card" style={{ position: "absolute", top: "105%", left: 0, right: 0, zIndex: 100, padding: "0.75rem", textAlign: "left", boxShadow: "0 10px 30px rgba(0,0,0,0.15)" }}>
+                  {searchResults.length === 0 ? (
+                    <div style={{ padding: "0.5rem", color: "var(--text-secondary)", fontSize: "0.85rem" }}>No matching records found.</div>
+                  ) : (
+                    searchResults.map((item, idx) => (
+                      <Link
+                        key={idx}
+                        href={item.link}
+                        onClick={() => setShowResults(false)}
+                        className="search-result-item"
+                        style={{ display: "flex", justifyContent: "space-between", padding: "0.5rem", borderRadius: "6px", textDecoration: "none", color: "inherit" }}
+                      >
+                        <span style={{ fontSize: "0.85rem", fontWeight: "700" }}>{item.name}</span>
+                        <span className="badge badge-primary" style={{ fontSize: "0.6rem" }}>{item.category}</span>
+                      </Link>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Metrics Trust Row */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1rem", borderTop: "1px solid var(--border-color)", paddingTop: "1.5rem" }}>
+              <div>
+                <strong style={{ fontSize: "1.6rem", fontWeight: 800, color: "var(--text-primary)" }}>1.5M+</strong>
+                <div style={{ fontSize: "0.72rem", color: "var(--text-secondary)", marginTop: "0.15rem" }}>Pageviews/mo</div>
+              </div>
+              <div>
+                <strong style={{ fontSize: "1.6rem", fontWeight: 800, color: "var(--primary)" }}>500K+</strong>
+                <div style={{ fontSize: "0.72rem", color: "var(--text-secondary)", marginTop: "0.15rem" }}>Happy Users</div>
+              </div>
+              <div>
+                <strong style={{ fontSize: "1.6rem", fontWeight: 800, color: "#10b981" }}>100%</strong>
+                <div style={{ fontSize: "0.72rem", color: "var(--text-secondary)", marginTop: "0.15rem" }}>Agenda Free</div>
               </div>
             </div>
-          )}
+
+            {/* Country Select */}
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
+              <span style={{ fontSize: "0.78rem", color: "var(--text-muted)", fontWeight: 700 }}>COUNTRY:</span>
+              {Object.entries(COUNTRY_MAP).map(([slug, info]) => (
+                <button
+                  key={slug}
+                  onClick={() => handleCountryChange(slug)}
+                  className="btn"
+                  style={{
+                    background: countrySlug === slug ? "rgba(var(--primary-rgb), 0.08)" : "rgba(255,255,255,0.01)",
+                    borderColor: countrySlug === slug ? "var(--primary)" : "rgba(255,255,255,0.06)",
+                    borderWidth: "1px",
+                    borderStyle: "solid",
+                    color: countrySlug === slug ? "var(--text-primary)" : "var(--text-secondary)",
+                    padding: "0.35rem 0.85rem",
+                    fontSize: "0.78rem",
+                    borderRadius: "99px",
+                    fontWeight: countrySlug === slug ? "700" : "500"
+                  }}
+                >
+                  {info.flag} {info.name}
+                </button>
+              ))}
+            </div>
+
+          </div>
 
         </div>
       </section>
 
-      {/* Comparative Banner */}
+      {/* ── Featured Split Suites ────────────────────────────────────────────────── */}
+      <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "2rem", marginBottom: "4rem" }}>
+        
+        {/* Panel 1 */}
+        <div style={{ background: "rgba(var(--primary-rgb), 0.02)", border: "1px solid rgba(var(--primary-rgb), 0.1)", borderRadius: "16px", padding: "2rem", display: "flex", flexDirection: "column", justifySelf: "stretch" }}>
+          <h2 style={{ fontSize: "1.6rem", fontWeight: 900, marginBottom: "0.5rem" }}>Brokers with no agenda.</h2>
+          <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", lineHeight: 1.5, marginBottom: "1.5rem" }}>
+            Compare and analyze top brokers with Select's no-nonsense data. We examine depositories, segments support, account setup fees, and leverage parameters.
+          </p>
+          <a href="#featuredbrokers" className="btn btn-primary" style={{ padding: "0.6rem 1.25rem", fontSize: "0.8rem", alignSelf: "flex-start", borderRadius: "8px", textDecoration: "none" }}>
+            📈 Featured Brokers ({brokers.length})
+          </a>
+        </div>
+
+        {/* Panel 2 */}
+        <div style={{ background: "rgba(16, 185, 129, 0.02)", border: "1px solid rgba(16, 185, 129, 0.1)", borderRadius: "16px", padding: "2rem", display: "flex", flexDirection: "column", justifySelf: "stretch" }}>
+          <h2 style={{ fontSize: "1.6rem", fontWeight: 900, marginBottom: "0.5rem" }}>Cards that don't rob.</h2>
+          <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", lineHeight: 1.5, marginBottom: "1.5rem" }}>
+            Give spending a solid boost. Select's hand-picked credit cards are designed to make your pocket thank you. Review lounge access, reward rates, and APR structures.
+          </p>
+          <a href="#featuredcards" className="btn btn-secondary" style={{ padding: "0.6rem 1.25rem", fontSize: "0.8rem", alignSelf: "flex-start", borderRadius: "8px", textDecoration: "none" }}>
+            💳 Featured Cards ({cards.length})
+          </a>
+        </div>
+
+      </section>
+
+      {/* ── Featured Brokers Section ───────────────────────────────────────────── */}
+      <section style={{ marginBottom: "4rem" }}>
+        <a id="featuredbrokers"></a>
+        <h2 style={{ fontSize: "1.8rem", fontWeight: 900, marginBottom: "1.5rem", borderBottom: "1px solid var(--border-color)", paddingBottom: "0.75rem" }}>
+          Featured Stock Brokers
+        </h2>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+          {brokers.length === 0 ? (
+            <div className="card" style={{ padding: "2rem", textAlign: "center", color: "var(--text-secondary)" }}>
+              No brokers registered for {countryInfo.title}.
+            </div>
+          ) : (
+            brokers.map((b) => {
+              const segments = [
+                { name: "Equity", ok: b.segments.equity },
+                { name: "Commodity", ok: b.segments.commodity },
+                { name: "Currency", ok: b.segments.currency },
+                { name: "Futures", ok: b.segments.futures },
+                { name: "Options", ok: b.segments.options }
+              ];
+
+              return (
+                <div key={b.slug} className="card" style={{ padding: "2rem" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(80px, 1fr))", gap: "2rem", alignItems: "start" }}>
+                    
+                    {/* Logo letter */}
+                    <div style={{ display: "flex", justifyContent: "center" }}>
+                      <div style={{ width: "84px", height: "84px", borderRadius: "14px", border: `2px solid ${b.logoColor}`, background: `${b.logoColor}0c`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "2rem", fontWeight: 900, color: b.logoColor }}>
+                        {b.logoLetter}
+                      </div>
+                    </div>
+
+                    {/* Details Column */}
+                    <div style={{ gridColumn: "span 5", display: "flex", flexDirection: "column", gap: "1rem" }}>
+                      
+                      {/* Name / Rating Row */}
+                      <div className="flex-between" style={{ flexWrap: "wrap", gap: "0.5rem" }}>
+                        <div>
+                          <h3 style={{ fontSize: "1.4rem", fontWeight: 800, display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                            {b.name}
+                            <span style={{ fontSize: "0.85rem", color: "var(--warning)", fontWeight: "bold" }}>
+                              ★ {b.rating}
+                            </span>
+                          </h3>
+                          <span className="badge badge-secondary" style={{ fontSize: "0.68rem", display: "inline-block", marginTop: "0.25rem" }}>
+                            {b.type}
+                          </span>
+                        </div>
+                        <Link href={`/${countrySlug}/brokers/${b.slug}`} className="btn btn-primary" style={{ padding: "0.45rem 1.25rem", fontSize: "0.82rem", borderRadius: "8px", textDecoration: "none" }}>
+                          Full Details Review
+                        </Link>
+                      </div>
+
+                      {/* Segments checklist */}
+                      <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", borderTop: "1px solid var(--border-color)", borderBottom: "1px solid var(--border-color)", padding: "0.75rem 0" }}>
+                        {segments.map((seg, idx) => (
+                          <div key={idx} style={{ display: "flex", alignItems: "center", gap: "0.35rem", fontSize: "0.82rem" }}>
+                            <span style={{ color: seg.ok ? "#10b981" : "var(--text-muted)", fontWeight: "bold" }}>
+                              {seg.ok ? "✓" : "×"}
+                            </span>
+                            <span style={{ color: seg.ok ? "var(--text-primary)" : "var(--text-muted)", fontWeight: seg.ok ? 600 : 400 }}>
+                              {seg.name}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Charges Row */}
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(110px, 1fr))", gap: "1rem" }}>
+                        <div className="premium-spec-cell" style={{ padding: "0.5rem 0.75rem" }}>
+                          <div style={{ fontSize: "0.65rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Account setup</div>
+                          <strong style={{ fontSize: "0.85rem" }}>{b.charges.opening}</strong>
+                        </div>
+                        <div className="premium-spec-cell" style={{ padding: "0.5rem 0.75rem" }}>
+                          <div style={{ fontSize: "0.65rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Annual AMC</div>
+                          <strong style={{ fontSize: "0.85rem" }}>{b.charges.amc}</strong>
+                        </div>
+                        <div className="premium-spec-cell" style={{ padding: "0.5rem 0.75rem" }}>
+                          <div style={{ fontSize: "0.65rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Delivery Brokerage</div>
+                          <strong style={{ fontSize: "0.85rem", color: "#10b981" }}>{b.brokerage.delivery}</strong>
+                        </div>
+                        <div className="premium-spec-cell" style={{ padding: "0.5rem 0.75rem" }}>
+                          <div style={{ fontSize: "0.65rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Intraday Brokerage</div>
+                          <strong style={{ fontSize: "0.85rem", color: "var(--warning)" }}>{b.brokerage.intraday}</strong>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      </section>
+
+      {/* ── Featured Cards Section ─────────────────────────────────────────────── */}
+      <section style={{ marginBottom: "4rem" }}>
+        <a id="featuredcards"></a>
+        <h2 style={{ fontSize: "1.8rem", fontWeight: 900, marginBottom: "1.5rem", borderBottom: "1px solid var(--border-color)", paddingBottom: "0.75rem" }}>
+          Featured Credit Cards
+        </h2>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+          {cards.length === 0 ? (
+            <div className="card" style={{ padding: "2rem", textAlign: "center", color: "var(--text-secondary)" }}>
+              No credit cards registered for {countryInfo.title}.
+            </div>
+          ) : (
+            cards.map((c) => {
+              const checklist = [
+                { name: "Welcome Bonus", ok: c.featuresChecklist.welcomeBonus },
+                { name: "Travel Perks", ok: c.featuresChecklist.travel },
+                { name: "Fuel Waiver", ok: c.featuresChecklist.fuel },
+                { name: "Shopping Offers", ok: c.featuresChecklist.shopping },
+                { name: "Point Rewards", ok: c.featuresChecklist.rewards }
+              ];
+
+              return (
+                <div key={c.slug} className="card" style={{ padding: "2rem" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(80px, 1fr))", gap: "2rem", alignItems: "start" }}>
+                    
+                    {/* Graphic Card */}
+                    <div style={{ display: "flex", justifyContent: "center" }}>
+                      <div style={{
+                        width: "100px",
+                        height: "64px",
+                        borderRadius: "8px",
+                        background: "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                        boxShadow: "0 6px 15px rgba(0,0,0,0.25)",
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "space-between",
+                        padding: "0.5rem",
+                        color: "#fff",
+                        fontSize: "0.45rem",
+                        fontWeight: 800
+                      }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", opacity: 0.8 }}>
+                          <span>{c.issuer.toUpperCase()}</span>
+                          <span style={{ width: 8, height: 6, borderRadius: 1, background: "#fbbf24" }} />
+                        </div>
+                        <div style={{ fontSize: "0.5rem" }}>{c.name.split(" ").slice(-1)[0]}</div>
+                      </div>
+                    </div>
+
+                    {/* Content details */}
+                    <div style={{ gridColumn: "span 5", display: "flex", flexDirection: "column", gap: "1rem" }}>
+                      
+                      {/* Name and Rating */}
+                      <div className="flex-between" style={{ flexWrap: "wrap", gap: "0.5rem" }}>
+                        <div>
+                          <h3 style={{ fontSize: "1.4rem", fontWeight: 800, display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                            {c.name}
+                            <span style={{ fontSize: "0.85rem", color: "var(--warning)", fontWeight: "bold" }}>
+                              ★ {c.overallRating}
+                            </span>
+                          </h3>
+                          <span className="badge badge-secondary" style={{ fontSize: "0.68rem", display: "inline-block", marginTop: "0.25rem" }}>
+                            {c.type} • Best for: {c.bestFor}
+                          </span>
+                        </div>
+                        <Link href={`/${countrySlug}/credit-card/${c.slug}`} className="btn btn-primary" style={{ padding: "0.45rem 1.25rem", fontSize: "0.82rem", borderRadius: "8px", textDecoration: "none" }}>
+                          Full Details Review
+                        </Link>
+                      </div>
+
+                      {/* Checklist */}
+                      <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", borderTop: "1px solid var(--border-color)", borderBottom: "1px solid var(--border-color)", padding: "0.75rem 0" }}>
+                        {checklist.map((item, idx) => (
+                          <div key={idx} style={{ display: "flex", alignItems: "center", gap: "0.35rem", fontSize: "0.82rem" }}>
+                            <span style={{ color: item.ok ? "#10b981" : "var(--text-muted)", fontWeight: "bold" }}>
+                              {item.ok ? "✓" : "×"}
+                            </span>
+                            <span style={{ color: item.ok ? "var(--text-primary)" : "var(--text-muted)", fontWeight: item.ok ? 600 : 400 }}>
+                              {item.name}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Specs charges */}
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(110px, 1fr))", gap: "1rem" }}>
+                        <div className="premium-spec-cell" style={{ padding: "0.5rem 0.75rem" }}>
+                          <div style={{ fontSize: "0.65rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Reward Rate</div>
+                          <strong style={{ fontSize: "0.85rem", color: "#10b981" }}>{c.fees.rewardPointValue}</strong>
+                        </div>
+                        <div className="premium-spec-cell" style={{ padding: "0.5rem 0.75rem" }}>
+                          <div style={{ fontSize: "0.65rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Joining Fee</div>
+                          <strong style={{ fontSize: "0.85rem" }}>{c.fees.joiningFee}</strong>
+                        </div>
+                        <div className="premium-spec-cell" style={{ padding: "0.5rem 0.75rem" }}>
+                          <div style={{ fontSize: "0.65rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Annual Fee</div>
+                          <strong style={{ fontSize: "0.85rem" }}>{c.fees.annualFee}</strong>
+                        </div>
+                        <div className="premium-spec-cell" style={{ padding: "0.5rem 0.75rem" }}>
+                          <div style={{ fontSize: "0.65rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>APR Interest</div>
+                          <strong style={{ fontSize: "0.85rem", color: "var(--danger)" }}>{c.fees.apr}</strong>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      </section>
+
+      {/* Directory suites for other products */}
+      <section style={{ marginBottom: "4rem" }}>
+        <h2 style={{ fontSize: "1.8rem", fontWeight: 900, marginBottom: "1.5rem" }}>Other Directory Categories</h2>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1.5rem" }}>
+          
+          <div className="card" style={{ padding: "1.5rem", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+            <div>
+              <span style={{ fontSize: "1.5rem" }}>🏦</span>
+              <h4 style={{ fontWeight: 800, marginTop: "0.75rem" }}>Bank Accounts</h4>
+              <p style={{ color: "var(--text-secondary)", fontSize: "0.8rem", marginTop: "0.25rem", lineHeight: 1.4 }}>
+                Compare digital, neobank and high-interest savings programs in {countryInfo.title}.
+              </p>
+            </div>
+            <Link href={`/${countrySlug}/bank-accounts`} className="btn btn-secondary" style={{ padding: "0.45rem 1rem", fontSize: "0.78rem", borderRadius: "8px", textDecoration: "none", marginTop: "1.25rem" }}>
+              Explore Banks ({banks.length}) →
+            </Link>
+          </div>
+
+          <div className="card" style={{ padding: "1.5rem", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+            <div>
+              <span style={{ fontSize: "1.5rem" }}>📱</span>
+              <h4 style={{ fontWeight: 800, marginTop: "0.75rem" }}>Payment Apps</h4>
+              <p style={{ color: "var(--text-secondary)", fontSize: "0.8rem", marginTop: "0.25rem", lineHeight: 1.4 }}>
+                Review transaction limits, loading fees and transfer delays in {countryInfo.title}.
+              </p>
+            </div>
+            <Link href={`/${countrySlug}/payment-apps`} className="btn btn-secondary" style={{ padding: "0.45rem 1rem", fontSize: "0.78rem", borderRadius: "8px", textDecoration: "none", marginTop: "1.25rem" }}>
+              Explore UPI Apps ({payments.length}) →
+            </Link>
+          </div>
+
+          <div className="card" style={{ padding: "1.5rem", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+            <div>
+              <span style={{ fontSize: "1.5rem" }}>🪙</span>
+              <h4 style={{ fontWeight: 800, marginTop: "0.75rem" }}>Crypto Apps</h4>
+              <p style={{ color: "var(--text-secondary)", fontSize: "0.8rem", marginTop: "0.25rem", lineHeight: 1.4 }}>
+                Evaluate trading platforms, taker/maker charges and staking options in {countryInfo.title}.
+              </p>
+            </div>
+            <Link href={`/${countrySlug}/crypto`} className="btn btn-secondary" style={{ padding: "0.45rem 1rem", fontSize: "0.78rem", borderRadius: "8px", textDecoration: "none", marginTop: "1.25rem" }}>
+              Explore Crypto ({crypto.length}) →
+            </Link>
+          </div>
+
+        </div>
+      </section>
+
+      {/* Comparison and Calculators Banner */}
       <section className="card" style={{ padding: "2.5rem", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "2rem" }}>
         <div style={{ maxWidth: "580px" }}>
-          <h2 style={{ fontSize: "1.6rem", fontWeight: 800 }}>Confused about choices? Compare side-by-side</h2>
+          <h2 style={{ fontSize: "1.6rem", fontWeight: 800 }}>Need specific calculators?</h2>
           <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginTop: "0.4rem", lineHeight: 1.45 }}>
-            Put two financial products side by side to compare rates, joining fee structures, checklists, pros, and cons in a structured grid matrix.
+            Compute brokerage charges, tax breakages, stamp duty levies and transaction markups directly.
           </p>
         </div>
-        <Link href={`/${countrySlug}/compare`} className="btn btn-primary" style={{ padding: "0.75rem 2rem", fontSize: "0.9rem", borderRadius: "10px", textDecoration: "none" }}>
-          Compare Side-by-Side
+        <Link href={`/${countrySlug}/calculator`} className="btn btn-primary" style={{ padding: "0.75rem 2rem", fontSize: "0.9rem", borderRadius: "10px", textDecoration: "none" }}>
+          Open Calculators Hub
         </Link>
       </section>
 
       <footer style={{ marginTop: "5rem", paddingTop: "2.5rem", borderTop: "1px solid var(--border-color)", textAlign: "center", color: "var(--text-muted)", fontSize: "0.8rem" }}>
-        <p>© 2026 ipopreipo.com Select. All ratings and metrics compiled through provider disclosures. Invest responsibly.</p>
+        <p>© 2026 ipopreipo.com Select. Ratings and checklists compiled via provider terms. Invest carefully.</p>
       </footer>
 
-      {/* Styled overrides for live search and card sheens */}
       <style>{`
         .search-result-item:hover {
           background: var(--spec-bg);
         }
         [data-theme="light"] .search-result-item:hover {
           background: #f1f5f9;
-        }
-        .select-product-card:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16);
-          border-color: var(--primary);
         }
       `}</style>
     </div>
