@@ -34,9 +34,38 @@ export default function Navbar() {
   const country = (params?.country as string) || "india";
 
   const getDynamicHref = (href: string) => {
-    if (href === "/") return "/";
-    const segment = href.split("/")[1];
-    return `/${country}/${segment}`;
+    if (typeof window === "undefined") return href;
+    const hostname = window.location.hostname;
+    const isLocal = hostname.includes("localhost");
+    const mainDomain = isLocal ? "localhost:3000" : "ipopreipo.vercel.app";
+    const selectDomain = isLocal ? "select.localhost:3000" : "select.ipopreipo.vercel.app";
+    const protocol = isLocal ? "http" : "https";
+
+    const selectFeatures = [
+      "select",
+      "bank-accounts",
+      "credit-card",
+      "brokers",
+      "payment-apps",
+      "crypto",
+      "compare",
+      "calculator"
+    ];
+
+    if (href === "/") {
+      return `${protocol}://${mainDomain}/`;
+    }
+
+    const segments = href.split("/").filter(Boolean);
+    const segment = segments[0];
+
+    if (selectFeatures.includes(segment)) {
+      const path = segment === "select" ? "" : `/${country}/${segment}`;
+      return `${protocol}://${selectDomain}${path}`;
+    } else {
+      const path = `/${country}/${segment}`;
+      return `${protocol}://${mainDomain}${path}`;
+    }
   };
 
   const { user, logout } = useAuth();
