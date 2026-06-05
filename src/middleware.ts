@@ -22,11 +22,14 @@ const FEATURES = [
   "ipo",
   "login",
   "payment-apps",
-  "preipo"
+  "preipo",
+  "select"
 ];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const host = request.headers.get("host") || "";
+  const isSelectSubdomain = host.startsWith("select.");
 
   // 1. Skip static assets, internal Next.js files, and API routes
   if (
@@ -50,7 +53,27 @@ export function middleware(request: NextRequest) {
 
   const countrySlug = (countryCode && COUNTRY_MAP[countryCode.toLowerCase()]) || "india";
 
-  // 3. Parse pathname
+  // 3. Handle Select Subdomain Root
+  if (isSelectSubdomain) {
+    if (pathname === "/" || pathname === "") {
+      const response = NextResponse.rewrite(new URL(`/${countrySlug}/select`, request.url));
+      if (!request.cookies.get("user-country")) {
+        response.cookies.set("user-country", countrySlug, { path: "/" });
+      }
+      return response;
+    }
+    const segments = pathname.split("/").filter(Boolean);
+    if (segments.length === 1 && COUNTRIES.includes(segments[0])) {
+      const targetCountry = segments[0];
+      const response = NextResponse.rewrite(new URL(`/${targetCountry}/select`, request.url));
+      if (!request.cookies.get("user-country")) {
+        response.cookies.set("user-country", targetCountry, { path: "/" });
+      }
+      return response;
+    }
+  }
+
+  // 4. Parse pathname
   const segments = pathname.split("/").filter(Boolean);
 
   if (segments.length > 0) {
