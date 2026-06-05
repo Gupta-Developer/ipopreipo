@@ -18,6 +18,7 @@ const NAV_ITEMS = [
   { label: "Home",         href: "/" },
   { label: "IPO Tracker",  href: "/ipo" },
   { label: "Pre-IPO",      href: "/preipo" },
+  { label: "Bank Accounts", href: "/bank-accounts/india" },
   { label: "Credit Cards", href: "/credit-card/india" },
   { label: "Brokers",      href: "/brokers/india" },
   { label: "Payment Apps", href: "/payment-apps/india" },
