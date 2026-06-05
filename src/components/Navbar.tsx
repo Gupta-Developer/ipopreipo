@@ -20,11 +20,11 @@ const NAV_ITEMS = [
     label: "Select",       
     href: "/select",
     subItems: [
-      { label: "Bank Accounts", href: "/bank-accounts" },
-      { label: "Credit Cards", href: "/credit-card" },
-      { label: "Brokers",      href: "/brokers" },
-      { label: "Payment Apps", href: "/payment-apps" },
-      { label: "Crypto Apps",  href: "/crypto" }
+      { label: "Bank Accounts", desc: "Compare digital & high-yield accounts", icon: "🏦", href: "/bank-accounts" },
+      { label: "Credit Cards", desc: "Compare lounge & reward rate benefits", icon: "💳", href: "/credit-card" },
+      { label: "Stock Brokers", desc: "Analyze setup costs & delivery AMC", icon: "📈", href: "/brokers" },
+      { label: "Payment Apps", desc: "UPI limits & loading wallets review", icon: "📱", href: "/payment-apps" },
+      { label: "Crypto Apps", desc: "Taker fees & staking options metrics", icon: "🪙", href: "/crypto" }
     ]
   },
   { label: "IPO Tracker",  href: "/ipo" },
@@ -132,16 +132,15 @@ export default function Navbar() {
 
           {/* Logo */}
           <Link href="/" className="nb-logo">
-            <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden>
-              <rect width="22" height="22" rx="6" fill={`rgb(var(--primary-rgb))`} />
-              <path d="M5 16 L11 6 L17 16" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M7.5 12 L14.5 12" stroke="white" strokeWidth="1.8" strokeLinecap="round" opacity="0.65"/>
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" style={{ marginRight: "2px" }}>
+              <path d="M3 17L9 11L13 15L21 7M21 7H16M21 7V12" stroke="rgb(var(--primary-rgb))" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M3 21H21" stroke="var(--text-muted)" strokeWidth="1.5" strokeLinecap="round" opacity="0.3"/>
             </svg>
-            <span className="nb-wordmark">
-              <span className="nb-ipo">ipo</span>
-              <span className="nb-pre">pre</span>
-              <span className="nb-ipo">ipo</span>
-              <span className="nb-tld">.com</span>
+            <span className="nb-wordmark" style={{ display: "inline-flex", alignItems: "center", fontSize: "1.1rem" }}>
+              <span style={{ color: "var(--text-primary)", fontWeight: 900, letterSpacing: "-0.04em" }}>IPO</span>
+              <span style={{ color: "rgb(var(--primary-rgb))", fontWeight: 900, letterSpacing: "-0.04em" }}>pre</span>
+              <span style={{ color: "var(--text-primary)", fontWeight: 900, letterSpacing: "-0.04em" }}>IPO</span>
+              <span style={{ color: "var(--text-muted)", fontWeight: 400, opacity: 0.8 }}>.com</span>
             </span>
           </Link>
 
@@ -165,14 +164,19 @@ export default function Navbar() {
                       </svg>
                       {active && <span className="nb-link-pip" />}
                     </Link>
-                    <div className="nb-nav-dropdown">
+                    <div className="nb-nav-dropdown" style={{ minWidth: "290px" }}>
                       {item.subItems.map((sub) => (
                         <Link
                           key={sub.href}
                           href={getDynamicHref(sub.href)}
                           className="nb-nav-dropdown-item"
+                          style={{ display: "flex", alignItems: "start", gap: "0.75rem", padding: "0.65rem" }}
                         >
-                          {sub.label}
+                          <span style={{ fontSize: "1.25rem", filter: "grayscale(0.1)" }}>{sub.icon}</span>
+                          <div style={{ display: "flex", flexDirection: "column", gap: "1px" }}>
+                            <strong style={{ fontSize: "0.85rem", color: "var(--text-primary)", fontWeight: 700 }}>{sub.label}</strong>
+                            <span style={{ fontSize: "0.72rem", color: "var(--text-secondary)", fontWeight: 400, lineHeight: 1.25 }}>{sub.desc}</span>
+                          </div>
                         </Link>
                       ))}
                     </div>
@@ -329,16 +333,15 @@ export default function Navbar() {
       <div className={`nb-drawer${mobileOpen ? " nb-drawer-open" : ""}`} aria-hidden={!mobileOpen}>
         <div className="nb-drawer-header">
           <Link href="/" className="nb-logo" onClick={() => setMobileOpen(false)}>
-            <svg width="20" height="20" viewBox="0 0 22 22" fill="none">
-              <rect width="22" height="22" rx="6" fill={`rgb(var(--primary-rgb))`} />
-              <path d="M5 16 L11 6 L17 16" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M7.5 12 L14.5 12" stroke="white" strokeWidth="1.8" strokeLinecap="round" opacity="0.65"/>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path d="M3 17L9 11L13 15L21 7M21 7H16M21 7V12" stroke="rgb(var(--primary-rgb))" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M3 21H21" stroke="var(--text-muted)" strokeWidth="1.5" strokeLinecap="round" opacity="0.3"/>
             </svg>
-            <span className="nb-wordmark">
-              <span className="nb-ipo">ipo</span>
-              <span className="nb-pre">pre</span>
-              <span className="nb-ipo">ipo</span>
-              <span className="nb-tld">.com</span>
+            <span className="nb-wordmark" style={{ display: "inline-flex", alignItems: "center", fontSize: "1rem" }}>
+              <span style={{ color: "var(--text-primary)", fontWeight: 900, letterSpacing: "-0.04em" }}>IPO</span>
+              <span style={{ color: "rgb(var(--primary-rgb))", fontWeight: 900, letterSpacing: "-0.04em" }}>pre</span>
+              <span style={{ color: "var(--text-primary)", fontWeight: 900, letterSpacing: "-0.04em" }}>IPO</span>
+              <span style={{ color: "var(--text-muted)", fontWeight: 400, opacity: 0.8 }}>.com</span>
             </span>
           </Link>
           <button className="nb-icon-btn" onClick={() => setMobileOpen(false)} aria-label="Close menu">

@@ -490,10 +490,6 @@ export default function SelectFinologyDashboard() {
         </Link>
       </section>
 
-      <footer style={{ marginTop: "5rem", paddingTop: "2.5rem", borderTop: "1px solid var(--border-color)", textAlign: "center", color: "var(--text-muted)", fontSize: "0.8rem" }}>
-        <p>© 2026 ipopreipo.com Select. Ratings and checklists compiled via provider terms. Invest carefully.</p>
-      </footer>
-
       <style>{`
         .search-result-item:hover {
           background: var(--spec-bg);

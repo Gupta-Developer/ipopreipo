@@ -341,10 +341,6 @@ export default function Home() {
 
         </div>
 
-        {/* Footer */}
-        <footer style={{ marginTop: "5rem", paddingTop: "2.5rem", borderTop: "1px solid var(--border-color)", textAlign: "center", color: "var(--text-secondary)", fontSize: "0.8rem" }}>
-          <p>© 2026 IPOpreIPO. Institutional intelligence dashboard. Data updated real-time through unofficial syndicate pipelines and registrars.</p>
-        </footer>
       </div>
     </>
   );
