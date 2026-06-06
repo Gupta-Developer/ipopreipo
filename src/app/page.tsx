@@ -67,18 +67,19 @@ export default function Home() {
         top: "100px",
         left: "50%",
         transform: "translateX(-50%)",
-        width: "600px",
+        width: "min(600px, 100vw)",
         height: "300px",
         background: "radial-gradient(circle, rgba(var(--primary-rgb), 0.12) 0%, transparent 70%)",
         filter: "blur(60px)",
         pointerEvents: "none",
-        zIndex: 0
+        zIndex: 0,
+        overflow: "hidden"
       }} />
 
       <div className="app-container" style={{ paddingTop: "3rem", position: "relative", zIndex: 1 }}>
         
         {/* Premium Hero Title Section */}
-        <header style={{ marginBottom: "4rem", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" }}>
+        <header style={{ marginBottom: "4rem", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", padding: "0 0.5rem" }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", background: "rgba(var(--primary-rgb), 0.06)", border: "1px solid rgba(var(--primary-rgb), 0.15)", padding: "0.35rem 1rem", borderRadius: "99px", marginBottom: "1.5rem" }}>
             <span style={{ display: "inline-block", width: "7px", height: "7px", borderRadius: "50%", background: "var(--success)" }} />
             <span style={{ fontSize: "0.75rem", fontWeight: "700", color: "var(--text-primary)", letterSpacing: "0.05em", textTransform: "uppercase" }}>Unified Global Asset Intel</span>
@@ -87,15 +88,15 @@ export default function Home() {
           <h1 style={{ fontSize: "3.5rem", fontWeight: 900, letterSpacing: "-0.05em", lineHeight: 1.1, maxWidth: "800px" }}>
             Investments & Offering <span className="text-gradient-purple">Intelligence Hub</span>
           </h1>
-          <p style={{ color: "var(--text-secondary)", fontSize: "1.2rem", marginTop: "1rem", maxWidth: "600px", lineHeight: 1.5 }}>
+          <p style={{ color: "var(--text-secondary)", fontSize: "1.1rem", marginTop: "1rem", maxWidth: "600px", lineHeight: 1.5 }}>
             Real-time Grey Market tracking, private unlisted stocks equity metrics, credit reward comparative slabs, and stock brokerage profiles.
           </p>
 
-          <div style={{ display: "flex", gap: "1rem", marginTop: "2rem" }}>
-            <Link href="/ipo" className="btn btn-primary" style={{ padding: "0.8rem 1.8rem" }}>
+          <div style={{ display: "flex", gap: "1rem", marginTop: "2rem", flexWrap: "wrap", justifyContent: "center", width: "100%" }}>
+            <Link href="/ipo" className="btn btn-primary" style={{ padding: "0.8rem 1.8rem", minWidth: "150px" }}>
               Explore IPO Tracker
             </Link>
-            <Link href="/preipo" className="btn btn-secondary" style={{ padding: "0.8rem 1.8rem" }}>
+            <Link href="/preipo" className="btn btn-secondary" style={{ padding: "0.8rem 1.8rem", minWidth: "150px" }}>
               Private Markets
             </Link>
           </div>

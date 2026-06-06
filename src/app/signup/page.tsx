@@ -62,8 +62,8 @@ export default function SignupPage() {
       {/* Background glow mesh */}
       <div style={{
         position: "absolute",
-        width: "400px",
-        height: "400px",
+        width: "min(400px, 100vw)",
+        height: "min(400px, 100vh)",
         background: "radial-gradient(circle, rgba(var(--primary-rgb), 0.12) 0%, transparent 70%)",
         filter: "blur(50px)",
         pointerEvents: "none"

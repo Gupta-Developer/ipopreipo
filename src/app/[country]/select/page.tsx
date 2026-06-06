@@ -64,7 +64,7 @@ export default function SelectFinologyDashboard() {
           position: "absolute",
           top: "-50px",
           left: "20%",
-          width: "450px",
+          width: "min(450px, 100vw)",
           height: "220px",
           background: "radial-gradient(circle, rgba(var(--primary-rgb), 0.08) 0%, transparent 70%)",
           filter: "blur(50px)",
