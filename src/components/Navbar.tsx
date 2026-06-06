@@ -28,7 +28,7 @@ const NAV_ITEMS = [
     ]
   },
   { label: "IPO Tracker",  href: "/ipo" },
-  { label: "Pre-IPO",      href: "/preipo" },
+  { label: "Pre-IPO (Unlisted)", href: "/preipo" },
   { label: "Compare",      href: "/compare" },
   { label: "Calculators",  href: "/calculator" },
 ];
