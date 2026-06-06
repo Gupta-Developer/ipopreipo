@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import React, { useState, useEffect, Suspense } from "react";
+import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 interface IPODetails {
@@ -273,8 +273,9 @@ const COUNTRY_CONFIGS: Record<string, {
   }
 };
 
-export default function LocalizedIPOPage() {
+function LocalizedIPOPageContent() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const countrySlug = (params?.country as string) || "india";
   const config = COUNTRY_CONFIGS[countrySlug] || COUNTRY_CONFIGS["india"];
 
@@ -285,6 +286,20 @@ export default function LocalizedIPOPage() {
 
   // Sub-view Tab state ("overview" | "calendar" | "performance")
   const [subView, setSubView] = useState<"overview" | "calendar" | "performance">("overview");
+
+  // Sync subView with search query param
+  useEffect(() => {
+    if (searchParams) {
+      const view = searchParams.get("view");
+      if (view === "calendar") {
+        setSubView("calendar");
+      } else if (view === "performance") {
+        setSubView("performance");
+      } else if (view === "overview") {
+        setSubView("overview");
+      }
+    }
+  }, [searchParams]);
 
   // Hero Slider Slide State
   const [activeSlide, setActiveSlide] = useState(0);
@@ -1131,5 +1146,13 @@ export default function LocalizedIPOPage() {
       `}</style>
 
     </div>
+  );
+}
+
+export default function LocalizedIPOPage() {
+  return (
+    <Suspense fallback={<div className="app-container" style={{ padding: "4rem", textAlign: "center" }}>Loading IPO Dashboard...</div>}>
+      <LocalizedIPOPageContent />
+    </Suspense>
   );
 }

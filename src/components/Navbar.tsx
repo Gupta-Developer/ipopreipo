@@ -27,7 +27,15 @@ const NAV_ITEMS = [
       { label: "Crypto Apps", desc: "Taker fees & staking options metrics", icon: "🪙", href: "/crypto" }
     ]
   },
-  { label: "IPO Tracker",  href: "/ipo" },
+  { 
+    label: "IPO (New Listings)",  
+    href: "/ipo",
+    subItems: [
+      { label: "IPO Dashboard", desc: "Overview of current & live IPOs", icon: "📊", href: "/ipo" },
+      { label: "IPO Calendar", desc: "Upcoming, open & closed dates", icon: "📅", href: "/ipo?view=calendar" },
+      { label: "IPO Performance", desc: "Listing gains & YTD returns tracker", icon: "📈", href: "/ipo?view=performance" }
+    ]
+  },
   { label: "Pre-IPO (Unlisted)", href: "/preipo" },
   { label: "Compare",      href: "/compare" },
   { label: "Calculators",  href: "/calculator" },
