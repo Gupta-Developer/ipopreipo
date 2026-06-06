@@ -37,6 +37,16 @@ const NAV_ITEMS = [
     ]
   },
   { label: "Pre-IPO (Unlisted)", href: "/preipo" },
+  {
+    label: "News",
+    href: "/news",
+    subItems: [
+      { label: "All Market News",  desc: "Latest IPO alerts & market analysis",        icon: "📰", href: "/news" },
+      { label: "IPO Alerts",       desc: "GMP updates, allotment & listing day news",   icon: "🏦", href: "/news?category=ipo" },
+      { label: "Market Analysis",  desc: "Earnings, indices & sector analysis",         icon: "📈", href: "/news?category=markets" },
+      { label: "Economy Updates",  desc: "Central bank decisions & macro data",         icon: "🌐", href: "/news?category=economy" },
+    ]
+  },
   { label: "Compare",      href: "/compare" },
   { label: "Calculators",  href: "/calculator" },
 ];

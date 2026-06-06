@@ -48,6 +48,12 @@ export default function Sitemap() {
               </Link>
             </li>
             <li>
+              <Link href={getUrl("/news")} className="sitemap-link">
+                <strong>Market News & Analysis</strong>
+                <span>IPO alerts, economic data, earnings and market intelligence</span>
+              </Link>
+            </li>
+            <li>
               <Link href={getUrl("/compare")} className="sitemap-link">
                 <strong>Compare Assets</strong>
                 <span>Multi-asset cross comparisons checklists</span>

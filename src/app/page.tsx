@@ -338,6 +338,34 @@ export default function Home() {
               </Link>
             </div>
 
+            {/* Sidebar Module: Latest News Headlines */}
+            <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+              <h3 style={{ fontSize: "1.2rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <span>📰</span> Market Headlines
+              </h3>
+              
+              <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
+                {[
+                  { title: "Bajaj Housing Finance IPO Subscribed 67x — GMP at ₹180", tag: "IPO", sentiment: "bullish" },
+                  { title: "SEBI Introduces T+0 Settlement for Top 500 Stocks", tag: "Markets", sentiment: "neutral" },
+                  { title: "RBI Holds Repo at 6.25% — Rate Cut Signals H2 2026", tag: "Economy", sentiment: "neutral" },
+                ].map((item, idx, arr) => (
+                  <div key={idx} style={{ paddingBottom: "0.85rem", paddingTop: idx > 0 ? "0.85rem" : 0, borderBottom: idx < arr.length - 1 ? "1px solid var(--border-color)" : "none" }}>
+                    <div style={{ display: "flex", gap: "0.4rem", marginBottom: "0.35rem" }}>
+                      <span className={`badge ${item.sentiment === "bullish" ? "badge-success" : "badge-secondary"}`} style={{ fontSize: "0.58rem", padding: "0.12rem 0.45rem" }}>
+                        {item.tag}
+                      </span>
+                    </div>
+                    <p style={{ fontSize: "0.8rem", fontWeight: 600, lineHeight: 1.35, color: "var(--text-primary)" }}>{item.title}</p>
+                  </div>
+                ))}
+              </div>
+
+              <Link href="/india/news" className="btn btn-secondary" style={{ width: "100%" }}>
+                All Market News →
+              </Link>
+            </div>
+
           </aside>
 
         </div>

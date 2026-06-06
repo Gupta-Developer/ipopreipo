@@ -71,6 +71,7 @@ export default function Footer() {
             <nav className="ft-nav">
               <Link href={getDynamicHref("/ipo")} className="ft-link">IPO Tracker</Link>
               <Link href={getDynamicHref("/preipo")} className="ft-link">Pre-IPO Unlisted</Link>
+              <Link href={getDynamicHref("/news")} className="ft-link">Market News</Link>
               <Link href={getDynamicHref("/compare")} className="ft-link">Asset Compare</Link>
             </nav>
           </div>

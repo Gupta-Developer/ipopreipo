@@ -22,9 +22,11 @@ const FEATURES = [
   "crypto",
   "ipo",
   "login",
+  "news",
   "payment-apps",
   "preipo",
-  "select"
+  "select",
+  "sitemap"
 ];
 
 export function middleware(request: NextRequest) {
