@@ -194,8 +194,105 @@ export default function LoginPage() {
           </button>
         </form>
 
+        {/* ── DEV SHORTCUTS ─────────────────────────────────────────────── */}
+        <div style={{
+          marginTop: "1.75rem",
+          border: "1px dashed rgba(245, 158, 11, 0.35)",
+          borderRadius: "12px",
+          padding: "1rem 1.1rem",
+          background: "rgba(245, 158, 11, 0.04)"
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.85rem" }}>
+            <span style={{ fontSize: "0.65rem", background: "rgba(245,158,11,0.12)", color: "#d97706", border: "1px solid rgba(245,158,11,0.3)", padding: "0.2rem 0.6rem", borderRadius: "99px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+              🛠 Dev Only
+            </span>
+            <span style={{ fontSize: "0.72rem", color: "var(--text-muted)", fontWeight: 500 }}>
+              Quick login shortcuts
+            </span>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0.5rem" }}>
+            {/* User Login */}
+            <button
+              type="button"
+              disabled={submitting || success}
+              onClick={async () => {
+                setSubmitting(true);
+                setError("");
+                const res = await login("mayank@ipopreipo.com", "password123");
+                if (res.success) { setSuccess(true); setTimeout(() => router.push("/"), 600); }
+                else { setError(res.error || "Failed"); }
+                setSubmitting(false);
+              }}
+              style={{
+                display: "flex", flexDirection: "column", alignItems: "center", gap: "0.3rem",
+                padding: "0.65rem 0.5rem", borderRadius: "10px", cursor: "pointer",
+                background: "rgba(16, 185, 129, 0.06)", border: "1px solid rgba(16, 185, 129, 0.25)",
+                color: "#10b981", fontFamily: "inherit", transition: "all 0.2s"
+              }}
+              onMouseOver={e => { e.currentTarget.style.background = "rgba(16,185,129,0.12)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+              onMouseOut={e => { e.currentTarget.style.background = "rgba(16,185,129,0.06)"; e.currentTarget.style.transform = "none"; }}
+            >
+              <span style={{ fontSize: "1.2rem" }}>👤</span>
+              <span style={{ fontSize: "0.7rem", fontWeight: 800 }}>User</span>
+              <span style={{ fontSize: "0.58rem", color: "var(--text-muted)", fontWeight: 500, textAlign: "center" }}>PRO</span>
+            </button>
+
+            {/* Author Login */}
+            <button
+              type="button"
+              disabled={submitting || success}
+              onClick={async () => {
+                setSubmitting(true);
+                setError("");
+                const res = await login("author@ipopreipo.com", "password123");
+                if (res.success) { setSuccess(true); setTimeout(() => router.push("/"), 600); }
+                else { setError(res.error || "Failed"); }
+                setSubmitting(false);
+              }}
+              style={{
+                display: "flex", flexDirection: "column", alignItems: "center", gap: "0.3rem",
+                padding: "0.65rem 0.5rem", borderRadius: "10px", cursor: "pointer",
+                background: "rgba(99, 102, 241, 0.06)", border: "1px solid rgba(99, 102, 241, 0.25)",
+                color: "rgb(var(--primary-rgb))", fontFamily: "inherit", transition: "all 0.2s"
+              }}
+              onMouseOver={e => { e.currentTarget.style.background = "rgba(99,102,241,0.12)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+              onMouseOut={e => { e.currentTarget.style.background = "rgba(99,102,241,0.06)"; e.currentTarget.style.transform = "none"; }}
+            >
+              <span style={{ fontSize: "1.2rem" }}>✍️</span>
+              <span style={{ fontSize: "0.7rem", fontWeight: 800 }}>Author</span>
+              <span style={{ fontSize: "0.58rem", color: "var(--text-muted)", fontWeight: 500, textAlign: "center" }}>AUTHOR</span>
+            </button>
+
+            {/* Admin Login */}
+            <button
+              type="button"
+              disabled={submitting || success}
+              onClick={async () => {
+                setSubmitting(true);
+                setError("");
+                const res = await login("admin@ipopreipo.com", "password123");
+                if (res.success) { setSuccess(true); setTimeout(() => router.push("/"), 600); }
+                else { setError(res.error || "Failed"); }
+                setSubmitting(false);
+              }}
+              style={{
+                display: "flex", flexDirection: "column", alignItems: "center", gap: "0.3rem",
+                padding: "0.65rem 0.5rem", borderRadius: "10px", cursor: "pointer",
+                background: "rgba(239, 68, 68, 0.06)", border: "1px solid rgba(239, 68, 68, 0.25)",
+                color: "#ef4444", fontFamily: "inherit", transition: "all 0.2s"
+              }}
+              onMouseOver={e => { e.currentTarget.style.background = "rgba(239,68,68,0.12)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+              onMouseOut={e => { e.currentTarget.style.background = "rgba(239,68,68,0.06)"; e.currentTarget.style.transform = "none"; }}
+            >
+              <span style={{ fontSize: "1.2rem" }}>🛡️</span>
+              <span style={{ fontSize: "0.7rem", fontWeight: 800 }}>Admin</span>
+              <span style={{ fontSize: "0.58rem", color: "var(--text-muted)", fontWeight: 500, textAlign: "center" }}>ADMIN</span>
+            </button>
+          </div>
+        </div>
+
         {/* Signup redirection footer */}
-        <div style={{ marginTop: "2rem", borderTop: "1px solid var(--border-color)", paddingTop: "1.25rem", textAlign: "center", fontSize: "0.82rem", color: "var(--text-secondary)" }}>
+        <div style={{ marginTop: "1.5rem", borderTop: "1px solid var(--border-color)", paddingTop: "1.25rem", textAlign: "center", fontSize: "0.82rem", color: "var(--text-secondary)" }}>
           Don't have an account?{" "}
           <Link href="/signup" style={{ color: "var(--primary)", fontWeight: "700" }}>
             Sign Up
