@@ -8,6 +8,7 @@ interface AuthContextType {
   loading: boolean;
   login: (email: string, password?: string) => Promise<{ success: boolean; error?: string }>;
   signup: (name: string, email: string, password?: string) => Promise<{ success: boolean; error?: string }>;
+  loginWithGoogle: (name: string, email: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
 }
 
@@ -115,13 +116,58 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { success: true };
   };
 
+  const loginWithGoogle = async (name: string, email: string) => {
+    // Simulate API query latency
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    const usersStr = localStorage.getItem("registered_users") || JSON.stringify(DEFAULT_USERS);
+    const users = JSON.parse(usersStr);
+    const normalizedEmail = email.toLowerCase().trim();
+
+    let sessionUser: User;
+
+    if (users[normalizedEmail]) {
+      const foundUser = users[normalizedEmail];
+      sessionUser = {
+        id: foundUser.id,
+        email: foundUser.email,
+        name: foundUser.name,
+        role: foundUser.role,
+        createdAt: foundUser.createdAt
+      };
+    } else {
+      const newUser = {
+        id: String(Object.keys(users).length + 1),
+        email: normalizedEmail,
+        name: name.trim(),
+        role: "USER" as const,
+        createdAt: new Date().toISOString(),
+        pass: "google-oauth-managed"
+      };
+      users[normalizedEmail] = newUser;
+      localStorage.setItem("registered_users", JSON.stringify(users));
+
+      sessionUser = {
+        id: newUser.id,
+        email: newUser.email,
+        name: newUser.name,
+        role: newUser.role,
+        createdAt: newUser.createdAt
+      };
+    }
+
+    localStorage.setItem("active_session", JSON.stringify(sessionUser));
+    setUser(sessionUser);
+    return { success: true };
+  };
+
   const logout = () => {
     localStorage.removeItem("active_session");
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, signup, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, signup, loginWithGoogle, logout }}>
       {children}
     </AuthContext.Provider>
   );
