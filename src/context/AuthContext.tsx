@@ -23,6 +23,23 @@ const DEFAULT_USERS: Record<string, User & { pass: string }> = {
     role: "PRO",
     createdAt: "2026-06-01T00:00:00Z",
     pass: "password123"
+  },
+  "admin@ipopreipo.com": {
+    id: "2",
+    email: "admin@ipopreipo.com",
+    name: "System Admin",
+    role: "ADMIN",
+    createdAt: "2026-06-05T00:00:00Z",
+    pass: "password123"
+  },
+  "author@ipopreipo.com": {
+    id: "3",
+    email: "author@ipopreipo.com",
+    name: "Regional Editor",
+    role: "AUTHOR",
+    createdAt: "2026-06-05T00:00:00Z",
+    pass: "password123",
+    assignedCountries: ["india", "united-states"]
   }
 };
 
@@ -32,9 +49,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Initialize session and directories on load
   useEffect(() => {
-    // Sync default users if none exist in localStorage
-    if (!localStorage.getItem("registered_users")) {
+    const existingUsersStr = localStorage.getItem("registered_users");
+    if (!existingUsersStr) {
       localStorage.setItem("registered_users", JSON.stringify(DEFAULT_USERS));
+    } else {
+      const existingUsers = JSON.parse(existingUsersStr);
+      let updated = false;
+      for (const [email, u] of Object.entries(DEFAULT_USERS)) {
+        if (!existingUsers[email]) {
+          existingUsers[email] = u;
+          updated = true;
+        }
+      }
+      if (updated) {
+        localStorage.setItem("registered_users", JSON.stringify(existingUsers));
+      }
     }
 
     const session = localStorage.getItem("active_session");

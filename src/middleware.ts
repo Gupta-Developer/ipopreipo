@@ -13,6 +13,7 @@ const COUNTRY_MAP: Record<string, string> = {
 };
 
 const FEATURES = [
+  "admin",
   "bank-accounts",
   "brokers",
   "calculator",

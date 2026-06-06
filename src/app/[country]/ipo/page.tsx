@@ -320,8 +320,20 @@ function LocalizedIPOPageContent() {
     statusText: string;
   } | null>(null);
 
+  // Load IPO database dynamically from localStorage
+  const [ipos, setIpos] = useState<IPODetails[]>([]);
+  useEffect(() => {
+    const db = localStorage.getItem("ipo_database");
+    if (!db) {
+      localStorage.setItem("ipo_database", JSON.stringify(IPO_DATA));
+      setIpos(IPO_DATA);
+    } else {
+      setIpos(JSON.parse(db));
+    }
+  }, []);
+
   // Filter IPOs by active country and tab / query
-  const countryIPOs = IPO_DATA.filter((ipo) => ipo.countrySlug === countrySlug);
+  const countryIPOs = ipos.filter((ipo) => ipo.countrySlug === countrySlug);
   const listedIPOs = countryIPOs.filter((ipo) => ipo.status === "listed");
 
   const filteredIPOs = countryIPOs.filter((ipo) => {
