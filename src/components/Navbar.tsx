@@ -962,11 +962,17 @@ export default function Navbar() {
           .nb-user-info { display: none; }
           .nb-user-btn { padding: 0.28rem; gap: 0; }
         }
+        @media (max-width: 768px) {
+          .nb-theme-wrap, .nb-mode-btn, .nb-divider { display: none !important; }
+        }
         @media (max-width: 640px) {
           .nb-inner { padding: 0 1rem; }
-          .nb-wordmark { font-size: 1rem; }
-          .nb-search-input { width: 160px; }
+          .nb-wordmark { font-size: 0.95rem; }
+          .nb-search-input { width: 140px; }
           .nb-user-btn { display: none; }
+        }
+        @media (max-width: 480px) {
+          .nb-wordmark span:last-child { display: none !important; }
         }
         @media (max-width: 400px) {
           .nb-search-open { display: none; }
