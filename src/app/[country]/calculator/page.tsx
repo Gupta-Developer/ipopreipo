@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { BROKERS_DATA } from "@/data/brokersData";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -110,6 +110,21 @@ function DonutChart({ invested, returns, color = "#6366f1" }: { invested: number
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function CalculatorHub() {
   const [activeTab, setActiveTab] = useState<CalcId>("sip");
+  const [brokerSlug, setBrokerSlug] = useState("groww");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get("tab") as CalcId;
+      const broker = params.get("broker");
+      if (tab && CALCULATORS.some((c) => c.id === tab)) {
+        setActiveTab(tab);
+      }
+      if (broker && BROKERS_DATA.some((b) => b.slug === broker)) {
+        setBrokerSlug(broker);
+      }
+    }
+  }, []);
 
   // SIP
   const [sipMonthly, setSipMonthly] = useState(5000);
@@ -133,7 +148,6 @@ export default function CalculatorHub() {
   const [fdCompounding, setFdCompounding] = useState<"quarterly" | "monthly" | "annually">("quarterly");
 
   // Brokerage
-  const [brokerSlug, setBrokerSlug] = useState("groww");
   const [txType, setTxType] = useState<"delivery" | "intraday">("delivery");
   const [buyPrice, setBuyPrice] = useState(1000);
   const [sellPrice, setSellPrice] = useState(1100);

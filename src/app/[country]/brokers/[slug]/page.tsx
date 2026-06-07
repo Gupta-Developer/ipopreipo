@@ -279,13 +279,22 @@ export default function BrokerDetailPage() {
             
             {/* Brokerage Plans (Single Plan) */}
             <div className="card" style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
-              <div style={{ borderBottom: "1px solid var(--border-color)", paddingBottom: "1rem" }}>
-                <h3 style={{ fontSize: "1.3rem", fontWeight: "800", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                  Brokerage Plans <span style={{ fontSize: "0.75rem", fontWeight: "600", color: "var(--primary)", background: "var(--success-bg)", padding: "0.15rem 0.5rem", borderRadius: "6px", border: "1px solid var(--success-border)" }}>Single Plan</span>
-                </h3>
-                <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", margin: "0.25rem 0 0" }}>
-                  Detailed account fees, segment brokerage rates, and margins offered by {broker.name}.
-                </p>
+              <div style={{ borderBottom: "1px solid var(--border-color)", paddingBottom: "1rem", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "1rem" }}>
+                <div>
+                  <h3 style={{ fontSize: "1.3rem", fontWeight: "800", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    Brokerage Plans <span style={{ fontSize: "0.75rem", fontWeight: "600", color: "var(--primary)", background: "var(--success-bg)", padding: "0.15rem 0.5rem", borderRadius: "6px", border: "1px solid var(--success-border)" }}>Single Plan</span>
+                  </h3>
+                  <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", margin: "0.25rem 0 0" }}>
+                    Detailed account fees, segment brokerage rates, and margins offered by {broker.name}.
+                  </p>
+                </div>
+                <Link 
+                  href={`/${countrySlug}/calculator?tab=brokerage&broker=${broker.slug}`}
+                  className="btn btn-secondary"
+                  style={{ fontSize: "0.8rem", padding: "0.5rem 1rem", textDecoration: "none" }}
+                >
+                  📊 {broker.name} Brokerage Calculator
+                </Link>
               </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "2.25rem" }}>
