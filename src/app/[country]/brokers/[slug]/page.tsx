@@ -297,93 +297,75 @@ export default function BrokerDetailPage() {
                 </Link>
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "2.25rem" }}>
-                {/* Account Charges */}
-                <div>
-                  <h4 style={{ fontSize: "0.95rem", fontWeight: "800", color: "var(--primary)", marginBottom: "0.85rem", textTransform: "uppercase", letterSpacing: "0.03em" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "2.5rem" }} className="m-flex-column">
+                
+                {/* Account Charges Column */}
+                <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                  <h4 style={{ fontSize: "0.95rem", fontWeight: "800", color: "var(--primary)", borderBottom: "1px solid var(--border-color)", paddingBottom: "0.5rem", textTransform: "uppercase", letterSpacing: "0.03em" }}>
                     Account Charges
                   </h4>
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1rem" }}>
-                    <div className="premium-spec-cell" style={{ display: "flex", flexDirection: "column", gap: "0.15rem" }}>
-                      <span style={{ fontSize: "0.72rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Account Opening</span>
-                      <strong style={{ fontSize: "0.95rem" }}>{broker.charges.opening}</strong>
-                    </div>
-                    <div className="premium-spec-cell" style={{ display: "flex", flexDirection: "column", gap: "0.15rem" }}>
-                      <span style={{ fontSize: "0.72rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Account Maintenance (AMC)</span>
-                      <strong style={{ fontSize: "0.95rem" }}>{broker.charges.amc}</strong>
-                    </div>
-                    <div className="premium-spec-cell" style={{ display: "flex", flexDirection: "column", gap: "0.15rem" }}>
-                      <span style={{ fontSize: "0.72rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Call & Trade</span>
-                      <strong style={{ fontSize: "0.95rem" }}>{broker.charges.callTrade}</strong>
-                    </div>
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    {[
+                      { label: "Account Opening", value: broker.charges.opening },
+                      { label: "Account AMC", value: broker.charges.amc },
+                      { label: "Call & Trade", value: broker.charges.callTrade },
+                    ].map((item, idx) => (
+                      <div key={idx} style={{ display: "flex", justifyContent: "space-between", padding: "0.75rem 0", borderBottom: "1px solid var(--border-color)", fontSize: "0.85rem" }}>
+                        <span style={{ color: "var(--text-secondary)" }}>{item.label}</span>
+                        <strong style={{ color: "var(--text-primary)" }}>{item.value}</strong>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
-                {/* Brokerage Fees */}
-                <div>
-                  <h4 style={{ fontSize: "0.95rem", fontWeight: "800", color: "var(--success)", marginBottom: "0.85rem", textTransform: "uppercase", letterSpacing: "0.03em" }}>
-                    Brokerage Charges
+                {/* Brokerage Fees Column */}
+                <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                  <h4 style={{ fontSize: "0.95rem", fontWeight: "800", color: "var(--success)", borderBottom: "1px solid var(--border-color)", paddingBottom: "0.5rem", textTransform: "uppercase", letterSpacing: "0.03em" }}>
+                    Brokerage Fees
                   </h4>
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1rem" }}>
-                    <div className="premium-spec-cell" style={{ display: "flex", flexDirection: "column", gap: "0.15rem" }}>
-                      <span style={{ fontSize: "0.72rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Equity Delivery</span>
-                      <strong style={{ fontSize: "0.95rem", color: "var(--success)" }}>{broker.brokerage.delivery}</strong>
-                    </div>
-                    <div className="premium-spec-cell" style={{ display: "flex", flexDirection: "column", gap: "0.15rem" }}>
-                      <span style={{ fontSize: "0.72rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Equity Intraday</span>
-                      <strong style={{ fontSize: "0.95rem" }}>{broker.brokerage.intraday}</strong>
-                    </div>
-                    <div className="premium-spec-cell" style={{ display: "flex", flexDirection: "column", gap: "0.15rem" }}>
-                      <span style={{ fontSize: "0.72rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Equity Futures</span>
-                      <strong style={{ fontSize: "0.95rem" }}>{broker.brokerage.futures}</strong>
-                    </div>
-                    <div className="premium-spec-cell" style={{ display: "flex", flexDirection: "column", gap: "0.15rem" }}>
-                      <span style={{ fontSize: "0.72rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Equity Options</span>
-                      <strong style={{ fontSize: "0.95rem" }}>{broker.brokerage.options}</strong>
-                    </div>
-                    <div className="premium-spec-cell" style={{ display: "flex", flexDirection: "column", gap: "0.15rem" }}>
-                      <span style={{ fontSize: "0.72rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Currency Futures</span>
-                      <strong style={{ fontSize: "0.95rem" }}>{broker.brokerage.currencyFutures || "-"}</strong>
-                    </div>
-                    <div className="premium-spec-cell" style={{ display: "flex", flexDirection: "column", gap: "0.15rem" }}>
-                      <span style={{ fontSize: "0.72rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Currency Options</span>
-                      <strong style={{ fontSize: "0.95rem" }}>{broker.brokerage.currencyOptions || "-"}</strong>
-                    </div>
-                    <div className="premium-spec-cell" style={{ display: "flex", flexDirection: "column", gap: "0.15rem" }}>
-                      <span style={{ fontSize: "0.72rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Commodity Futures</span>
-                      <strong style={{ fontSize: "0.95rem" }}>{broker.brokerage.commodityFutures || "-"}</strong>
-                    </div>
-                    <div className="premium-spec-cell" style={{ display: "flex", flexDirection: "column", gap: "0.15rem" }}>
-                      <span style={{ fontSize: "0.72rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Commodity Options</span>
-                      <strong style={{ fontSize: "0.95rem" }}>{broker.brokerage.commodityOptions || "-"}</strong>
-                    </div>
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    {[
+                      { label: "Equity Delivery", value: broker.brokerage.delivery, highlight: true },
+                      { label: "Equity Intraday", value: broker.brokerage.intraday },
+                      { label: "Equity Futures", value: broker.brokerage.futures },
+                      { label: "Equity Options", value: broker.brokerage.options },
+                      { label: "Currency Futures", value: broker.brokerage.currencyFutures || "-" },
+                      { label: "Currency Options", value: broker.brokerage.currencyOptions || "-" },
+                      { label: "Commodity Futures", value: broker.brokerage.commodityFutures || "-" },
+                      { label: "Commodity Options", value: broker.brokerage.commodityOptions || "-" },
+                    ].map((item, idx) => (
+                      <div key={idx} style={{ display: "flex", justifyContent: "space-between", padding: "0.75rem 0", borderBottom: "1px solid var(--border-color)", fontSize: "0.85rem" }}>
+                        <span style={{ color: "var(--text-secondary)" }}>{item.label}</span>
+                        <strong style={{ color: item.highlight ? "var(--success)" : "var(--text-primary)" }}>{item.value}</strong>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
-                {/* Margins */}
-                <div>
-                  <h4 style={{ fontSize: "0.95rem", fontWeight: "800", color: "var(--warning)", marginBottom: "0.85rem", textTransform: "uppercase", letterSpacing: "0.03em" }}>
+                {/* Segment Margins Column */}
+                <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                  <h4 style={{ fontSize: "0.95rem", fontWeight: "800", color: "var(--warning)", borderBottom: "1px solid var(--border-color)", paddingBottom: "0.5rem", textTransform: "uppercase", letterSpacing: "0.03em" }}>
                     Segment Margins
                   </h4>
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1rem" }}>
-                    <div className="premium-spec-cell" style={{ display: "flex", flexDirection: "column", gap: "0.15rem" }}>
-                      <span style={{ fontSize: "0.72rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Equity Delivery Margin</span>
-                      <strong style={{ fontSize: "0.95rem" }}>{broker.margins.delivery}</strong>
-                    </div>
-                    <div className="premium-spec-cell" style={{ display: "flex", flexDirection: "column", gap: "0.15rem" }}>
-                      <span style={{ fontSize: "0.72rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Equity Intraday Margin</span>
-                      <strong style={{ fontSize: "0.95rem", color: "var(--warning)" }}>{broker.margins.intraday}</strong>
-                    </div>
-                    <div className="premium-spec-cell" style={{ display: "flex", flexDirection: "column", gap: "0.15rem" }}>
-                      <span style={{ fontSize: "0.72rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Futures Margin</span>
-                      <strong style={{ fontSize: "0.95rem" }}>{broker.margins.futures || "-"}</strong>
-                    </div>
-                    <div className="premium-spec-cell" style={{ display: "flex", flexDirection: "column", gap: "0.15rem" }}>
-                      <span style={{ fontSize: "0.72rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Options Margin</span>
-                      <strong style={{ fontSize: "0.95rem" }}>{broker.margins.options || "-"}</strong>
-                    </div>
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    {[
+                      { label: "Equity Delivery Margin", value: broker.margins.delivery },
+                      { label: "Equity Intraday Margin", value: broker.margins.intraday, highlight: true },
+                      { label: "Futures Margin", value: broker.margins.futures || "-" },
+                      { label: "Options Margin", value: broker.margins.options || "-" },
+                      { label: "Currency Futures Margin", value: broker.margins.currencyFutures || "-" },
+                      { label: "Currency Options Margin", value: broker.margins.currencyOptions || "-" },
+                      { label: "Commodity Futures Margin", value: broker.margins.commodityFutures || "-" },
+                      { label: "Commodity Options Margin", value: broker.margins.commodityOptions || "-" },
+                    ].map((item, idx) => (
+                      <div key={idx} style={{ display: "flex", justifyContent: "space-between", padding: "0.75rem 0", borderBottom: "1px solid var(--border-color)", fontSize: "0.85rem" }}>
+                        <span style={{ color: "var(--text-secondary)" }}>{item.label}</span>
+                        <strong style={{ color: item.highlight ? "var(--warning)" : "var(--text-primary)" }}>{item.value}</strong>
+                      </div>
+                    ))}
                   </div>
                 </div>
+
               </div>
             </div>
 
