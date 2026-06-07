@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { notFound, useParams } from "next/navigation";
 import { BROKERS_DATA } from "@/data/brokersData";
@@ -14,7 +14,33 @@ export default function BrokerDetailPage() {
   // States inside hook
   const [likes, setLikes] = useState(broker ? broker.likes : 0);
   const [liked, setLiked] = useState(false);
-  const [activeTab, setActiveTab] = useState<"specs" | "taxes" | "reviews">("specs");
+  const [activeSection, setActiveSection] = useState<string>("specs");
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        });
+      },
+      { threshold: 0.15, rootMargin: "-100px 0px -60% 0px" }
+    );
+
+    const sections = ["specs", "taxes", "reviews"];
+    sections.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    return () => {
+      sections.forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) observer.unobserve(el);
+      });
+    };
+  }, []);
 
   if (!broker) {
     return (
@@ -160,295 +186,336 @@ export default function BrokerDetailPage() {
         </div>
       </div>
 
-      {/* Tabs Menu */}
-      <div style={{ display: "flex", borderBottom: "1px solid var(--border-color)", marginBottom: "2.5rem", gap: "1rem" }}>
+      {/* Sticky Navigation Bar */}
+      <div style={{ 
+        position: "sticky", 
+        top: "0", 
+        zIndex: 100, 
+        background: "rgba(10, 11, 14, 0.8)", 
+        backdropFilter: "blur(12px)", 
+        borderBottom: "1px solid var(--border-color)", 
+        marginBottom: "2.5rem", 
+        display: "flex", 
+        gap: "1.5rem",
+        padding: "1rem 0",
+      }}>
         <button 
-          onClick={() => setActiveTab("specs")} 
+          onClick={() => {
+            document.getElementById("specs")?.scrollIntoView({ behavior: "smooth", block: "start" });
+          }}
           style={{ 
-            padding: "0.85rem 1.5rem", 
-            borderBottom: activeTab === "specs" ? "2px solid var(--primary)" : "none", 
-            fontWeight: activeTab === "specs" ? "700" : "500",
-            color: activeTab === "specs" ? "var(--text-primary)" : "var(--text-secondary)",
-            fontSize: "0.95rem"
+            padding: "0.5rem 1rem", 
+            borderBottom: activeSection === "specs" ? "2px solid var(--primary)" : "none", 
+            fontWeight: activeSection === "specs" ? "700" : "500",
+            color: activeSection === "specs" ? "var(--text-primary)" : "var(--text-secondary)",
+            fontSize: "0.95rem",
+            background: "none",
+            border: "none",
+            cursor: "pointer"
           }}
         >
           Charges & specs
         </button>
         <button 
-          onClick={() => setActiveTab("taxes")} 
+          onClick={() => {
+            document.getElementById("taxes")?.scrollIntoView({ behavior: "smooth", block: "start" });
+          }}
           style={{ 
-            padding: "0.85rem 1.5rem", 
-            borderBottom: activeTab === "taxes" ? "2px solid var(--primary)" : "none", 
-            fontWeight: activeTab === "taxes" ? "700" : "500",
-            color: activeTab === "taxes" ? "var(--text-primary)" : "var(--text-secondary)",
-            fontSize: "0.95rem"
+            padding: "0.5rem 1rem", 
+            borderBottom: activeSection === "taxes" ? "2px solid var(--primary)" : "none", 
+            fontWeight: activeSection === "taxes" ? "700" : "500",
+            color: activeSection === "taxes" ? "var(--text-primary)" : "var(--text-secondary)",
+            fontSize: "0.95rem",
+            background: "none",
+            border: "none",
+            cursor: "pointer"
           }}
         >
           Transaction Taxes
         </button>
         <button 
-          onClick={() => setActiveTab("reviews")} 
+          onClick={() => {
+            document.getElementById("reviews")?.scrollIntoView({ behavior: "smooth", block: "start" });
+          }}
           style={{ 
-            padding: "0.85rem 1.5rem", 
-            borderBottom: activeTab === "reviews" ? "2px solid var(--primary)" : "none", 
-            fontWeight: activeTab === "reviews" ? "700" : "500",
-            color: activeTab === "reviews" ? "var(--text-primary)" : "var(--text-secondary)",
-            fontSize: "0.95rem"
+            padding: "0.5rem 1rem", 
+            borderBottom: activeSection === "reviews" ? "2px solid var(--primary)" : "none", 
+            fontWeight: activeSection === "reviews" ? "700" : "500",
+            color: activeSection === "reviews" ? "var(--text-primary)" : "var(--text-secondary)",
+            fontSize: "0.95rem",
+            background: "none",
+            border: "none",
+            cursor: "pointer"
           }}
         >
           Ratings & Reviews
         </button>
       </div>
 
-      {/* CONTENT MODULES */}
-
-      {activeTab === "specs" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "2.5rem" }}>
-          
-          {/* Main specifications grid */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "2rem" }} className="m-flex-column">
+      {/* CONTENT FEED (SCROLLABLE SECTIONS) */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "4rem" }}>
+        
+        {/* Section 1: Charges & Specs */}
+        <section id="specs" style={{ scrollMarginTop: "80px" }}>
+          <h2 style={{ fontSize: "1.5rem", fontWeight: "800", marginBottom: "1.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <span style={{ color: "var(--primary)" }}>📋</span> Charges & Specifications
+          </h2>
+          <div style={{ display: "flex", flexDirection: "column", gap: "2.5rem" }}>
             
-            {/* Column 1: Core Charges */}
-            <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-              <h3 style={{ borderBottom: "1px solid var(--border-color)", paddingBottom: "0.5rem", fontSize: "1.1rem", color: "var(--primary)" }}>Core Charges</h3>
-              <div>
-                <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Account Opening</span>
-                <div style={{ fontSize: "1.1rem", fontWeight: "700", marginTop: "0.15rem" }}>{broker.charges.opening}</div>
+            {/* Main specifications grid */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "2rem" }} className="m-flex-column">
+              
+              {/* Column 1: Core Charges */}
+              <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+                <h3 style={{ borderBottom: "1px solid var(--border-color)", paddingBottom: "0.5rem", fontSize: "1.1rem", color: "var(--primary)" }}>Core Charges</h3>
+                <div>
+                  <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Account Opening</span>
+                  <div style={{ fontSize: "1.1rem", fontWeight: "700", marginTop: "0.15rem" }}>{broker.charges.opening}</div>
+                </div>
+                <div>
+                  <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Account AMC</span>
+                  <div style={{ fontSize: "1.1rem", fontWeight: "700", marginTop: "0.15rem" }}>{broker.charges.amc}</div>
+                </div>
+                <div>
+                  <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Call & Trade Charge</span>
+                  <div style={{ fontSize: "1.1rem", fontWeight: "700", marginTop: "0.15rem" }}>{broker.charges.callTrade}</div>
+                </div>
               </div>
-              <div>
-                <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Account AMC</span>
-                <div style={{ fontSize: "1.1rem", fontWeight: "700", marginTop: "0.15rem" }}>{broker.charges.amc}</div>
+
+              {/* Column 2: Brokerage Rates */}
+              <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+                <h3 style={{ borderBottom: "1px solid var(--border-color)", paddingBottom: "0.5rem", fontSize: "1.1rem", color: "var(--success)" }}>Brokerage Fees</h3>
+                <div>
+                  <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Equity Delivery</span>
+                  <div style={{ fontSize: "1.1rem", fontWeight: "700", marginTop: "0.15rem", color: "var(--success)" }}>{broker.brokerage.delivery}</div>
+                </div>
+                <div>
+                  <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Equity Intraday</span>
+                  <div style={{ fontSize: "1.1rem", fontWeight: "700", marginTop: "0.15rem" }}>{broker.brokerage.intraday}</div>
+                </div>
+                <div>
+                  <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Futures & Options (F&O)</span>
+                  <div style={{ fontSize: "1.1rem", fontWeight: "700", marginTop: "0.15rem" }}>F: {broker.brokerage.futures} | O: {broker.brokerage.options}</div>
+                </div>
               </div>
-              <div>
-                <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Call & Trade Charge</span>
-                <div style={{ fontSize: "1.1rem", fontWeight: "700", marginTop: "0.15rem" }}>{broker.charges.callTrade}</div>
+
+              {/* Column 3: Margins & Platforms */}
+              <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+                <h3 style={{ borderBottom: "1px solid var(--border-color)", paddingBottom: "0.5rem", fontSize: "1.1rem", color: "var(--warning)" }}>Margins & Platforms</h3>
+                <div>
+                  <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Delivery margin (MTF)</span>
+                  <div style={{ fontSize: "1.1rem", fontWeight: "700", marginTop: "0.15rem" }}>{broker.margins.delivery}</div>
+                </div>
+                <div>
+                  <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Intraday Margin limit</span>
+                  <div style={{ fontSize: "1.1rem", fontWeight: "700", marginTop: "0.15rem", color: "var(--warning)" }}>{broker.margins.intraday}</div>
+                </div>
+                <div>
+                  <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Trading Platforms</span>
+                  <div style={{ fontSize: "0.85rem", fontWeight: "600", marginTop: "0.25rem", color: "var(--text-primary)" }}>
+                    {broker.platforms.join(", ")}
+                  </div>
+                </div>
               </div>
+
             </div>
 
-            {/* Column 2: Brokerage Rates */}
-            <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-              <h3 style={{ borderBottom: "1px solid var(--border-color)", paddingBottom: "0.5rem", fontSize: "1.1rem", color: "var(--success)" }}>Brokerage Fees</h3>
-              <div>
-                <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Equity Delivery</span>
-                <div style={{ fontSize: "1.1rem", fontWeight: "700", marginTop: "0.15rem", color: "var(--success)" }}>{broker.brokerage.delivery}</div>
+            {/* Pros & Cons Columns */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }} className="m-flex-column">
+              
+              {/* Pros card */}
+              <div className="card" style={{ borderLeft: "4px solid #10b981" }}>
+                <h3 style={{ fontSize: "1.2rem", marginBottom: "1.25rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  <span style={{ color: "#10b981" }}>🟢</span> Advantages (Pros)
+                </h3>
+                <ul style={{ display: "flex", flexDirection: "column", gap: "0.85rem", paddingLeft: "1rem", color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.4 }}>
+                  {broker.pros.map((pro, index) => (
+                    <li key={index}>{pro}</li>
+                  ))}
+                </ul>
               </div>
-              <div>
-                <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Equity Intraday</span>
-                <div style={{ fontSize: "1.1rem", fontWeight: "700", marginTop: "0.15rem" }}>{broker.brokerage.intraday}</div>
+
+              {/* Cons card */}
+              <div className="card" style={{ borderLeft: "4px solid #ef4444" }}>
+                <h3 style={{ fontSize: "1.2rem", marginBottom: "1.25rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  <span style={{ color: "#ef4444" }}>🔴</span> Disadvantages (Cons)
+                </h3>
+                <ul style={{ display: "flex", flexDirection: "column", gap: "0.85rem", paddingLeft: "1rem", color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.4 }}>
+                  {broker.cons.map((con, index) => (
+                    <li key={index}>{con}</li>
+                  ))}
+                </ul>
               </div>
-              <div>
-                <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Futures & Options (F&O)</span>
-                <div style={{ fontSize: "1.1rem", fontWeight: "700", marginTop: "0.15rem" }}>F: {broker.brokerage.futures} | O: {broker.brokerage.options}</div>
-              </div>
+
             </div>
 
-            {/* Column 3: Margins & Platforms */}
-            <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-              <h3 style={{ borderBottom: "1px solid var(--border-color)", paddingBottom: "0.5rem", fontSize: "1.1rem", color: "var(--warning)" }}>Margins & Platforms</h3>
-              <div>
-                <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Delivery margin (MTF)</span>
-                <div style={{ fontSize: "1.1rem", fontWeight: "700", marginTop: "0.15rem" }}>{broker.margins.delivery}</div>
+            {/* Checklists grids */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }} className="m-flex-column">
+              {/* Features check */}
+              <div className="card">
+                <h3 style={{ fontSize: "1.1rem", marginBottom: "1rem" }}>Additional Service Features</h3>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.85rem" }}>
+                  {broker.additionalFeatures.map((f, idx) => (
+                    <div key={idx} style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.85rem" }}>
+                      <span className={`premium-indicator ${f.supported ? 'premium-indicator-checked' : 'premium-indicator-crossed'}`}>
+                        {f.supported ? "✓" : "×"}
+                      </span>
+                      <span style={{ color: f.supported ? "var(--text-primary)" : "var(--text-muted)" }}>{f.label}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div>
-                <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Intraday Margin limit</span>
-                <div style={{ fontSize: "1.1rem", fontWeight: "700", marginTop: "0.15rem", color: "var(--warning)" }}>{broker.margins.intraday}</div>
-              </div>
-              <div>
-                <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Trading Platforms</span>
-                <div style={{ fontSize: "0.85rem", fontWeight: "600", marginTop: "0.25rem", color: "var(--text-primary)" }}>
-                  {broker.platforms.join(", ")}
+
+              {/* Other assets check */}
+              <div className="card">
+                <h3 style={{ fontSize: "1.1rem", marginBottom: "1rem" }}>Available Investment Products</h3>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.85rem" }}>
+                  {broker.otherInvestments.map((inv, idx) => (
+                    <div key={idx} style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.85rem" }}>
+                      <span className={`premium-indicator ${inv.supported ? 'premium-indicator-checked' : 'premium-indicator-crossed'}`}>
+                        {inv.supported ? "✓" : "×"}
+                      </span>
+                      <span style={{ color: inv.supported ? "var(--text-primary)" : "var(--text-muted)" }}>{inv.label}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
 
           </div>
+        </section>
 
-          {/* Pros & Cons Columns */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }} className="m-flex-column">
+        {/* Section 2: Transaction Taxes */}
+        <section id="taxes" style={{ scrollMarginTop: "80px" }}>
+          <h2 style={{ fontSize: "1.5rem", fontWeight: "800", marginBottom: "1.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <span style={{ color: "var(--success)" }}>💸</span> Transaction Taxes & Statutory Fees
+          </h2>
+          <div className="card">
+            <h3 style={{ fontSize: "1.3rem", marginBottom: "1.5rem" }}>Detailed Transaction Taxes & Statutory Fees</h3>
+            <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "-1rem", marginBottom: "1.5rem" }}>
+              Below are standard regulatory transaction taxes charged directly in your contract notes.
+            </p>
+
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "0.85rem" }}>
+                <thead>
+                  <tr style={{ borderBottom: "1px solid var(--border-color)", color: "var(--text-secondary)" }}>
+                    <th style={{ padding: "0.85rem 1rem" }}>Fee Category</th>
+                    <th style={{ padding: "0.85rem 1rem" }}>Equity Delivery</th>
+                    <th style={{ padding: "0.85rem 1rem" }}>Equity Intraday</th>
+                    <th style={{ padding: "0.85rem 1rem" }}>Futures</th>
+                    <th style={{ padding: "0.85rem 1rem" }}>Options</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.02)" }}>
+                    <td style={{ padding: "1rem", fontWeight: "700" }}>Securities Transaction Tax (STT)</td>
+                    <td style={{ padding: "1rem" }}>{broker.taxes.stt.delivery}</td>
+                    <td style={{ padding: "1rem" }}>{broker.taxes.stt.intraday}</td>
+                    <td style={{ padding: "1rem" }}>{broker.taxes.stt.futures}</td>
+                    <td style={{ padding: "1rem" }}>{broker.taxes.stt.options}</td>
+                  </tr>
+                  <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.02)" }}>
+                    <td style={{ padding: "1rem", fontWeight: "700" }}>Stamp Duty Charges</td>
+                    <td style={{ padding: "1rem" }}>{broker.taxes.stampDuty.delivery}</td>
+                    <td style={{ padding: "1rem" }}>{broker.taxes.stampDuty.intraday}</td>
+                    <td style={{ padding: "1rem" }}>{broker.taxes.stampDuty.futures}</td>
+                    <td style={{ padding: "1rem" }}>{broker.taxes.stampDuty.options}</td>
+                  </tr>
+                  <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.02)" }}>
+                    <td style={{ padding: "1rem", fontWeight: "700" }}>Exchange Tx Charges</td>
+                    <td style={{ padding: "1rem" }}>{broker.taxes.exchangeCharges.delivery}</td>
+                    <td style={{ padding: "1rem" }}>{broker.taxes.exchangeCharges.intraday}</td>
+                    <td style={{ padding: "1rem" }}>{broker.taxes.exchangeCharges.futures}</td>
+                    <td style={{ padding: "1rem" }}>{broker.taxes.exchangeCharges.options}</td>
+                  </tr>
+                  <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.02)" }}>
+                    <td style={{ padding: "1rem", fontWeight: "700" }}>SEBI Turnover Fees</td>
+                    <td style={{ padding: "1rem" }}>{broker.taxes.sebiFees.delivery}</td>
+                    <td style={{ padding: "1rem" }}>{broker.taxes.sebiFees.intraday}</td>
+                    <td style={{ padding: "1rem" }}>{broker.taxes.sebiFees.futures}</td>
+                    <td style={{ padding: "1rem" }}>{broker.taxes.sebiFees.options}</td>
+                  </tr>
+                  <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.02)" }}>
+                    <td style={{ padding: "1rem", fontWeight: "700" }}>GST Tax Rate</td>
+                    <td style={{ padding: "1rem" }}>{broker.taxes.gst.delivery}</td>
+                    <td style={{ padding: "1rem" }}>{broker.taxes.gst.intraday}</td>
+                    <td style={{ padding: "1rem" }}>{broker.taxes.gst.futures}</td>
+                    <td style={{ padding: "1rem" }}>{broker.taxes.gst.options}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div className="premium-spec-cell" style={{ marginTop: "1.5rem" }}>
+              <strong>Depository Participant (DP) Charges:</strong> {broker.taxes.dpCharges}
+            </div>
+          </div>
+        </section>
+
+        {/* Section 3: Ratings & Reviews */}
+        <section id="reviews" style={{ scrollMarginTop: "80px" }}>
+          <h2 style={{ fontSize: "1.5rem", fontWeight: "800", marginBottom: "1.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <span style={{ color: "var(--warning)" }}>⭐</span> Ratings & Editorial Reviews
+          </h2>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "2.5rem" }} className="m-flex-column">
             
-            {/* Pros card */}
-            <div className="card" style={{ borderLeft: "4px solid #10b981" }}>
-              <h3 style={{ fontSize: "1.2rem", marginBottom: "1.25rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                <span style={{ color: "#10b981" }}>🟢</span> Advantages (Pros)
-              </h3>
-              <ul style={{ display: "flex", flexDirection: "column", gap: "0.85rem", paddingLeft: "1rem", color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.4 }}>
-                {broker.pros.map((pro, index) => (
-                  <li key={index}>{pro}</li>
-                ))}
-              </ul>
+            {/* Category Stars Panel */}
+            <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1.5rem", height: "fit-content" }}>
+              <h3 style={{ fontSize: "1.2rem", borderBottom: "1px solid var(--border-color)", paddingBottom: "0.5rem" }}>Finology Star Breakdown</h3>
+              <div>
+                <div className="flex-between" style={{ fontSize: "0.85rem", marginBottom: "0.25rem" }}>
+                  <span>Charges & Affordability</span>
+                  <strong style={{ color: "var(--warning)" }}>{broker.categoryRatings.charges} / 5.0</strong>
+                </div>
+                <div style={{ height: "4px", background: "rgba(255,255,255,0.05)", borderRadius: "99px" }}>
+                  <div style={{ height: "100%", background: "var(--warning)", width: `${broker.categoryRatings.charges * 20}%` }}></div>
+                </div>
+              </div>
+              <div>
+                <div className="flex-between" style={{ fontSize: "0.85rem", marginBottom: "0.25rem" }}>
+                  <span>Platform Usability</span>
+                  <strong style={{ color: "var(--primary)" }}>{broker.categoryRatings.usability} / 5.0</strong>
+                </div>
+                <div style={{ height: "4px", background: "rgba(255,255,255,0.05)", borderRadius: "99px" }}>
+                  <div style={{ height: "100%", background: "var(--primary)", width: `${broker.categoryRatings.usability * 20}%` }}></div>
+                </div>
+              </div>
+              <div>
+                <div className="flex-between" style={{ fontSize: "0.85rem", marginBottom: "0.25rem" }}>
+                  <span>Customer Helpdesk</span>
+                  <strong style={{ color: "var(--success)" }}>{broker.categoryRatings.customerService} / 5.0</strong>
+                </div>
+                <div style={{ height: "4px", background: "rgba(255,255,255,0.05)", borderRadius: "99px" }}>
+                  <div style={{ height: "100%", background: "var(--success)", width: `${broker.categoryRatings.customerService * 20}%` }}></div>
+                </div>
+              </div>
             </div>
 
-            {/* Cons card */}
-            <div className="card" style={{ borderLeft: "4px solid #ef4444" }}>
-              <h3 style={{ fontSize: "1.2rem", marginBottom: "1.25rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                <span style={{ color: "#ef4444" }}>🔴</span> Disadvantages (Cons)
-              </h3>
-              <ul style={{ display: "flex", flexDirection: "column", gap: "0.85rem", paddingLeft: "1rem", color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.4 }}>
-                {broker.cons.map((con, index) => (
-                  <li key={index}>{con}</li>
-                ))}
-              </ul>
+            {/* Detailed Editorial Reviews */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "1.75rem" }}>
+              <div className="card">
+                <h4 style={{ color: "var(--primary)", fontSize: "1.1rem", marginBottom: "0.5rem" }}>Usability & Interface Review</h4>
+                <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.5 }}>{broker.detailedReviews.usability}</p>
+              </div>
+              <div className="card">
+                <h4 style={{ color: "var(--success)", fontSize: "1.1rem", marginBottom: "0.5rem" }}>Charges & Transaction Pricing</h4>
+                <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.5 }}>{broker.detailedReviews.charges}</p>
+              </div>
+              <div className="card">
+                <h4 style={{ color: "var(--warning)", fontSize: "1.1rem", marginBottom: "0.5rem" }}>Onboarding & Activation Process</h4>
+                <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.5 }}>{broker.detailedReviews.opening}</p>
+              </div>
+              <div className="card">
+                <h4 style={{ color: "var(--text-primary)", fontSize: "1.1rem", marginBottom: "0.5rem" }}>Customer Desk & Support Resolution</h4>
+                <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.5 }}>{broker.detailedReviews.service}</p>
+              </div>
             </div>
 
           </div>
+        </section>
 
-          {/* Checklists grids */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }} className="m-flex-column">
-            {/* Features check */}
-            <div className="card">
-              <h3 style={{ fontSize: "1.1rem", marginBottom: "1rem" }}>Additional Service Features</h3>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.85rem" }}>
-                {broker.additionalFeatures.map((f, idx) => (
-                  <div key={idx} style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.85rem" }}>
-                    <span className={`premium-indicator ${f.supported ? 'premium-indicator-checked' : 'premium-indicator-crossed'}`}>
-                      {f.supported ? "✓" : "×"}
-                    </span>
-                    <span style={{ color: f.supported ? "var(--text-primary)" : "var(--text-muted)" }}>{f.label}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Other assets check */}
-            <div className="card">
-              <h3 style={{ fontSize: "1.1rem", marginBottom: "1rem" }}>Available Investment Products</h3>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.85rem" }}>
-                {broker.otherInvestments.map((inv, idx) => (
-                  <div key={idx} style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.85rem" }}>
-                    <span className={`premium-indicator ${inv.supported ? 'premium-indicator-checked' : 'premium-indicator-crossed'}`}>
-                      {inv.supported ? "✓" : "×"}
-                    </span>
-                    <span style={{ color: inv.supported ? "var(--text-primary)" : "var(--text-muted)" }}>{inv.label}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-        </div>
-      )}
-
-      {activeTab === "taxes" && (
-        <div className="card">
-          <h3 style={{ fontSize: "1.3rem", marginBottom: "1.5rem" }}>Detailed Transaction Taxes & Statutory Fees</h3>
-          <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "-1rem", marginBottom: "1.5rem" }}>
-            Below are standard regulatory transaction taxes charged directly in your contract notes.
-          </p>
-
-          <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "0.85rem" }}>
-              <thead>
-                <tr style={{ borderBottom: "1px solid var(--border-color)", color: "var(--text-secondary)" }}>
-                  <th style={{ padding: "0.85rem 1rem" }}>Fee Category</th>
-                  <th style={{ padding: "0.85rem 1rem" }}>Equity Delivery</th>
-                  <th style={{ padding: "0.85rem 1rem" }}>Equity Intraday</th>
-                  <th style={{ padding: "0.85rem 1rem" }}>Futures</th>
-                  <th style={{ padding: "0.85rem 1rem" }}>Options</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.02)" }}>
-                  <td style={{ padding: "1rem", fontWeight: "700" }}>Securities Transaction Tax (STT)</td>
-                  <td style={{ padding: "1rem" }}>{broker.taxes.stt.delivery}</td>
-                  <td style={{ padding: "1rem" }}>{broker.taxes.stt.intraday}</td>
-                  <td style={{ padding: "1rem" }}>{broker.taxes.stt.futures}</td>
-                  <td style={{ padding: "1rem" }}>{broker.taxes.stt.options}</td>
-                </tr>
-                <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.02)" }}>
-                  <td style={{ padding: "1rem", fontWeight: "700" }}>Stamp Duty Charges</td>
-                  <td style={{ padding: "1rem" }}>{broker.taxes.stampDuty.delivery}</td>
-                  <td style={{ padding: "1rem" }}>{broker.taxes.stampDuty.intraday}</td>
-                  <td style={{ padding: "1rem" }}>{broker.taxes.stampDuty.futures}</td>
-                  <td style={{ padding: "1rem" }}>{broker.taxes.stampDuty.options}</td>
-                </tr>
-                <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.02)" }}>
-                  <td style={{ padding: "1rem", fontWeight: "700" }}>Exchange Tx Charges</td>
-                  <td style={{ padding: "1rem" }}>{broker.taxes.exchangeCharges.delivery}</td>
-                  <td style={{ padding: "1rem" }}>{broker.taxes.exchangeCharges.intraday}</td>
-                  <td style={{ padding: "1rem" }}>{broker.taxes.exchangeCharges.futures}</td>
-                  <td style={{ padding: "1rem" }}>{broker.taxes.exchangeCharges.options}</td>
-                </tr>
-                <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.02)" }}>
-                  <td style={{ padding: "1rem", fontWeight: "700" }}>SEBI Turnover Fees</td>
-                  <td style={{ padding: "1rem" }}>{broker.taxes.sebiFees.delivery}</td>
-                  <td style={{ padding: "1rem" }}>{broker.taxes.sebiFees.intraday}</td>
-                  <td style={{ padding: "1rem" }}>{broker.taxes.sebiFees.futures}</td>
-                  <td style={{ padding: "1rem" }}>{broker.taxes.sebiFees.options}</td>
-                </tr>
-                <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.02)" }}>
-                  <td style={{ padding: "1rem", fontWeight: "700" }}>GST Tax Rate</td>
-                  <td style={{ padding: "1rem" }}>{broker.taxes.gst.delivery}</td>
-                  <td style={{ padding: "1rem" }}>{broker.taxes.gst.intraday}</td>
-                  <td style={{ padding: "1rem" }}>{broker.taxes.gst.futures}</td>
-                  <td style={{ padding: "1rem" }}>{broker.taxes.gst.options}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div className="premium-spec-cell" style={{ marginTop: "1.5rem" }}>
-            <strong>Depository Participant (DP) Charges:</strong> {broker.taxes.dpCharges}
-          </div>
-        </div>
-      )}
-
-      {activeTab === "reviews" && (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "2.5rem" }} className="m-flex-column">
-          
-          {/* Category Stars Panel */}
-          <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1.5rem", height: "fit-content" }}>
-            <h3 style={{ fontSize: "1.2rem", borderBottom: "1px solid var(--border-color)", paddingBottom: "0.5rem" }}>Finology Star Breakdown</h3>
-            <div>
-              <div className="flex-between" style={{ fontSize: "0.85rem", marginBottom: "0.25rem" }}>
-                <span>Charges & Affordability</span>
-                <strong style={{ color: "var(--warning)" }}>{broker.categoryRatings.charges} / 5.0</strong>
-              </div>
-              <div style={{ height: "4px", background: "rgba(255,255,255,0.05)", borderRadius: "99px" }}>
-                <div style={{ height: "100%", background: "var(--warning)", width: `${broker.categoryRatings.charges * 20}%` }}></div>
-              </div>
-            </div>
-            <div>
-              <div className="flex-between" style={{ fontSize: "0.85rem", marginBottom: "0.25rem" }}>
-                <span>Platform Usability</span>
-                <strong style={{ color: "var(--primary)" }}>{broker.categoryRatings.usability} / 5.0</strong>
-              </div>
-              <div style={{ height: "4px", background: "rgba(255,255,255,0.05)", borderRadius: "99px" }}>
-                <div style={{ height: "100%", background: "var(--primary)", width: `${broker.categoryRatings.usability * 20}%` }}></div>
-              </div>
-            </div>
-            <div>
-              <div className="flex-between" style={{ fontSize: "0.85rem", marginBottom: "0.25rem" }}>
-                <span>Customer Helpdesk</span>
-                <strong style={{ color: "var(--success)" }}>{broker.categoryRatings.customerService} / 5.0</strong>
-              </div>
-              <div style={{ height: "4px", background: "rgba(255,255,255,0.05)", borderRadius: "99px" }}>
-                <div style={{ height: "100%", background: "var(--success)", width: `${broker.categoryRatings.customerService * 20}%` }}></div>
-              </div>
-            </div>
-          </div>
-
-          {/* Detailed Editorial Reviews */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "1.75rem" }}>
-            <div className="card">
-              <h4 style={{ color: "var(--primary)", fontSize: "1.1rem", marginBottom: "0.5rem" }}>Usability & Interface Review</h4>
-              <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.5 }}>{broker.detailedReviews.usability}</p>
-            </div>
-            <div className="card">
-              <h4 style={{ color: "var(--success)", fontSize: "1.1rem", marginBottom: "0.5rem" }}>Charges & Transaction Pricing</h4>
-              <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.5 }}>{broker.detailedReviews.charges}</p>
-            </div>
-            <div className="card">
-              <h4 style={{ color: "var(--warning)", fontSize: "1.1rem", marginBottom: "0.5rem" }}>Onboarding & Activation Process</h4>
-              <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.5 }}>{broker.detailedReviews.opening}</p>
-            </div>
-            <div className="card">
-              <h4 style={{ color: "var(--text-primary)", fontSize: "1.1rem", marginBottom: "0.5rem" }}>Customer Desk & Support Resolution</h4>
-              <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.5 }}>{broker.detailedReviews.service}</p>
-            </div>
-          </div>
-
-        </div>
-      )}
+      </div>
 
       {/* Editorial Detailed Article */}
       {broker.detailedArticle && (
