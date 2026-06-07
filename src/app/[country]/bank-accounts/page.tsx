@@ -182,13 +182,6 @@ export default function BankAccountsCountryPage() {
                     Active Users: {bank.activeUsers} • Interest Rate: <strong>{bank.interestRate}</strong>
                   </span>
                 </div>
-                <Link 
-                  href={`/${countrySlug}/bank-accounts/${bank.slug}`}
-                  className="btn btn-primary"
-                  style={{ padding: "0.45rem 1rem", fontSize: "0.8rem", borderRadius: "8px", textDecoration: "none" }}
-                >
-                  Full Details Review
-                </Link>
               </div>
 
               {/* Active Features Checklist Badges */}
@@ -228,6 +221,14 @@ export default function BankAccountsCountryPage() {
                   <strong style={{ color: "var(--warning)", fontSize: "0.85rem" }}>{bank.charges.foreignExchange}</strong>
                 </div>
               </div>
+
+              <Link 
+                href={`/${countrySlug}/bank-accounts/${bank.slug}`}
+                className="btn btn-primary full-review-btn"
+                style={{ padding: "0.45rem 1rem", fontSize: "0.8rem", borderRadius: "8px", textDecoration: "none" }}
+              >
+                Full Detailed Review
+              </Link>
 
             </div>
           </div>

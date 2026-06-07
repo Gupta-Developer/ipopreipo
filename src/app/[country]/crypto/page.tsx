@@ -168,13 +168,6 @@ export default function CryptoAppsCountryPage() {
                     Userbase: {app.activeUsers} • Liked by: {app.likes} members
                   </span>
                 </div>
-                <Link 
-                  href={`/${countrySlug}/crypto/${app.slug}`}
-                  className="btn btn-primary"
-                  style={{ padding: "0.45rem 1rem", fontSize: "0.8rem", borderRadius: "8px", textDecoration: "none" }}
-                >
-                  Full Specs & Reviews
-                </Link>
               </div>
 
               {/* Supported Trading Channels */}
@@ -214,6 +207,14 @@ export default function CryptoAppsCountryPage() {
                   <strong style={{ color: "var(--warning)", fontSize: "0.85rem" }}>{app.platforms.slice(0, 2).join(", ")}</strong>
                 </div>
               </div>
+
+              <Link 
+                href={`/${countrySlug}/crypto/${app.slug}`}
+                className="btn btn-primary full-review-btn"
+                style={{ padding: "0.45rem 1rem", fontSize: "0.8rem", borderRadius: "8px", textDecoration: "none" }}
+              >
+                Full Detailed Review
+              </Link>
 
             </div>
           </div>

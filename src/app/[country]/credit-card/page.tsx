@@ -174,7 +174,7 @@ export default function CreditCardCountryPage() {
               {/* Right Column: Spec layouts & details */}
               <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
                 
-                {/* Upper Row: Title, Rating, and CTA Link */}
+                {/* Upper Row: Title, Rating */}
                 <div className="flex-between" style={{ flexWrap: "wrap", gap: "0.75rem" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "0.85rem", flexWrap: "wrap" }}>
                     <h2 style={{ fontSize: "1.6rem", margin: 0, fontWeight: "800", letterSpacing: "-0.03em" }}>{card.name}</h2>
@@ -185,10 +185,6 @@ export default function CreditCardCountryPage() {
                       <span>{card.overallRating}</span>
                     </div>
                   </div>
-
-                  <Link href={`/${countrySlug}/credit-card/${card.slug}`} className="btn btn-primary" style={{ padding: "0.6rem 1.4rem", fontSize: "0.85rem", borderRadius: "10px", textDecoration: "none" }}>
-                    Full Details
-                  </Link>
                 </div>
 
                 {/* Middle Row: Type pills and dynamic checkers */}
@@ -242,6 +238,14 @@ export default function CreditCardCountryPage() {
                     <strong style={{ color: "var(--danger)", fontSize: "1rem", fontWeight: "700" }}>{card.fees.apr}</strong>
                   </div>
                 </div>
+
+                <Link 
+                  href={`/${countrySlug}/credit-card/${card.slug}`} 
+                  className="btn btn-primary full-review-btn" 
+                  style={{ padding: "0.6rem 1.4rem", fontSize: "0.85rem", borderRadius: "10px", textDecoration: "none" }}
+                >
+                  Full Detailed Review
+                </Link>
 
               </div>
 

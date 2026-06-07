@@ -242,7 +242,7 @@ export default function SelectFinologyDashboard() {
 
               return (
                 <div key={b.slug} className="card" style={{ padding: "2rem" }}>
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(80px, 1fr))", gap: "2rem", alignItems: "start" }}>
+                  <div className="select-product-grid" style={{ gap: "2rem" }}>
                     
                     {/* Logo letter */}
                     <div style={{ display: "flex", justifyContent: "center" }}>
@@ -252,7 +252,7 @@ export default function SelectFinologyDashboard() {
                     </div>
 
                     {/* Details Column */}
-                    <div style={{ gridColumn: "span 5", display: "flex", flexDirection: "column", gap: "1rem" }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
                       
                       {/* Name / Rating Row */}
                       <div className="flex-between" style={{ flexWrap: "wrap", gap: "0.5rem" }}>
@@ -267,9 +267,6 @@ export default function SelectFinologyDashboard() {
                             {b.type}
                           </span>
                         </div>
-                        <Link href={`/${countrySlug}/brokers/${b.slug}`} className="btn btn-primary" style={{ padding: "0.45rem 1.25rem", fontSize: "0.82rem", borderRadius: "8px", textDecoration: "none" }}>
-                          Full Details Review
-                        </Link>
                       </div>
 
                       {/* Segments checklist */}
@@ -306,6 +303,10 @@ export default function SelectFinologyDashboard() {
                         </div>
                       </div>
 
+                      <Link href={`/${countrySlug}/brokers/${b.slug}`} className="btn btn-primary full-review-btn" style={{ padding: "0.45rem 1.25rem", fontSize: "0.82rem", borderRadius: "8px", textDecoration: "none" }}>
+                        Full Detailed Review
+                      </Link>
+
                     </div>
                   </div>
                 </div>
@@ -339,7 +340,7 @@ export default function SelectFinologyDashboard() {
 
               return (
                 <div key={c.slug} className="card" style={{ padding: "2rem" }}>
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(80px, 1fr))", gap: "2rem", alignItems: "start" }}>
+                  <div className="select-product-grid" style={{ gap: "2rem" }}>
                     
                     {/* Graphic Card */}
                     <div style={{ display: "flex", justifyContent: "center" }}>
@@ -367,7 +368,7 @@ export default function SelectFinologyDashboard() {
                     </div>
 
                     {/* Content details */}
-                    <div style={{ gridColumn: "span 5", display: "flex", flexDirection: "column", gap: "1rem" }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
                       
                       {/* Name and Rating */}
                       <div className="flex-between" style={{ flexWrap: "wrap", gap: "0.5rem" }}>
@@ -382,9 +383,6 @@ export default function SelectFinologyDashboard() {
                             {c.type} • Best for: {c.bestFor}
                           </span>
                         </div>
-                        <Link href={`/${countrySlug}/credit-card/${c.slug}`} className="btn btn-primary" style={{ padding: "0.45rem 1.25rem", fontSize: "0.82rem", borderRadius: "8px", textDecoration: "none" }}>
-                          Full Details Review
-                        </Link>
                       </div>
 
                       {/* Checklist */}
@@ -420,6 +418,10 @@ export default function SelectFinologyDashboard() {
                           <strong style={{ fontSize: "0.85rem", color: "var(--danger)" }}>{c.fees.apr}</strong>
                         </div>
                       </div>
+
+                      <Link href={`/${countrySlug}/credit-card/${c.slug}`} className="btn btn-primary full-review-btn" style={{ padding: "0.45rem 1.25rem", fontSize: "0.82rem", borderRadius: "8px", textDecoration: "none" }}>
+                        Full Detailed Review
+                      </Link>
 
                     </div>
                   </div>

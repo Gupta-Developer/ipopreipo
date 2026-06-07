@@ -197,13 +197,6 @@ export default function BrokersCountryPage() {
                     Depository: {broker.depository} • Active Clients: {broker.activeClients}
                   </span>
                 </div>
-                <Link 
-                  href={`/${countrySlug}/brokers/${broker.slug}`}
-                  className="btn btn-primary"
-                  style={{ padding: "0.45rem 1rem", fontSize: "0.8rem", borderRadius: "8px", textDecoration: "none" }}
-                >
-                  Full Details Review
-                </Link>
               </div>
 
               {/* Active Trading Segment Badges */}
@@ -238,6 +231,14 @@ export default function BrokersCountryPage() {
                   <strong style={{ color: "var(--warning)", fontSize: "0.85rem" }}>{broker.brokerage.intraday}</strong>
                 </div>
               </div>
+
+              <Link 
+                href={`/${countrySlug}/brokers/${broker.slug}`}
+                className="btn btn-primary full-review-btn"
+                style={{ padding: "0.45rem 1rem", fontSize: "0.8rem", borderRadius: "8px", textDecoration: "none" }}
+              >
+                Full Detailed Review
+              </Link>
 
             </div>
           </div>

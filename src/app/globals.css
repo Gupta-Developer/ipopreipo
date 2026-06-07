@@ -1041,4 +1041,28 @@ hr {
   }
 }
 
+.select-product-grid {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  align-items: start;
+}
+
+.full-review-btn {
+  align-self: flex-end;
+}
+
+@media (max-width: 768px) {
+  .select-product-grid {
+    grid-template-columns: 1fr !important;
+    justify-items: center;
+    gap: 1.5rem !important;
+  }
+  .full-review-btn {
+    align-self: stretch !important;
+    text-align: center;
+    margin-top: 0.5rem;
+  }
+}
+
+
 
