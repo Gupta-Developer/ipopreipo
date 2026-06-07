@@ -63,6 +63,15 @@ export interface BrokerData {
     opening: string;
   };
   taxes: BrokerTaxes;
+  detailedArticle?: {
+    title: string;
+    intro: string;
+    sections: {
+      heading: string;
+      content?: string;
+      items?: string[];
+    }[];
+  };
 }
 
 export const BROKERS_DATA: BrokerData[] = [
@@ -167,6 +176,43 @@ export const BROKERS_DATA: BrokerData[] = [
         options: "18% on (Brokerage + Exchange + SEBI)"
       },
       dpCharges: "₹13.5 per company debit per day (charged by CDSL/Groww)"
+    },
+    detailedArticle: {
+      title: "Why Choose Groww? Know Everything about Groww here.",
+      intro: "Groww has rapidly emerged as one of India's leading investment platforms, capturing the attention of both novice and seasoned participants in the financial markets. Founded in 2017 with the core mission of democratising investing, Groww initially focused on simplifying mutual fund investments. Over time, it has strategically expanded its offerings to encompass a wide array of asset classes, including stocks, IPOs, Futures & Options, NFOs, and ETFs. The platform is lauded for its clean, intuitive user interface and its commitment to providing a seamless investment experience. This detailed review aims to examine the Groww app, examining its features, pricing, pros and cons, and specifically highlighting what it offers to both traders and long-term investors.",
+      sections: [
+        {
+          heading: "What Groww Offers for Investors",
+          content: "Groww provides a robust platform for individuals looking to build wealth over the long term through various investment avenues:",
+          items: [
+            "Mutual Funds: Groww exclusively offers direct mutual funds, which have a lower expense ratio compared to regular funds, leading to higher returns over time.",
+            "Wide Range of Schemes: Investors can access a vast selection of mutual fund schemes across different categories (equity, debt, hybrid, sectoral, etc.).",
+            "SIP and Lumpsum Investments: Groww facilitates both Systematic Investment Plans (SIPs) for regular investing and lumpsum investments.",
+            "Easy Navigation and Filtering: Provides intuitive tools to filter and compare mutual funds based on parameters like returns, ratings, and expense ratios.",
+            "Portfolio Tracking: Track the performance of your mutual fund and stock portfolio through a consolidated dashboard."
+          ]
+        },
+        {
+          heading: "What Groww Offers for Traders",
+          content: "Groww has expanded its platform to cater to the needs of active traders, providing tools and features for efficient trading in the equity markets:",
+          items: [
+            "Real-time Market Data: Live stock prices and market movements.",
+            "Advanced Charting Tools: Interactive charts with various technical indicators (e.g., moving averages, RSI, MACD) to aid in technical analysis.",
+            "Multiple Order Types: Place market orders, limit orders, stop-loss orders, and GTT (Good Till Triggered) orders.",
+            "Option Chain Analysis: Comprehensive view of option chains for indices and stocks, aiding in options trading strategy.",
+            "Basket & Iceberg Orders: Execute complex multi-leg options strategies simultaneously or break large quantities to minimize market impact.",
+            "Instant Margin Pledge: Pledge existing holdings to obtain trading margin for Futures & Options segments."
+          ]
+        },
+        {
+          heading: "Groww Trading Platforms",
+          content: "Groww offers access to the financial markets through two primary trading platforms: the Groww Mobile App and the Groww Web Platform.",
+          items: [
+            "Groww Mobile App: Designed for mobile-first users. It features an incredibly clean UI, instant price alerts, option chains, TradingView charts integrations, and easy online IPO applications via UPI.",
+            "Groww Web Platform: Ideal for desktop or laptop users. Features a streamlined Terminal Interface that integrates charts, technical indicators, order placement, open positions, and watchlists onto a single screen for professional efficiency."
+          ]
+        }
+      ]
     }
   },
   {

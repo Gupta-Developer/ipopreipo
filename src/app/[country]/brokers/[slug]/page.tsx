@@ -119,6 +119,47 @@ export default function BrokerDetailPage() {
         </div>
       </div>
 
+      {/* Product Basket */}
+      <div className="card" style={{ marginBottom: "2.5rem" }}>
+        <h3 style={{ fontSize: "1.2rem", fontWeight: "800", marginBottom: "0.4rem" }}>Product Basket</h3>
+        <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", margin: "0 0 1.5rem" }}>
+          The segments in which you can invest through this broker (includes Equity, Commodity, Currency, Futures, and Options).
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: "1rem" }}>
+          {[
+            { label: "Equity", supported: broker.segments.equity, icon: "📈" },
+            { label: "Commodity", supported: broker.segments.commodity, icon: "🧱" },
+            { label: "Currency", supported: broker.segments.currency, icon: "💱" },
+            { label: "Futures", supported: broker.segments.futures, icon: "📊" },
+            { label: "Options", supported: broker.segments.options, icon: "⚖️" },
+          ].map((seg, idx) => (
+            <div 
+              key={idx} 
+              style={{ 
+                display: "flex", 
+                alignItems: "center", 
+                gap: "0.75rem", 
+                padding: "0.85rem 1.1rem", 
+                borderRadius: "12px", 
+                background: seg.supported ? "rgba(16, 185, 129, 0.05)" : "rgba(255, 255, 255, 0.01)",
+                border: `1px solid ${seg.supported ? "rgba(16, 185, 129, 0.2)" : "rgba(255, 255, 255, 0.05)"}`,
+                transition: "all 0.2s"
+              }}
+            >
+              <span style={{ fontSize: "1.2rem" }}>{seg.icon}</span>
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <span style={{ fontSize: "0.85rem", fontWeight: "700", color: seg.supported ? "var(--text-primary)" : "var(--text-secondary)" }}>
+                  {seg.label}
+                </span>
+                <span style={{ fontSize: "0.7rem", fontWeight: "600", color: seg.supported ? "#10b981" : "var(--text-muted)", marginTop: "0.1rem" }}>
+                  {seg.supported ? "Available" : "Not Offered"}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Tabs Menu */}
       <div style={{ display: "flex", borderBottom: "1px solid var(--border-color)", marginBottom: "2.5rem", gap: "1rem" }}>
         <button 
@@ -406,6 +447,54 @@ export default function BrokerDetailPage() {
             </div>
           </div>
 
+        </div>
+      )}
+
+      {/* Editorial Detailed Article */}
+      {broker.detailedArticle && (
+        <div className="card" style={{ marginTop: "3rem", padding: "2.5rem" }}>
+          <h2 style={{ fontSize: "1.6rem", fontWeight: "900", marginBottom: "1.5rem", borderBottom: "1px solid var(--border-color)", paddingBottom: "0.75rem" }} className="text-gradient-purple">
+            {broker.detailedArticle.title}
+          </h2>
+          <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem", lineHeight: "1.75", marginBottom: "2rem" }}>
+            {broker.detailedArticle.intro}
+          </p>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: "2.25rem" }}>
+            {broker.detailedArticle.sections.map((sect, idx) => (
+              <div key={idx}>
+                <h3 style={{ fontSize: "1.2rem", fontWeight: "800", color: "var(--primary)", marginBottom: "0.85rem" }}>
+                  {sect.heading}
+                </h3>
+                {sect.content && (
+                  <p style={{ color: "var(--text-secondary)", fontSize: "0.92rem", lineHeight: "1.65", marginBottom: "1rem" }}>
+                    {sect.content}
+                  </p>
+                )}
+                {sect.items && sect.items.length > 0 && (
+                  <ul style={{ display: "flex", flexDirection: "column", gap: "0.75rem", paddingLeft: "1.2rem" }}>
+                    {sect.items.map((item, itemIdx) => {
+                      const splitIndex = item.indexOf(":");
+                      if (splitIndex !== -1) {
+                        const title = item.substring(0, splitIndex);
+                        const desc = item.substring(splitIndex + 1);
+                        return (
+                          <li key={itemIdx} style={{ color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: "1.5" }}>
+                            <strong style={{ color: "var(--text-primary)" }}>{title}</strong>:{desc}
+                          </li>
+                        );
+                      }
+                      return (
+                        <li key={itemIdx} style={{ color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: "1.5" }}>
+                          {item}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
