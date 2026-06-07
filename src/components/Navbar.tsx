@@ -286,6 +286,40 @@ export default function Navbar() {
             {/* Divider */}
             <div className="nb-divider" />
 
+            {/* Role-based quick-action buttons */}
+            {user?.role === "ADMIN" && (
+              <Link
+                href={`/${country}/admin`}
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: "0.35rem",
+                  padding: "0.38rem 0.85rem", borderRadius: "8px", fontSize: "0.78rem",
+                  fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap",
+                  background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.28)",
+                  color: "#ef4444", transition: "all 0.2s"
+                }}
+                onMouseOver={e => { e.currentTarget.style.background = "rgba(239,68,68,0.15)"; }}
+                onMouseOut={e => { e.currentTarget.style.background = "rgba(239,68,68,0.08)"; }}
+              >
+                🛡️ Admin Panel
+              </Link>
+            )}
+            {user?.role === "AUTHOR" && (
+              <Link
+                href={`/${country}/admin`}
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: "0.35rem",
+                  padding: "0.38rem 0.85rem", borderRadius: "8px", fontSize: "0.78rem",
+                  fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap",
+                  background: "rgba(99,102,241,0.08)", border: "1px solid rgba(99,102,241,0.28)",
+                  color: "rgb(var(--primary-rgb))", transition: "all 0.2s"
+                }}
+                onMouseOver={e => { e.currentTarget.style.background = "rgba(99,102,241,0.16)"; }}
+                onMouseOut={e => { e.currentTarget.style.background = "rgba(99,102,241,0.08)"; }}
+              >
+                ✍️ Submit Draft
+              </Link>
+            )}
+
             {/* User Profile / Auth State */}
             {user ? (
               <div ref={userMenuRef} style={{ position: "relative" }}>
@@ -305,8 +339,30 @@ export default function Navbar() {
                   </svg>
                 </button>
                 {showUserMenu && (
-                  <div className="nb-dropdown" style={{ right: 0, minWidth: "180px" }}>
+                  <div className="nb-dropdown" style={{ right: 0, minWidth: "200px" }}>
                     <div className="nb-dropdown-label">Session: {user.email}</div>
+                    {user.role === "ADMIN" && (
+                      <Link
+                        href={`/${country}/admin`}
+                        className="nb-dropdown-item"
+                        onClick={() => setShowUserMenu(false)}
+                        style={{ textDecoration: "none", color: "#ef4444" }}
+                      >
+                        <span style={{ fontSize: "0.9rem" }}>🛡️</span>
+                        <span className="nb-dropdown-item-label" style={{ color: "#ef4444", fontWeight: 700 }}>Admin Panel</span>
+                      </Link>
+                    )}
+                    {user.role === "AUTHOR" && (
+                      <Link
+                        href={`/${country}/admin`}
+                        className="nb-dropdown-item"
+                        onClick={() => setShowUserMenu(false)}
+                        style={{ textDecoration: "none", color: "rgb(var(--primary-rgb))" }}
+                      >
+                        <span style={{ fontSize: "0.9rem" }}>✍️</span>
+                        <span className="nb-dropdown-item-label" style={{ color: "rgb(var(--primary-rgb))", fontWeight: 700 }}>Submit Draft</span>
+                      </Link>
+                    )}
                     <button 
                       className="nb-dropdown-item" 
                       onClick={() => {
@@ -412,6 +468,34 @@ export default function Navbar() {
                   <span style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>{user.email}</span>
                 </div>
               </div>
+              {user.role === "ADMIN" && (
+                <Link
+                  href={`/${country}/admin`}
+                  onClick={() => setMobileOpen(false)}
+                  style={{
+                    display: "flex", alignItems: "center", gap: "0.6rem",
+                    padding: "0.65rem 0.85rem", borderRadius: "10px", textDecoration: "none",
+                    background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)",
+                    color: "#ef4444", fontWeight: 700, fontSize: "0.85rem"
+                  }}
+                >
+                  🛡️ <span>Admin Panel</span>
+                </Link>
+              )}
+              {user.role === "AUTHOR" && (
+                <Link
+                  href={`/${country}/admin`}
+                  onClick={() => setMobileOpen(false)}
+                  style={{
+                    display: "flex", alignItems: "center", gap: "0.6rem",
+                    padding: "0.65rem 0.85rem", borderRadius: "10px", textDecoration: "none",
+                    background: "rgba(99,102,241,0.08)", border: "1px solid rgba(99,102,241,0.25)",
+                    color: "rgb(var(--primary-rgb))", fontWeight: 700, fontSize: "0.85rem"
+                  }}
+                >
+                  ✍️ <span>Submit Draft</span>
+                </Link>
+              )}
               <button 
                 className="nb-pref-toggle" 
                 onClick={() => {

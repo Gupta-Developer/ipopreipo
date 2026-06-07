@@ -678,7 +678,7 @@ export default function MarketNewsPage() {
             <div className="card" style={{ padding: "1.5rem" }}>
               <h3 style={{ fontSize: "1rem", fontWeight: 800, marginBottom: "1.25rem" }}>📊 Market Pulse</h3>
               <div style={{ display: "flex", flexDirection: "column", gap: "0.85rem" }}>
-                {countrySlug === "india" ? [
+                {(countrySlug === "india" ? [
                   { label: "NIFTY 50", val: "24,812.30", chg: "+0.84%", up: true },
                   { label: "SENSEX",   val: "81,423.00", chg: "+0.91%", up: true },
                   { label: "USD/INR",  val: "₹83.42",    chg: "-0.12%", up: false },
@@ -693,8 +693,7 @@ export default function MarketNewsPage() {
                   { label: "GBP/USD",  val: "1.274",     chg: "+0.22%", up: true },
                   { label: "EUR/GBP",  val: "0.854",     chg: "-0.07%", up: false },
                   { label: "Gold",     val: "£1,831/oz", chg: "+0.18%", up: true },
-                ]
-                .map((kpi, i) => (
+                ]).map((kpi, i) => (
                   <div key={i} style={{
                     display: "flex", justifyContent: "space-between", alignItems: "center",
                     padding: "0.6rem 0.85rem", borderRadius: "8px", background: "var(--spec-bg)",
