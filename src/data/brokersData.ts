@@ -9,6 +9,10 @@ export interface BrokerBrokerage {
   intraday: string;
   futures: string;
   options: string;
+  currencyFutures?: string;
+  currencyOptions?: string;
+  commodityFutures?: string;
+  commodityOptions?: string;
 }
 
 export interface BrokerTaxes {
@@ -45,6 +49,12 @@ export interface BrokerData {
   margins: {
     delivery: string;
     intraday: string;
+    futures?: string;
+    options?: string;
+    currencyFutures?: string;
+    currencyOptions?: string;
+    commodityFutures?: string;
+    commodityOptions?: string;
   };
   platforms: string[];
   pros: string[];
@@ -99,11 +109,21 @@ export const BROKERS_DATA: BrokerData[] = [
       delivery: "0.05% or ₹20 max",
       intraday: "0.05% or ₹20 max",
       futures: "₹20 flat",
-      options: "₹20 flat"
+      options: "₹20 flat",
+      currencyFutures: "-",
+      currencyOptions: "-",
+      commodityFutures: "-",
+      commodityOptions: "-"
     },
     margins: {
-      delivery: "1x (No Leverage)",
-      intraday: "Up to 5x"
+      delivery: "1x",
+      intraday: "Up to 5x",
+      futures: "-",
+      options: "-",
+      currencyFutures: "-",
+      currencyOptions: "-",
+      commodityFutures: "-",
+      commodityOptions: "-"
     },
     platforms: ["Groww Web", "Groww App (iOS & Android)"],
     pros: [
@@ -238,11 +258,21 @@ export const BROKERS_DATA: BrokerData[] = [
       delivery: "₹0 (Free)",
       intraday: "0.03% or ₹20 max",
       futures: "0.03% or ₹20 max",
-      options: "₹20 flat"
+      options: "₹20 flat",
+      currencyFutures: "0.03% or ₹20 max",
+      currencyOptions: "₹20 flat",
+      commodityFutures: "0.03% or ₹20 max",
+      commodityOptions: "₹20 flat"
     },
     margins: {
-      delivery: "1x (No Leverage)",
-      intraday: "Up to 5x"
+      delivery: "1x",
+      intraday: "Up to 5x",
+      futures: "-",
+      options: "-",
+      currencyFutures: "-",
+      currencyOptions: "-",
+      commodityFutures: "-",
+      commodityOptions: "-"
     },
     platforms: ["Kite Web", "Kite Mobile App", "Console (Backoffice)", "Sensibull"],
     pros: [
