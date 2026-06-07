@@ -185,6 +185,13 @@ export default function CreditCardCountryPage() {
                       <span>{card.overallRating}</span>
                     </div>
                   </div>
+                  <Link 
+                    href={`/${countrySlug}/credit-card/${card.slug}`}
+                    className="btn btn-primary desktop-only-btn"
+                    style={{ padding: "0.6rem 1.4rem", fontSize: "0.85rem", borderRadius: "10px", textDecoration: "none" }}
+                  >
+                    Full Details
+                  </Link>
                 </div>
 
                 {/* Middle Row: Type pills and dynamic checkers */}
@@ -241,7 +248,7 @@ export default function CreditCardCountryPage() {
 
                 <Link 
                   href={`/${countrySlug}/credit-card/${card.slug}`} 
-                  className="btn btn-primary full-review-btn" 
+                  className="btn btn-primary full-review-btn mobile-only-btn" 
                   style={{ padding: "0.6rem 1.4rem", fontSize: "0.85rem", borderRadius: "10px", textDecoration: "none" }}
                 >
                   Full Detailed Review

@@ -166,6 +166,13 @@ export default function PaymentAppsCountryPage() {
                     Active Userbase: {app.activeUsers} • Liked by: {app.likes} members
                   </span>
                 </div>
+                <Link 
+                  href={`/${countrySlug}/payment-apps/${app.slug}`}
+                  className="btn btn-primary desktop-only-btn"
+                  style={{ padding: "0.45rem 1rem", fontSize: "0.8rem", borderRadius: "8px", textDecoration: "none" }}
+                >
+                  Full Specs & Reviews
+                </Link>
               </div>
 
               {/* Supported Payment Channels */}
@@ -206,7 +213,7 @@ export default function PaymentAppsCountryPage() {
 
               <Link 
                 href={`/${countrySlug}/payment-apps/${app.slug}`}
-                className="btn btn-primary full-review-btn"
+                className="btn btn-primary full-review-btn mobile-only-btn"
                 style={{ padding: "0.45rem 1rem", fontSize: "0.8rem", borderRadius: "8px", textDecoration: "none" }}
               >
                 Full Detailed Review

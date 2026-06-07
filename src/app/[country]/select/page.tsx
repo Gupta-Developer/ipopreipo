@@ -267,6 +267,9 @@ export default function SelectFinologyDashboard() {
                             {b.type}
                           </span>
                         </div>
+                        <Link href={`/${countrySlug}/brokers/${b.slug}`} className="btn btn-primary desktop-only-btn" style={{ padding: "0.45rem 1.25rem", fontSize: "0.82rem", borderRadius: "8px", textDecoration: "none" }}>
+                          Full Details Review
+                        </Link>
                       </div>
 
                       {/* Segments checklist */}
@@ -303,7 +306,7 @@ export default function SelectFinologyDashboard() {
                         </div>
                       </div>
 
-                      <Link href={`/${countrySlug}/brokers/${b.slug}`} className="btn btn-primary full-review-btn" style={{ padding: "0.45rem 1.25rem", fontSize: "0.82rem", borderRadius: "8px", textDecoration: "none" }}>
+                      <Link href={`/${countrySlug}/brokers/${b.slug}`} className="btn btn-primary full-review-btn mobile-only-btn" style={{ padding: "0.45rem 1.25rem", fontSize: "0.82rem", borderRadius: "8px", textDecoration: "none" }}>
                         Full Detailed Review
                       </Link>
 
@@ -383,6 +386,9 @@ export default function SelectFinologyDashboard() {
                             {c.type} • Best for: {c.bestFor}
                           </span>
                         </div>
+                        <Link href={`/${countrySlug}/credit-card/${c.slug}`} className="btn btn-primary desktop-only-btn" style={{ padding: "0.45rem 1.25rem", fontSize: "0.82rem", borderRadius: "8px", textDecoration: "none" }}>
+                          Full Details Review
+                        </Link>
                       </div>
 
                       {/* Checklist */}
@@ -419,7 +425,7 @@ export default function SelectFinologyDashboard() {
                         </div>
                       </div>
 
-                      <Link href={`/${countrySlug}/credit-card/${c.slug}`} className="btn btn-primary full-review-btn" style={{ padding: "0.45rem 1.25rem", fontSize: "0.82rem", borderRadius: "8px", textDecoration: "none" }}>
+                      <Link href={`/${countrySlug}/credit-card/${c.slug}`} className="btn btn-primary full-review-btn mobile-only-btn" style={{ padding: "0.45rem 1.25rem", fontSize: "0.82rem", borderRadius: "8px", textDecoration: "none" }}>
                         Full Detailed Review
                       </Link>
 
