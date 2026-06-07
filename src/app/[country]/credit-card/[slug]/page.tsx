@@ -334,6 +334,64 @@ export default function CardReviewPage() {
         </aside>
       </section>
 
+      {/* Editorial Detailed Article */}
+      {card.detailedArticle && (
+        <div className="card" style={{ marginTop: "3rem", padding: "2.5rem" }}>
+          <h2 style={{ fontSize: "1.6rem", fontWeight: "900", marginBottom: "1.5rem", borderBottom: "1px solid var(--border-color)", paddingBottom: "0.75rem" }} className="text-gradient-purple">
+            {card.detailedArticle.title}
+          </h2>
+          <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem", lineHeight: "1.75", marginBottom: "2rem" }}>
+            {card.detailedArticle.intro}
+          </p>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: "2.25rem" }}>
+            {card.detailedArticle.sections.map((sect, idx) => (
+              <div key={idx}>
+                <h3 style={{ fontSize: "1.2rem", fontWeight: "800", color: "var(--primary)", marginBottom: "0.85rem" }}>
+                  {sect.heading}
+                </h3>
+                {sect.content && (
+                  <p style={{ color: "var(--text-secondary)", fontSize: "0.92rem", lineHeight: "1.65", marginBottom: "1rem" }}>
+                    {sect.content}
+                  </p>
+                )}
+                {sect.items && sect.items.length > 0 && (
+                  <ul style={{ display: "flex", flexDirection: "column", gap: "0.75rem", paddingLeft: "1.2rem", marginBottom: "1.5rem" }}>
+                    {sect.items.map((item, itemIdx) => (
+                      <li key={itemIdx} style={{ color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: "1.5" }}>
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {sect.table && (
+                  <div style={{ overflowX: "auto", margin: "1rem 0 1.5rem" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "0.85rem" }}>
+                      <thead>
+                        <tr style={{ borderBottom: "1px solid var(--border-color)", color: "var(--text-secondary)" }}>
+                          {sect.table.headers.map((th, thIdx) => (
+                            <th key={thIdx} style={{ padding: "0.75rem 0.5rem" }}>{th}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {sect.table.rows.map((row, rowIdx) => (
+                          <tr key={rowIdx} style={{ borderBottom: "1px solid var(--border-color)" }}>
+                            {row.map((td, tdIdx) => (
+                              <td key={tdIdx} style={{ padding: "0.75rem 0.5rem", color: tdIdx === 0 ? "var(--text-secondary)" : "var(--text-primary)", fontWeight: tdIdx === 0 ? "500" : "600" }}>{td}</td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

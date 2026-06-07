@@ -41,6 +41,11 @@ export interface CreditCardDetail {
     fuel: boolean;
     rewards: boolean;
     shopping: boolean;
+    cashback: boolean;
+    dining: boolean;
+    insurance: boolean;
+    interest: boolean;
+    lounge: boolean;
   };
   perks: CardPerk[];
   fees: FeeDetails;
@@ -56,6 +61,16 @@ export interface CreditCardDetail {
   reviewContent: string;
   reviewOverviewTable: { label: string; value: string }[];
   country: string;
+  detailedArticle?: {
+    title: string;
+    intro: string;
+    sections: {
+      heading: string;
+      content?: string;
+      items?: string[];
+      table?: { headers: string[]; rows: string[][] };
+    }[];
+  };
 }
 
 export const CREDIT_CARDS_CATALOG: CreditCardDetail[] = [
@@ -76,7 +91,12 @@ export const CREDIT_CARDS_CATALOG: CreditCardDetail[] = [
       travel: false,
       fuel: true,
       rewards: false,
-      shopping: false
+      shopping: false,
+      cashback: true,
+      dining: false,
+      insurance: false,
+      interest: false,
+      lounge: false
     },
     perks: [
       {
@@ -164,7 +184,37 @@ export const CREDIT_CARDS_CATALOG: CreditCardDetail[] = [
       { label: "Cashback cap", value: "₹5,000 per statement cycle" },
       { label: "Card type", value: "Cashback" },
       { label: "Card network", value: "Visa" }
-    ]
+    ],
+    detailedArticle: {
+      title: "SBI Cashback Credit Card In-depth Review",
+      intro: "SBI Cashback Credit Card has taken the Indian credit card market by storm since its launch. With an aggressive 5% cashback rate on online spends and direct statements cashback credits, it has quickly established itself as one of the best cashback credit cards in India. Let's dive deep into the rewards, conditions, and slabs of this card.",
+      sections: [
+        {
+          heading: "SBI Cashback Credit Card Review",
+          content: "If you like retail therapy or pay most of your bills online, then the SBI Cashback credit card is made for you. From ordering food and booking flights to grabbing the latest fashion deals, this card ensures that you get cashback on almost everything you buy without the hassle of redeeming reward points. The 5% cashback on online spending is definitely the highlight, making it a solid choice for those who prefer swiping digitally over spending cash. On top of that, the 1% cashback on offline spending ensures that even your grocery runs and cafe visits don't go completely unrewarded."
+        },
+        {
+          heading: "Cashback Exclusions & Limits",
+          content: "But like everything in life, this card comes with a few conditions. The ₹5,000 monthly cashback cap means that if you're someone who splurges heavily online, you'll hit the limit pretty quickly. And while it covers most online expenses, some transactions do not earn cashback at all.",
+          items: [
+            "Excluded categories: Education, Fuel, Jewelry, Insurance, Rent, Utilities, and Wallets.",
+            "Monthly cap: Maximum ₹5,000 cashback per statement cycle."
+          ]
+        },
+        {
+          heading: "SBI Cashback Credit Card Maximum Cashback Slabs",
+          content: "The SBI Cashback credit card offers attractive cashback rates on both online and offline purchases. However, there's a limit to how much cashback you can earn:",
+          table: {
+            headers: ["Type of spend", "Cashback rate"],
+            rows: [
+              ["Online purchases", "5% cashback (capped at ₹5,000 per month)"],
+              ["Offline transactions", "1% cashback (no cap)"],
+              ["Non-eligible transactions", "No cashback"]
+            ]
+          }
+        }
+      ]
+    }
   },
   {
     slug: "tata-neu-infinity-hdfc",
@@ -183,7 +233,12 @@ export const CREDIT_CARDS_CATALOG: CreditCardDetail[] = [
       travel: false,
       fuel: true,
       rewards: true,
-      shopping: false
+      shopping: false,
+      cashback: false,
+      dining: false,
+      insurance: true,
+      interest: false,
+      lounge: true
     },
     perks: [
       {
@@ -276,7 +331,12 @@ export const CREDIT_CARDS_CATALOG: CreditCardDetail[] = [
       travel: false,
       fuel: true,
       rewards: true,
-      shopping: false
+      shopping: false,
+      cashback: false,
+      dining: true,
+      insurance: false,
+      interest: false,
+      lounge: false
     },
     perks: [
       {
