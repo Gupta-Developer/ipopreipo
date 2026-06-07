@@ -189,67 +189,82 @@ export default function BrokerDetailPage() {
       {/* Sticky Navigation Bar */}
       <div style={{ 
         position: "sticky", 
-        top: "0", 
+        top: "1rem", 
         zIndex: 100, 
-        background: "rgba(10, 11, 14, 0.8)", 
-        backdropFilter: "blur(12px)", 
-        borderBottom: "1px solid var(--border-color)", 
-        marginBottom: "2.5rem", 
-        display: "flex", 
-        gap: "1.5rem",
-        padding: "1rem 0",
+        display: "flex",
+        justifyContent: "center",
+        width: "100%",
+        marginBottom: "3rem",
       }}>
-        <button 
-          onClick={() => {
-            document.getElementById("specs")?.scrollIntoView({ behavior: "smooth", block: "start" });
-          }}
-          style={{ 
-            padding: "0.5rem 1rem", 
-            borderBottom: activeSection === "specs" ? "2px solid var(--primary)" : "none", 
-            fontWeight: activeSection === "specs" ? "700" : "500",
-            color: activeSection === "specs" ? "var(--text-primary)" : "var(--text-secondary)",
-            fontSize: "0.95rem",
-            background: "none",
-            border: "none",
-            cursor: "pointer"
-          }}
-        >
-          Charges & specs
-        </button>
-        <button 
-          onClick={() => {
-            document.getElementById("taxes")?.scrollIntoView({ behavior: "smooth", block: "start" });
-          }}
-          style={{ 
-            padding: "0.5rem 1rem", 
-            borderBottom: activeSection === "taxes" ? "2px solid var(--primary)" : "none", 
-            fontWeight: activeSection === "taxes" ? "700" : "500",
-            color: activeSection === "taxes" ? "var(--text-primary)" : "var(--text-secondary)",
-            fontSize: "0.95rem",
-            background: "none",
-            border: "none",
-            cursor: "pointer"
-          }}
-        >
-          Transaction Taxes
-        </button>
-        <button 
-          onClick={() => {
-            document.getElementById("reviews")?.scrollIntoView({ behavior: "smooth", block: "start" });
-          }}
-          style={{ 
-            padding: "0.5rem 1rem", 
-            borderBottom: activeSection === "reviews" ? "2px solid var(--primary)" : "none", 
-            fontWeight: activeSection === "reviews" ? "700" : "500",
-            color: activeSection === "reviews" ? "var(--text-primary)" : "var(--text-secondary)",
-            fontSize: "0.95rem",
-            background: "none",
-            border: "none",
-            cursor: "pointer"
-          }}
-        >
-          Ratings & Reviews
-        </button>
+        <div style={{
+          display: "flex", 
+          gap: "0.5rem",
+          padding: "0.45rem",
+          background: "var(--card-bg)", 
+          backdropFilter: "blur(18px)", 
+          WebkitBackdropFilter: "blur(18px)",
+          borderRadius: "30px", 
+          border: "1px solid var(--border-color)", 
+          boxShadow: "var(--shadow-md)",
+        }}>
+          <button 
+            onClick={() => {
+              document.getElementById("specs")?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
+            style={{ 
+              padding: "0.6rem 1.25rem", 
+              borderRadius: "20px",
+              background: activeSection === "specs" ? "var(--primary)" : "transparent",
+              color: activeSection === "specs" ? "#ffffff" : "var(--text-secondary)",
+              fontWeight: "700",
+              fontSize: "0.9rem",
+              border: "none",
+              cursor: "pointer",
+              transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+              boxShadow: activeSection === "specs" ? "0 4px 14px rgba(99, 102, 241, 0.4)" : "none"
+            }}
+          >
+            Charges & specs
+          </button>
+          <button 
+            onClick={() => {
+              document.getElementById("taxes")?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
+            style={{ 
+              padding: "0.6rem 1.25rem", 
+              borderRadius: "20px",
+              background: activeSection === "taxes" ? "var(--primary)" : "transparent",
+              color: activeSection === "taxes" ? "#ffffff" : "var(--text-secondary)",
+              fontWeight: "700",
+              fontSize: "0.9rem",
+              border: "none",
+              cursor: "pointer",
+              transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+              boxShadow: activeSection === "taxes" ? "0 4px 14px rgba(99, 102, 250, 0.4)" : "none"
+            }}
+          >
+            Transaction Taxes
+          </button>
+          <button 
+            onClick={() => {
+              document.getElementById("reviews")?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
+            style={{ 
+              padding: "0.6rem 1.25rem", 
+              borderRadius: "20px",
+              background: activeSection === "reviews" ? "var(--primary)" : "transparent",
+              color: activeSection === "reviews" ? "#ffffff" : "var(--text-secondary)",
+              fontWeight: "700",
+              fontSize: "0.9rem",
+              border: "none",
+              cursor: "pointer",
+              transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+              boxShadow: activeSection === "reviews" ? "0 4px 14px rgba(99, 102, 241, 0.4)" : "none"
+            }}
+          >
+            Ratings & Reviews
+          </button>
+        </div>
       </div>
 
       {/* CONTENT FEED (SCROLLABLE SECTIONS) */}
