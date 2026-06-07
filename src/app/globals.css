@@ -756,10 +756,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .credit-card-mockup {
-  width: 360px;
-  height: 220px;
-  border-radius: 18px;
-  padding: 1.5rem;
+  width: 100%;
+  max-width: 280px;
+  aspect-ratio: 1.58 / 1;
+  height: auto;
+  border-radius: 14px;
+  padding: 1.25rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -772,6 +774,17 @@ h1, h2, h3, h4, h5, h6 {
   transform-style: preserve-3d;
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255,255,255,0.04) inset;
 }
+
+.premium-row-card-credit {
+  grid-template-columns: 280px 1fr;
+}
+
+@media (max-width: 768px) {
+  .premium-row-card-credit {
+    grid-template-columns: 1fr;
+  }
+}
+
 
 .credit-card-mockup::before {
   content: "";

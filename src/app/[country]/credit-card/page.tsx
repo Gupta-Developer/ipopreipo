@@ -133,7 +133,7 @@ export default function CreditCardCountryPage() {
           return (
             <div 
               key={card.slug} 
-              className="premium-row-card"
+              className="premium-row-card premium-row-card-credit"
             >
               {/* Left Column: Styled 3D Realistic Credit Card */}
               <div className="card-mockup-wrapper">
