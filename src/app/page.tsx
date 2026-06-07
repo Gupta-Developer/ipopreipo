@@ -2,42 +2,44 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { BROKERS_DATA } from "@/data/brokersData";
+import { CREDIT_CARDS_CATALOG } from "@/data/cardsData";
+import { BANKS_DATA } from "@/data/banksData";
+import { PAYMENT_APPS_DATA } from "@/data/paymentAppsData";
 
-// Mock data for display
-const MINI_IPOS = [
-  { name: "CloudScale AI Systems", ticker: "CSAI", gmp: "+48%", size: "$850M", status: "Active" },
-  { name: "BioGenex Therapeutics", ticker: "BGNX", gmp: "+12%", size: "$320M", status: "Active" },
-  { name: "Quantum Security Lab", ticker: "QSL", gmp: "+35%", size: "$510M", status: "Upcoming" }
+// Core unlisted equity listings (Pre-IPO)
+const PRE_IPO_PREVIEWS = [
+  { name: "SpaceX", estPrice: "₹9,450", valuation: "$210 Billion", growth: "+45%", type: "Aerospace & Satellite", slug: "spacex" },
+  { name: "Stripe", estPrice: "₹2,385", valuation: "$70 Billion", growth: "+32%", type: "Fintech infrastructure", slug: "stripe" },
+  { name: "Canva", estPrice: "₹3,790", valuation: "$26 Billion", growth: "+38%", type: "SaaS design suite", slug: "canva" },
+  { name: "NSE India", estPrice: "₹6,800", valuation: "₹3.2 Lakh Cr", growth: "+58%", type: "Financial Exchange", slug: "nse" }
 ];
 
-const MINI_PREIPOS = [
-  { name: "SpaceX", estPrice: "$112.50", valuation: "$210B", growth: "+45%", type: "Aerospace" },
-  { name: "Stripe", estPrice: "$28.40", valuation: "$70B", growth: "+32%", type: "Fintech" },
-  { name: "Canva", estPrice: "$45.20", valuation: "$26B", growth: "+38%", type: "SaaS" }
-];
-
-const MINI_CARDS = [
-  { name: "SBI Cashback Card", rate: "5% Online Cash Back", fee: "₹999/yr", network: "Visa" },
-  { name: "Tata Neu Infinity HDFC", rate: "5% NeuCoins Slabs", fee: "₹1,499/yr", network: "RuPay" }
-];
-
-const MINI_BROKERS = [
-  { name: "Groww", type: "Discount", delivery: "₹0 (Max ₹20/trade)", rating: "3.8 ★" },
-  { name: "Zerodha", type: "Discount", delivery: "₹0 (Flat free)", rating: "4.4 ★" }
-];
-
-const MINI_APPS = [
-  { name: "PhonePe", type: "UPI & Wallet", limit: "₹1,00,000 daily", logoColor: "#5f259f", letter: "P" },
-  { name: "Google Pay", type: "UPI Payments", limit: "₹1,00,000 daily", logoColor: "#4285f4", letter: "G" }
+// Live IPO GMP Listings
+const IPO_PREVIEWS = [
+  { name: "Hexagon Nutrition Limited", ticker: "HEXA", gmp: "+₹12 (26.6%)", size: "₹1,200 Cr", lotSize: 333, status: "Active" },
+  { name: "UHM Vacation Limited", ticker: "UHMV", gmp: "+₹28 (16.8%)", size: "₹48 Cr", lotSize: 800, status: "Active" },
+  { name: "Vahh Chemicals Limited", ticker: "VAHH", gmp: "+₹10 (16.6%)", size: "₹18 Cr", lotSize: 2000, status: "Active" },
+  { name: "CMR Green Technologies", ticker: "CMRG", gmp: "+₹71 (36.9%)", size: "₹950 Cr", lotSize: 78, status: "Listed" }
 ];
 
 export default function Home() {
-  // Live Interactive Poll state
-  const [votes, setVotes] = useState({ bullish: 1542, bearish: 412, neutral: 285 });
+  const router = useRouter();
+
+  // Search state
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeTab, setActiveTab] = useState<"ipo" | "preipo" | "select">("ipo");
+  
+  // Select Category state
+  const [selectCategory, setSelectCategory] = useState<"cards" | "brokers" | "banks" | "apps">("cards");
+
+  // Vote state
+  const [votes, setVotes] = useState({ bullish: 1845, bearish: 489, neutral: 312 });
   const [userVoted, setUserVoted] = useState<string | null>(null);
 
   const handleVote = (type: "bullish" | "bearish" | "neutral") => {
-    if (userVoted) return; // Prevent double vote
+    if (userVoted) return;
     setVotes((prev) => ({ ...prev, [type]: prev[type] + 1 }));
     setUserVoted(type);
   };
@@ -47,17 +49,49 @@ export default function Home() {
   const percentBearish = Math.round((votes.bearish / totalVotes) * 100);
   const percentNeutral = Math.round((votes.neutral / totalVotes) * 100);
 
+  // Search matching algorithm
+  const searchResults = (() => {
+    if (!searchQuery.trim()) return null;
+    const query = searchQuery.toLowerCase();
+
+    const matchedIpos = IPO_PREVIEWS.filter(ipo => 
+      ipo.name.toLowerCase().includes(query) || ipo.ticker.toLowerCase().includes(query)
+    ).slice(0, 3).map(x => ({ ...x, category: "Public IPO", url: "/india/ipo" }));
+
+    const matchedPreIpos = PRE_IPO_PREVIEWS.filter(p => 
+      p.name.toLowerCase().includes(query)
+    ).slice(0, 3).map(x => ({ ...x, ticker: "", category: "Pre-IPO Share", url: "/india/preipo" }));
+
+    const matchedCards = CREDIT_CARDS_CATALOG.filter(c => 
+      c.name.toLowerCase().includes(query) || c.issuer.toLowerCase().includes(query)
+    ).slice(0, 3).map(x => ({ name: x.name, ticker: x.issuer, category: "Credit Card", url: `/india/credit-card/${x.slug}` }));
+
+    const matchedBrokers = BROKERS_DATA.filter(b => 
+      b.name.toLowerCase().includes(query)
+    ).slice(0, 3).map(x => ({ name: x.name, ticker: x.type, category: "Demat Broker", url: `/india/brokers/${x.slug}` }));
+
+    const matchedBanks = BANKS_DATA.filter(bk => 
+      bk.name.toLowerCase().includes(query)
+    ).slice(0, 3).map(x => ({ name: x.name, ticker: x.type, category: "Bank Account", url: `/india/bank-accounts/${x.slug}` }));
+
+    const matchedApps = PAYMENT_APPS_DATA.filter(app => 
+      app.name.toLowerCase().includes(query)
+    ).slice(0, 3).map(x => ({ name: x.name, ticker: x.type, category: "Payment App", url: `/india/payment-apps/${x.slug}` }));
+
+    return [...matchedIpos, ...matchedPreIpos, ...matchedCards, ...matchedBrokers, ...matchedBanks, ...matchedApps];
+  })();
+
   return (
     <>
       {/* Live Scrolling Ticker */}
       <div className="ticker-wrap">
         <div className="ticker">
-          <div className="ticker-item">⚡ <strong>MARKET WATCH:</strong> Live Grey Market Premiums (GMP) and subscription metrics</div>
-          <div className="ticker-item">CloudScale AI Systems (CSAI) <span className="badge badge-success">GMP +$21.50 (48%)</span></div>
-          <div className="ticker-item">BioGenex Therapeutics (BGNX) <span className="badge badge-primary">GMP +$2.40 (12%)</span></div>
-          <div className="ticker-item">Quantum Security Lab (QSL) <span className="badge badge-success">GMP +$10.85 (35%)</span></div>
-          <div className="ticker-item">🛸 SpaceX (Pre-IPO) <strong style={{ color: "var(--primary)" }}>$112.50</strong> <span style={{ color: "var(--success)", fontSize: "0.75rem" }}>+45% YoY</span></div>
-          <div className="ticker-item">🛸 Stripe (Pre-IPO) <strong style={{ color: "var(--primary)" }}>$28.40</strong> <span style={{ color: "var(--success)", fontSize: "0.75rem" }}>+32% YoY</span></div>
+          <div className="ticker-item">⚡ <strong>PLATFORM INTEL:</strong> 100% Unbiased Private & Public Listings Directory</div>
+          <div className="ticker-item">Hexagon Nutrition (HEXA) <span className="badge badge-success">GMP +26.6%</span></div>
+          <div className="ticker-item">CMR Green Tech (CMRG) <span className="badge badge-success">Listing Premium +36.9%</span></div>
+          <div className="ticker-item">🛸 SpaceX (Pre-IPO) <strong style={{ color: "var(--primary)" }}>₹9,450</strong> <span style={{ color: "var(--success)", fontSize: "0.75rem" }}>+45% YoY</span></div>
+          <div className="ticker-item">🛸 NSE India (Pre-IPO) <strong style={{ color: "var(--primary)" }}>₹6,800</strong> <span style={{ color: "var(--success)", fontSize: "0.75rem" }}>+58% YoY</span></div>
+          <div className="ticker-item">🛡️ Zero Affiliate Kickbacks Guarantee</div>
         </div>
       </div>
 
@@ -76,168 +110,333 @@ export default function Home() {
         overflow: "hidden"
       }} />
 
-      <div className="app-container" style={{ paddingTop: "3rem", position: "relative", zIndex: 1 }}>
+      <div className="app-container" style={{ paddingTop: "3.5rem", position: "relative", zIndex: 1 }}>
         
-        {/* Premium Hero Title Section */}
-        <header style={{ marginBottom: "4rem", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", padding: "0 0.5rem" }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", background: "rgba(var(--primary-rgb), 0.06)", border: "1px solid rgba(var(--primary-rgb), 0.15)", padding: "0.35rem 1rem", borderRadius: "99px", marginBottom: "1.5rem" }}>
+        {/* Authority & Unbiased Hero Header */}
+        <header style={{ marginBottom: "3.5rem", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", padding: "0 0.5rem" }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", background: "rgba(var(--primary-rgb), 0.06)", border: "1px solid rgba(var(--primary-rgb), 0.15)", padding: "0.4rem 1.25rem", borderRadius: "99px", marginBottom: "1.5rem" }}>
             <span style={{ display: "inline-block", width: "7px", height: "7px", borderRadius: "50%", background: "var(--success)" }} />
-            <span style={{ fontSize: "0.75rem", fontWeight: "700", color: "var(--text-primary)", letterSpacing: "0.05em", textTransform: "uppercase" }}>Unified Global Asset Intel</span>
+            <span style={{ fontSize: "0.78rem", fontWeight: "800", color: "var(--text-primary)", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+              🛡️ 100% Unbiased Audited Capital Intel
+            </span>
           </div>
           
-          <h1 style={{ fontSize: "3.5rem", fontWeight: 900, letterSpacing: "-0.05em", lineHeight: 1.1, maxWidth: "800px" }}>
-            Investments & Offering <span className="text-gradient-purple">Intelligence Hub</span>
+          <h1 style={{ fontSize: "3.5rem", fontWeight: 900, letterSpacing: "-0.05em", lineHeight: 1.1, maxWidth: "880px" }}>
+            India's Leading Authority on <span className="text-gradient-purple">Public & Private Markets</span>
           </h1>
-          <p style={{ color: "var(--text-secondary)", fontSize: "1.1rem", marginTop: "1rem", maxWidth: "600px", lineHeight: 1.5 }}>
-            Real-time Grey Market tracking, private unlisted stocks equity metrics, credit reward comparative slabs, and stock brokerage profiles.
+          <p style={{ color: "var(--text-secondary)", fontSize: "1.1rem", marginTop: "1rem", maxWidth: "680px", lineHeight: 1.6 }}>
+            The largest, commission-free platform for Grey Market premiums, unlisted Pre-IPO valuations, and Select banking products. No affiliations, just pure data.
           </p>
 
-          <div style={{ display: "flex", gap: "1rem", marginTop: "2rem", flexWrap: "wrap", justifyContent: "center", width: "100%" }}>
-            <Link href="/ipo" className="btn btn-primary" style={{ padding: "0.8rem 1.8rem", minWidth: "150px" }}>
-              Explore IPO Tracker
-            </Link>
-            <Link href="/preipo" className="btn btn-secondary" style={{ padding: "0.8rem 1.8rem", minWidth: "150px" }}>
-              Private Markets
-            </Link>
+          {/* Unified Search Engine Bar */}
+          <div style={{ position: "relative", width: "100%", maxWidth: "600px", zIndex: 99 }}>
+            <div className="home-search-bar">
+              <span>🔍</span>
+              <input
+                type="text"
+                placeholder="Search IPO, Pre-IPO unlisted stock, broker, card, bank..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              {searchQuery && (
+                <button 
+                  onClick={() => setSearchQuery("")} 
+                  style={{ background: "transparent", border: "none", color: "var(--text-muted)", cursor: "pointer", marginRight: "1rem" }}
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            {/* Dropdown Floating Search Results */}
+            {searchResults && (
+              <div 
+                className="card" 
+                style={{ 
+                  position: "absolute", 
+                  top: "105%", 
+                  left: 0, 
+                  right: 0, 
+                  background: "var(--card-bg)", 
+                  border: "1px solid var(--card-border)", 
+                  borderRadius: "16px", 
+                  padding: "0.75rem", 
+                  maxHeight: "350px", 
+                  overflowY: "auto", 
+                  textAlign: "left",
+                  boxShadow: "0 20px 40px rgba(0,0,0,0.5)"
+                }}
+              >
+                {searchResults.length === 0 ? (
+                  <div style={{ padding: "1rem", color: "var(--text-secondary)", fontSize: "0.85rem" }}>
+                    No assets matching your query.
+                  </div>
+                ) : (
+                  searchResults.map((item, idx) => (
+                    <div 
+                      key={idx} 
+                      onClick={() => router.push(item.url)}
+                      style={{ 
+                        display: "flex", 
+                        justifyContent: "space-between", 
+                        alignItems: "center", 
+                        padding: "0.75rem 1rem", 
+                        borderRadius: "8px", 
+                        cursor: "pointer", 
+                        transition: "background 0.2s" 
+                      }}
+                      className="premium-spec-cell"
+                    >
+                      <div>
+                        <strong style={{ fontSize: "0.9rem", color: "var(--text-primary)" }}>{item.name}</strong>
+                        {item.ticker && (
+                          <span style={{ fontSize: "0.72rem", color: "var(--text-muted)", marginLeft: "0.5rem", fontFamily: "var(--font-mono)" }}>
+                            ({item.ticker})
+                          </span>
+                        )}
+                      </div>
+                      <span className="badge badge-primary" style={{ fontSize: "0.65rem" }}>{item.category}</span>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
           </div>
         </header>
 
-        {/* Global Statistics Cards Grid */}
-        <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))", gap: "1.5rem", marginBottom: "3.5rem" }}>
-          <div className="card" style={{ padding: "1.5rem 1.75rem" }}>
-            <span style={{ color: "var(--text-secondary)", fontSize: "0.72rem", textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: 700 }}>Average Listing Gains</span>
-            <div style={{ fontSize: "2.4rem", fontWeight: 900, margin: "0.25rem 0", color: "var(--success)", letterSpacing: "-0.02em" }}>+34.2%</div>
-            <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", fontWeight: "500" }}>Across YTD 2026 Listings</div>
+        {/* Global Statistics & Trust Counters Bar */}
+        <section className="trust-stats-bar">
+          <div className="trust-stat-item">
+            <div className="trust-stat-value">₹0</div>
+            <div className="trust-stat-label">Affiliate Kickbacks</div>
           </div>
-          <div className="card" style={{ padding: "1.5rem 1.75rem" }}>
-            <span style={{ color: "var(--text-secondary)", fontSize: "0.72rem", textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: 700 }}>Capital Raised YTD</span>
-            <div style={{ fontSize: "2.4rem", fontWeight: 900, margin: "0.25rem 0", color: "var(--text-primary)", letterSpacing: "-0.02em" }}>$12.45B</div>
-            <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", fontWeight: "500" }}>Across 42 Global Offerings</div>
+          <div className="trust-stat-item">
+            <div className="trust-stat-value">48+</div>
+            <div className="trust-stat-label">Audited IPOs YTD</div>
           </div>
-          <div className="card" style={{ padding: "1.5rem 1.75rem" }}>
-            <span style={{ color: "var(--text-secondary)", fontSize: "0.72rem", textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: 700 }}>Pre-IPO Capital Flow</span>
-            <div style={{ fontSize: "2.4rem", fontWeight: 900, margin: "0.25rem 0", color: "var(--primary)", letterSpacing: "-0.02em" }}>+$3.8B</div>
-            <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", fontWeight: "500" }}>Recorded Secondary Deals</div>
+          <div className="trust-stat-item">
+            <div className="trust-stat-value">120+</div>
+            <div className="trust-stat-label">Pre-IPO Benchmarks</div>
           </div>
-          <div className="card" style={{ padding: "1.5rem 1.75rem" }}>
-            <span style={{ color: "var(--text-secondary)", fontSize: "0.72rem", textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: 700 }}>Oversubscription Max</span>
-            <div style={{ fontSize: "2.4rem", fontWeight: 900, margin: "0.25rem 0", color: "var(--warning)", letterSpacing: "-0.02em" }}>12.8x</div>
-            <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", fontWeight: "500" }}>Reflecting Retail Interest</div>
+          <div className="trust-stat-item">
+            <div className="trust-stat-value">100%</div>
+            <div className="trust-stat-label">Unbiased Audits</div>
           </div>
         </section>
 
-        {/* Dynamic Interactive Dashboards Area */}
+        {/* Value Pillars (Why We Are Unbiased & Large) */}
+        <section className="pillar-grid">
+          <div className="pillar-card">
+            <div className="pillar-icon-wrapper">🛡️</div>
+            <h3 style={{ fontSize: "1.25rem", fontWeight: 800 }}>Audit Over Commission</h3>
+            <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", lineHeight: 1.5 }}>
+              Most reviews are paid by affiliate tracking tags. We do not accept broker commission structures, keeping every listing opening, AMC, and delivery markup completely raw.
+            </p>
+          </div>
+          <div className="pillar-card">
+            <div className="pillar-icon-wrapper">🛸</div>
+            <h3 style={{ fontSize: "1.25rem", fontWeight: 800 }}>Unified Capital Access</h3>
+            <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", lineHeight: 1.5 }}>
+              Map private unlisted benchmarks alongside live public listings. From SpaceX secondary equity to SME launches, track premiums without switching platforms.
+            </p>
+          </div>
+          <div className="pillar-card">
+            <div className="pillar-icon-wrapper">💎</div>
+            <h3 style={{ fontSize: "1.25rem", fontWeight: 800 }}>Select Audited Catalog</h3>
+            <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", lineHeight: 1.5 }}>
+              Handpicked cards, bank account limits, and payment app configurations. Use our integrated brokerage plans checker to calculate exact transaction costs.
+            </p>
+          </div>
+        </section>
+
+        {/* Interactive Asset Explorer Dashboard */}
         <div className="grid-dashboard" style={{ marginBottom: "4rem" }}>
           
           <main style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
             
-            {/* Module 1: IPO launches list */}
-            <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-              <div className="flex-between" style={{ borderBottom: "1px solid var(--border-color)", paddingBottom: "1rem" }}>
-                <div>
-                  <h2 style={{ fontSize: "1.4rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                    <span>📅</span> IPO Calendar Intel
-                  </h2>
-                  <p style={{ fontSize: "0.8rem", color: "var(--text-secondary)", marginTop: "0.25rem", fontWeight: "normal" }}>Live Grey Market Premiums (GMP) & prices</p>
-                </div>
-                <span className="badge badge-primary">3 Live Tracker</span>
-              </div>
-              
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.85rem" }}>
-                {MINI_IPOS.map((i, idx) => (
-                  <div key={idx} className="premium-spec-cell" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <div>
-                      <strong style={{ fontSize: "0.95rem", color: "var(--text-primary)" }}>{i.name}</strong>
-                      <div style={{ fontSize: "0.75rem", color: "var(--text-secondary)", marginTop: "0.15rem" }}>
-                        Ticker: <span style={{ fontFamily: "var(--font-mono)", color: "var(--text-primary)" }}>{i.ticker}</span> • Size: {i.size}
-                      </div>
-                    </div>
-                    <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-                      <span className="badge badge-success" style={{ fontWeight: "700" }}>{i.gmp} GMP</span>
-                      <span style={{ fontSize: "0.7rem", color: "var(--text-muted)" }}>{i.status}</span>
-                    </div>
-                  </div>
-                ))}
+            {/* Explorer Section Card */}
+            <div className="card" style={{ padding: "2rem" }}>
+              <div style={{ textAlign: "center", marginBottom: "2rem" }}>
+                <h2 style={{ fontSize: "1.8rem", fontWeight: 900 }}>Capital Listings Explorer</h2>
+                <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "0.25rem" }}>
+                  Select a category below to explore live audited ratings and metrics.
+                </p>
               </div>
 
-              <Link href="/ipo" className="btn btn-secondary" style={{ width: "100%", marginTop: "0.5rem" }}>
-                Open Full IPO Intelligence Calendar →
-              </Link>
-            </div>
-
-            {/* Module 2: Pre-IPO section */}
-            <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-              <div className="flex-between" style={{ borderBottom: "1px solid var(--border-color)", paddingBottom: "1rem" }}>
-                <div>
-                  <h2 style={{ fontSize: "1.4rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                    <span>🛸</span> Private Equity Shares
-                  </h2>
-                  <p style={{ fontSize: "0.8rem", color: "var(--text-secondary)", marginTop: "0.25rem", fontWeight: "normal" }}>Unlisted secondary equity shares trading valuation</p>
-                </div>
-                <span className="badge badge-success">High Demand</span>
+              {/* Tab Selector */}
+              <div className="home-tab-nav">
+                <button 
+                  onClick={() => setActiveTab("ipo")} 
+                  className={`home-tab-btn ${activeTab === "ipo" ? "active" : ""}`}
+                >
+                  📅 Public IPOs
+                </button>
+                <button 
+                  onClick={() => setActiveTab("preipo")} 
+                  className={`home-tab-btn ${activeTab === "preipo" ? "active" : ""}`}
+                >
+                  🛸 Private Pre-IPOs
+                </button>
+                <button 
+                  onClick={() => setActiveTab("select")} 
+                  className={`home-tab-btn ${activeTab === "select" ? "active" : ""}`}
+                >
+                  💎 Select Catalog
+                </button>
               </div>
 
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.85rem" }}>
-                {MINI_PREIPOS.map((p, idx) => (
-                  <div key={idx} className="premium-spec-cell" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <div>
-                      <strong style={{ fontSize: "0.95rem", color: "var(--text-primary)" }}>{p.name}</strong>
-                      <div style={{ fontSize: "0.75rem", color: "var(--text-secondary)", marginTop: "0.15rem" }}>
-                        Valuation: <strong style={{ color: "var(--text-primary)" }}>{p.valuation}</strong> • {p.type}
-                      </div>
-                    </div>
-                    <div style={{ textAlign: "right" }}>
-                      <div style={{ fontSize: "0.95rem", fontWeight: "800", color: "var(--text-primary)" }}>{p.estPrice}</div>
-                      <span style={{ fontSize: "0.7rem", color: "var(--success)", fontWeight: "600" }}>{p.growth} YoY</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <Link href="/preipo" className="btn btn-secondary" style={{ width: "100%", marginTop: "0.5rem" }}>
-                Explore Private Capital Markets →
-              </Link>
-            </div>
-
-            {/* Module 3: Payment Apps */}
-            <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-              <div className="flex-between" style={{ borderBottom: "1px solid var(--border-color)", paddingBottom: "1rem" }}>
-                <div>
-                  <h2 style={{ fontSize: "1.4rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                    <span>📱</span> Payment Channels & Wallets
-                  </h2>
-                  <p style={{ fontSize: "0.8rem", color: "var(--text-secondary)", marginTop: "0.25rem", fontWeight: "normal" }}>Compare limits, loading charges, and channels</p>
-                </div>
-                <span className="badge badge-primary">New Category</span>
-              </div>
-
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.85rem" }}>
-                {MINI_APPS.map((app, idx) => (
-                  <div key={idx} className="premium-spec-cell" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                      <div style={{ width: "36px", height: "36px", borderRadius: "8px", background: `${app.logoColor}15`, border: `1px solid ${app.logoColor}40`, display: "flex", alignItems: "center", justifyContent: "center", color: app.logoColor, fontWeight: "900" }}>
-                        {app.letter}
-                      </div>
+              {/* TAB CONTENT 1: PUBLIC IPOS */}
+              {activeTab === "ipo" && (
+                <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                  {IPO_PREVIEWS.map((ipo, idx) => (
+                    <div key={idx} className="premium-spec-cell" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "1rem" }}>
                       <div>
-                        <strong style={{ fontSize: "0.95rem", color: "var(--text-primary)" }}>{app.name}</strong>
-                        <div style={{ fontSize: "0.75rem", color: "var(--text-secondary)", marginTop: "0.15rem" }}>{app.type}</div>
+                        <strong style={{ fontSize: "1rem", color: "var(--text-primary)" }}>{ipo.name}</strong>
+                        <div style={{ fontSize: "0.75rem", color: "var(--text-secondary)", marginTop: "0.15rem" }}>
+                          Ticker: <span style={{ fontFamily: "var(--font-mono)" }}>{ipo.ticker}</span> • Size: {ipo.size}
+                        </div>
+                      </div>
+                      <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+                        <span className="badge badge-success" style={{ fontWeight: 800 }}>{ipo.gmp} GMP</span>
+                        <span className="badge badge-secondary" style={{ fontSize: "0.65rem" }}>{ipo.status}</span>
                       </div>
                     </div>
-                    <span style={{ fontSize: "0.8rem", color: "var(--text-primary)", fontWeight: "600" }}>{app.limit}</span>
+                  ))}
+                  <Link href="/india/ipo" className="btn btn-primary" style={{ textAlign: "center", marginTop: "1rem", textDecoration: "none" }}>
+                    Explore All IPO Listings →
+                  </Link>
+                </div>
+              )}
+
+              {/* TAB CONTENT 2: PRIVATE PRE-IPOS */}
+              {activeTab === "preipo" && (
+                <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                  {PRE_IPO_PREVIEWS.map((p, idx) => (
+                    <div key={idx} className="premium-spec-cell" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "1rem" }}>
+                      <div>
+                        <strong style={{ fontSize: "1rem", color: "var(--text-primary)" }}>{p.name}</strong>
+                        <div style={{ fontSize: "0.75rem", color: "var(--text-secondary)", marginTop: "0.15rem" }}>
+                          Valuation: <strong>{p.valuation}</strong> • {p.type}
+                        </div>
+                      </div>
+                      <div style={{ textAlign: "right" }}>
+                        <strong style={{ color: "var(--primary)" }}>{p.estPrice}</strong>
+                        <div style={{ fontSize: "0.7rem", color: "var(--success)" }}>{p.growth} YoY</div>
+                      </div>
+                    </div>
+                  ))}
+                  <Link href="/india/preipo" className="btn btn-primary" style={{ textAlign: "center", marginTop: "1rem", textDecoration: "none" }}>
+                    Explore All Pre-IPO Offerings →
+                  </Link>
+                </div>
+              )}
+
+              {/* TAB CONTENT 3: SELECT CATALOG */}
+              {activeTab === "select" && (
+                <div>
+                  {/* Select Sub categories */}
+                  <div style={{ display: "flex", justifyContent: "center", gap: "0.5rem", marginBottom: "1.5rem", flexWrap: "wrap" }}>
+                    <button 
+                      onClick={() => setSelectCategory("cards")} 
+                      className="badge" 
+                      style={{ background: selectCategory === "cards" ? "var(--primary)" : "rgba(255,255,255,0.05)", color: "#fff", cursor: "pointer", border: "none" }}
+                    >
+                      💳 Credit Cards ({CREDIT_CARDS_CATALOG.length})
+                    </button>
+                    <button 
+                      onClick={() => setSelectCategory("brokers")} 
+                      className="badge" 
+                      style={{ background: selectCategory === "brokers" ? "var(--primary)" : "rgba(255,255,255,0.05)", color: "#fff", cursor: "pointer", border: "none" }}
+                    >
+                      🏛️ Brokers ({BROKERS_DATA.length})
+                    </button>
+                    <button 
+                      onClick={() => setSelectCategory("banks")} 
+                      className="badge" 
+                      style={{ background: selectCategory === "banks" ? "var(--primary)" : "rgba(255,255,255,0.05)", color: "#fff", cursor: "pointer", border: "none" }}
+                    >
+                      🏦 Banks ({BANKS_DATA.length})
+                    </button>
+                    <button 
+                      onClick={() => setSelectCategory("apps")} 
+                      className="badge" 
+                      style={{ background: selectCategory === "apps" ? "var(--primary)" : "rgba(255,255,255,0.05)", color: "#fff", cursor: "pointer", border: "none" }}
+                    >
+                      📱 Apps ({PAYMENT_APPS_DATA.length})
+                    </button>
                   </div>
-                ))}
-              </div>
 
-              <Link href="/india/payment-apps" className="btn btn-secondary" style={{ width: "100%", marginTop: "0.5rem" }}>
-                Compare Payment Apps →
-              </Link>
+                  {/* Sub category preview */}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.85rem" }}>
+                    {selectCategory === "cards" && CREDIT_CARDS_CATALOG.slice(0, 3).map((c, idx) => (
+                      <div key={idx} className="premium-spec-cell flex-between">
+                        <div>
+                          <strong>{c.name}</strong>
+                          <div style={{ fontSize: "0.72rem", color: "var(--text-secondary)", marginTop: "0.15rem" }}>
+                            Best For: {c.bestFor} • Joining Fee: {c.fees.joiningFee}
+                          </div>
+                        </div>
+                        <Link href={`/india/credit-card/${c.slug}`} className="btn btn-secondary" style={{ padding: "0.25rem 0.75rem", fontSize: "0.75rem", textDecoration: "none" }}>
+                          Review
+                        </Link>
+                      </div>
+                    ))}
+
+                    {selectCategory === "brokers" && BROKERS_DATA.slice(0, 3).map((b, idx) => (
+                      <div key={idx} className="premium-spec-cell flex-between">
+                        <div>
+                          <strong>{b.name}</strong>
+                          <div style={{ fontSize: "0.72rem", color: "var(--text-secondary)", marginTop: "0.15rem" }}>
+                            Depository: {b.depository} • AMC: {b.charges.amc}
+                          </div>
+                        </div>
+                        <Link href={`/india/brokers/${b.slug}`} className="btn btn-secondary" style={{ padding: "0.25rem 0.75rem", fontSize: "0.75rem", textDecoration: "none" }}>
+                          Review
+                        </Link>
+                      </div>
+                    ))}
+
+                    {selectCategory === "banks" && BANKS_DATA.slice(0, 3).map((bk, idx) => (
+                      <div key={idx} className="premium-spec-cell flex-between">
+                        <div>
+                          <strong>{bk.name}</strong>
+                          <div style={{ fontSize: "0.72rem", color: "var(--text-secondary)", marginTop: "0.15rem" }}>
+                            Rate: {bk.interestRate} • Balance: {bk.charges.minimumBalance}
+                          </div>
+                        </div>
+                        <Link href={`/india/bank-accounts/${bk.slug}`} className="btn btn-secondary" style={{ padding: "0.25rem 0.75rem", fontSize: "0.75rem", textDecoration: "none" }}>
+                          Review
+                        </Link>
+                      </div>
+                    ))}
+
+                    {selectCategory === "apps" && PAYMENT_APPS_DATA.slice(0, 3).map((app, idx) => (
+                      <div key={idx} className="premium-spec-cell flex-between">
+                        <div>
+                          <strong>{app.name}</strong>
+                          <div style={{ fontSize: "0.72rem", color: "var(--text-secondary)", marginTop: "0.15rem" }}>
+                            Daily Limit: {app.limits.dailyLimit} • Load Fee: {app.charges.walletLoading}
+                          </div>
+                        </div>
+                        <Link href={`/india/payment-apps/${app.slug}`} className="btn btn-secondary" style={{ padding: "0.25rem 0.75rem", fontSize: "0.75rem", textDecoration: "none" }}>
+                          Review
+                        </Link>
+                      </div>
+                    ))}
+                  </div>
+
+                  <Link href="/india/select" className="btn btn-primary" style={{ textAlign: "center", display: "block", marginTop: "1.5rem", textDecoration: "none" }}>
+                    Explore Select Dashboard →
+                  </Link>
+                </div>
+              )}
+
             </div>
-
           </main>
 
           <aside style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
             
-            {/* Sidebar Module: Interactive Market Sentiment Poll */}
+            {/* Sentiment Gauge Card */}
             <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
               <h2 style={{ fontSize: "1.25rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
                 <span>📊</span> Sentiment Gauge
@@ -286,59 +485,12 @@ export default function Home() {
                 </div>
               ) : (
                 <div style={{ textAlign: "center", fontSize: "0.8rem", color: "var(--primary)", fontWeight: "700", background: "rgba(var(--primary-rgb), 0.08)", padding: "0.5rem", borderRadius: "6px" }}>
-                  ✓ Thank you for voting! Sentiment registered.
+                  ✓ Sentiment registered.
                 </div>
               )}
             </div>
 
-            {/* Sidebar Module: Premium Credit Cards Preview */}
-            <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-              <h3 style={{ fontSize: "1.2rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                <span>💳</span> Top Credit Cards
-              </h3>
-              
-              <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                {MINI_CARDS.map((c, idx) => (
-                  <div key={idx} style={{ paddingBottom: "1rem", borderBottom: idx === 0 ? "1px solid var(--border-color)" : "none" }}>
-                    <div className="flex-between">
-                      <strong style={{ fontSize: "0.9rem", color: "var(--text-primary)" }}>{c.name}</strong>
-                      <span className="badge badge-primary" style={{ fontSize: "0.6rem", padding: "0.1rem 0.4rem" }}>{c.network}</span>
-                    </div>
-                    <p style={{ color: "var(--text-secondary)", fontSize: "0.75rem", marginTop: "0.25rem" }}>{c.rate}</p>
-                    <div style={{ fontSize: "0.7rem", color: "var(--text-muted)", marginTop: "0.15rem" }}>Fee: {c.fee}</div>
-                  </div>
-                ))}
-              </div>
-
-              <Link href="/india/credit-card" className="btn btn-secondary" style={{ width: "100%" }}>
-                Compare Premium Cards →
-              </Link>
-            </div>
-
-            {/* Sidebar Module: Brokerage Partner Links */}
-            <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-              <h3 style={{ fontSize: "1.2rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                <span>🏛️</span> Recommended Brokers
-              </h3>
-              
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.85rem" }}>
-                {MINI_BROKERS.map((b, idx) => (
-                  <div key={idx} className="premium-spec-cell" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <div>
-                      <strong style={{ fontSize: "0.9rem", color: "var(--text-primary)" }}>{b.name}</strong>
-                      <div style={{ fontSize: "0.7rem", color: "var(--text-secondary)", marginTop: "0.15rem" }}>{b.type} • Delivery: {b.delivery}</div>
-                    </div>
-                    <strong style={{ fontSize: "0.8rem", color: "var(--warning)" }}>{b.rating}</strong>
-                  </div>
-                ))}
-              </div>
-
-              <Link href="/india/brokers" className="btn btn-secondary" style={{ width: "100%" }}>
-                Compare Demat Brokers →
-              </Link>
-            </div>
-
-            {/* Sidebar Module: Latest News Headlines */}
+            {/* Latest Headlines */}
             <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
               <h3 style={{ fontSize: "1.2rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
                 <span>📰</span> Market Headlines
