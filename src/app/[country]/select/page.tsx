@@ -22,35 +22,49 @@ export default function SelectFinologyDashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showResults, setShowResults] = useState(false);
   const [payments, setPayments] = useState<any[]>([]);
+  const [banks, setBanks] = useState<any[]>([]);
+  const [cards, setCards] = useState<any[]>([]);
+  const [crypto, setCrypto] = useState<any[]>([]);
+  const [brokers, setBrokers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`/api/payment-apps?countrySlug=${countrySlug}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success) {
-          setPayments(data.paymentApps);
-        }
+    setLoading(true);
+    Promise.all([
+      fetch(`/api/payment-apps?countrySlug=${countrySlug}`).then((res) => res.json()).catch(() => ({ success: false })),
+      fetch(`/api/banks?countrySlug=${countrySlug}`).then((res) => res.json()).catch(() => ({ success: false })),
+      fetch(`/api/credit-cards?countrySlug=${countrySlug}`).then((res) => res.json()).catch(() => ({ success: false })),
+      fetch(`/api/crypto-apps?countrySlug=${countrySlug}`).then((res) => res.json()).catch(() => ({ success: false })),
+      fetch(`/api/brokers?countrySlug=${countrySlug}`).then((res) => res.json()).catch(() => ({ success: false }))
+    ])
+      .then(([payData, bankData, cardData, cryptoData, brokerData]) => {
+        setPayments(payData.success && payData.paymentApps ? payData.paymentApps : []);
+        setBanks(bankData.success && bankData.banks ? bankData.banks : BANKS_DATA.filter((b) => b.countrySlug === countrySlug));
+        setCards(cardData.success && cardData.creditCards ? cardData.creditCards : CREDIT_CARDS_CATALOG.filter((c) => c.country.toLowerCase() === countryInfo.name.toLowerCase()));
+        setCrypto(cryptoData.success && cryptoData.cryptoApps ? cryptoData.cryptoApps : CRYPTO_APPS_DATA.filter((c) => c.country.toLowerCase() === countryInfo.name.toLowerCase()));
+        setBrokers(brokerData.success && brokerData.brokers ? brokerData.brokers : BROKERS_DATA.filter((b) => b.countryName.toLowerCase() === countryInfo.name.toLowerCase()));
       })
-      .catch((err) => console.error("Error fetching payment apps for dashboard:", err));
-  }, [countrySlug]);
-
-  // Filter local country data
-  const banks = BANKS_DATA.filter(b => b.countrySlug === countrySlug);
-  const cards = CREDIT_CARDS_CATALOG.filter(c => c.country.toLowerCase() === countryInfo.name.toLowerCase());
-  const crypto = CRYPTO_APPS_DATA.filter(c => c.country.toLowerCase() === countryInfo.name.toLowerCase());
-  const brokers = BROKERS_DATA.filter(b => b.countryName.toLowerCase() === countryInfo.name.toLowerCase());
+      .catch((err) => {
+        console.error("Error fetching dashboard data:", err);
+        setBanks(BANKS_DATA.filter((b) => b.countrySlug === countrySlug));
+        setCards(CREDIT_CARDS_CATALOG.filter((c) => c.country.toLowerCase() === countryInfo.name.toLowerCase()));
+        setCrypto(CRYPTO_APPS_DATA.filter((c) => c.country.toLowerCase() === countryInfo.name.toLowerCase()));
+        setBrokers(BROKERS_DATA.filter((b) => b.countryName.toLowerCase() === countryInfo.name.toLowerCase()));
+      })
+      .finally(() => setLoading(false));
+  }, [countrySlug, countryInfo.name]);
 
   // Universal search dropdown matching
   const allSearchable = [
-    ...banks.map(b => ({ name: b.name, category: "Bank Account", link: `/${countrySlug}/bank-accounts/${b.slug}` })),
-    ...cards.map(c => ({ name: c.name, category: "Credit Card", link: `/${countrySlug}/credit-card/${c.slug}` })),
-    ...payments.map(p => ({ name: p.name, category: "Payment App", link: `/${countrySlug}/payment-apps/${p.slug}` })),
-    ...crypto.map(c => ({ name: c.name, category: "Crypto App", link: `/${countrySlug}/crypto/${c.slug}` })),
-    ...brokers.map(b => ({ name: b.name, category: "Stock Broker", link: `/${countrySlug}/brokers/${b.slug}` }))
+    ...banks.map((b) => ({ name: b.name, category: "Bank Account", link: `/${countrySlug}/bank-accounts/${b.slug}` })),
+    ...cards.map((c) => ({ name: c.name, category: "Credit Card", link: `/${countrySlug}/credit-card/${c.slug}` })),
+    ...payments.map((p) => ({ name: p.name, category: "Payment App", link: `/${countrySlug}/payment-apps/${p.slug}` })),
+    ...crypto.map((c) => ({ name: c.name, category: "Crypto App", link: `/${countrySlug}/crypto/${c.slug}` })),
+    ...brokers.map((b) => ({ name: b.name, category: "Stock Broker", link: `/${countrySlug}/brokers/${b.slug}` }))
   ];
 
   const searchResults = searchQuery
-    ? allSearchable.filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 5)
+    ? allSearchable.filter((item) => item.name.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 5)
     : [];
 
   const handleCountryChange = (slug: string) => {

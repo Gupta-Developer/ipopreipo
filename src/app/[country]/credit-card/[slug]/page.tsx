@@ -56,7 +56,7 @@ export default function CardReviewPage() {
     } else {
       setLikeCount((prev) => prev + 1);
     }
-    hasLiked ? setHasLiked(false) : setHasLiked(true);
+    setHasLiked(!hasLiked);
   };
 
   const renderStars = (rating: number) => {
