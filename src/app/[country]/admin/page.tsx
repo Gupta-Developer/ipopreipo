@@ -27,6 +27,15 @@ interface PendingSubmission {
   submittedAt: string;
 }
 
+const getSelectValue = (countriesString: string) => {
+  if (!countriesString) return "india";
+  const list = countriesString.split(",").map(c => c.trim().toLowerCase()).filter(Boolean);
+  if (list.length >= 3 || list.includes("all")) {
+    return "india, united-states, united-kingdom";
+  }
+  return list[0] || "india";
+};
+
 export default function AdminConsolePage() {
   const params = useParams();
   const router = useRouter();
@@ -1324,7 +1333,17 @@ export default function AdminConsolePage() {
                                       <option value="AUTHOR">AUTHOR</option>
                                       <option value="ADMIN">ADMIN</option>
                                     </select>
-                                    <input type="text" placeholder="e.g. india, united-states" value={editingCountries} onChange={(e) => setEditingCountries(e.target.value)} className="input-field" style={{ padding: "0.25rem", fontSize: "0.78rem", width: "130px", background: "var(--card-bg)" }} />
+                                    <select
+                                      value={getSelectValue(editingCountries)}
+                                      onChange={(e) => setEditingCountries(e.target.value)}
+                                      className="input-field"
+                                      style={{ padding: "0.25rem", fontSize: "0.78rem", width: "130px", background: "var(--card-bg)" }}
+                                    >
+                                      <option value="india, united-states, united-kingdom">All Countries</option>
+                                      <option value="india">India</option>
+                                      <option value="united-states">United States</option>
+                                      <option value="united-kingdom">United Kingdom</option>
+                                    </select>
                                   </div>
                                   <div style={{ display: "flex", gap: "0.35rem" }}>
                                     <button onClick={() => handleSaveUserEdit(colUser.id)} style={{ fontSize: "0.72rem", color: "#10b981", fontWeight: 700, padding: "0.2rem 0.5rem", border: "1px solid #10b981", borderRadius: "4px", background: "none", cursor: "pointer" }}>Save</button>
@@ -1401,14 +1420,17 @@ export default function AdminConsolePage() {
                   </div>
                   
                   <div>
-                    <label style={{ fontSize: "0.72rem", color: "var(--text-secondary)", fontWeight: 700, display: "block", marginBottom: "0.35rem" }}>Assigned Country Slugs (comma separated)</label>
-                    <input 
-                      type="text" 
-                      placeholder="e.g. india, united-states" 
-                      value={editingUserId && dbUsers.find(u => u.id === editingUserId)?.role !== "AUTHOR" ? editingCountries : ""}
+                    <label style={{ fontSize: "0.72rem", color: "var(--text-secondary)", fontWeight: 700, display: "block", marginBottom: "0.35rem" }}>Assigned Country Portal</label>
+                    <select
+                      value={editingUserId && dbUsers.find(u => u.id === editingUserId)?.role !== "AUTHOR" ? getSelectValue(editingCountries) : "india, united-states, united-kingdom"}
                       onChange={(e) => setEditingCountries(e.target.value)}
                       className="input-field"
-                    />
+                    >
+                      <option value="india, united-states, united-kingdom">All Countries</option>
+                      <option value="india">India</option>
+                      <option value="united-states">United States</option>
+                      <option value="united-kingdom">United Kingdom</option>
+                    </select>
                   </div>
 
                   <button 
@@ -1513,7 +1535,17 @@ export default function AdminConsolePage() {
                                       <option value="AUTHOR">AUTHOR</option>
                                       <option value="ADMIN">ADMIN</option>
                                     </select>
-                                    <input type="text" placeholder="e.g. india, united-states" value={editingCountries} onChange={(e) => setEditingCountries(e.target.value)} className="input-field" style={{ padding: "0.25rem", fontSize: "0.78rem", width: "130px", background: "var(--card-bg)" }} />
+                                    <select
+                                      value={getSelectValue(editingCountries)}
+                                      onChange={(e) => setEditingCountries(e.target.value)}
+                                      className="input-field"
+                                      style={{ padding: "0.25rem", fontSize: "0.78rem", width: "130px", background: "var(--card-bg)" }}
+                                    >
+                                      <option value="india, united-states, united-kingdom">All Countries</option>
+                                      <option value="india">India</option>
+                                      <option value="united-states">United States</option>
+                                      <option value="united-kingdom">United Kingdom</option>
+                                    </select>
                                   </div>
                                   <div style={{ display: "flex", gap: "0.35rem" }}>
                                     <button onClick={() => handleSaveUserEdit(colUser.id)} style={{ fontSize: "0.72rem", color: "#10b981", fontWeight: 700, padding: "0.2rem 0.5rem", border: "1px solid #10b981", borderRadius: "4px", background: "none", cursor: "pointer" }}>Save</button>
