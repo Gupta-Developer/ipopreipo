@@ -1,26 +1,49 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { PAYMENT_APPS_DATA } from "@/data/paymentAppsData";
 
 export default function PaymentAppDetailPage() {
   const params = useParams();
   const countrySlug = (params?.country as string) || "india";
   const slug = params?.slug as string;
-  const app = PAYMENT_APPS_DATA.find((a) => a.slug === slug);
 
-  // Likes & Tabs states
-  const [likes, setLikes] = useState(app ? app.likes : 0);
+  const [app, setApp] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [likes, setLikes] = useState(0);
   const [liked, setLiked] = useState(false);
-  const [activeTab, setActiveTab] = useState<"specs" | "fees" | "reviews" >("specs");
+  const [activeTab, setActiveTab] = useState<"specs" | "fees" | "reviews">("specs");
 
-  if (!app) {
+  useEffect(() => {
+    if (!slug) return;
+    setLoading(true);
+    fetch(`/api/payment-apps?slug=${slug}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.paymentApps) {
+          setApp(data.paymentApps);
+          setLikes(data.paymentApps.likes || 0);
+        }
+      })
+      .catch((err) => console.error("Error fetching payment app details:", err))
+      .finally(() => setLoading(false));
+  }, [slug]);
+
+  if (loading) {
     return (
       <div className="app-container" style={{ padding: "4rem 2rem", textAlign: "center" }}>
         <h2 style={{ color: "var(--text-primary)" }}>Loading Payment App Details...</h2>
         <p style={{ color: "var(--text-secondary)", marginTop: "1rem" }}>Searching Select Registry...</p>
+      </div>
+    );
+  }
+
+  if (!app) {
+    return (
+      <div className="app-container" style={{ padding: "4rem 2rem", textAlign: "center" }}>
+        <h2 style={{ color: "var(--text-primary)" }}>Payment App Not Found</h2>
+        <p style={{ color: "var(--text-secondary)", marginTop: "1rem" }}>We couldn't find a payment app with the slug "{slug}".</p>
         <Link href={`/${countrySlug}/payment-apps`} className="btn btn-primary" style={{ marginTop: "2rem" }}>
           Back to Directory
         </Link>
@@ -209,7 +232,7 @@ export default function PaymentAppDetailPage() {
                 <span style={{ color: "#10b981" }}>🟢</span> Pros / Advantages
               </h3>
               <ul style={{ display: "flex", flexDirection: "column", gap: "0.85rem", paddingLeft: "1rem", color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.4 }}>
-                {app.pros.map((pro, index) => (
+                {app.pros.map((pro: any, index: number) => (
                   <li key={index}>{pro}</li>
                 ))}
               </ul>
@@ -220,7 +243,7 @@ export default function PaymentAppDetailPage() {
                 <span style={{ color: "#ef4444" }}>🔴</span> Cons / Limitations
               </h3>
               <ul style={{ display: "flex", flexDirection: "column", gap: "0.85rem", paddingLeft: "1rem", color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.4 }}>
-                {app.cons.map((con, index) => (
+                {app.cons.map((con: any, index: number) => (
                   <li key={index}>{con}</li>
                 ))}
               </ul>

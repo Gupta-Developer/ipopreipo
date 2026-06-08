@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { BANKS_DATA } from "@/data/banksData";
 
 const COUNTRY_MAP: Record<string, { code: string; name: string; title: string }> = {
   "india": { code: "india", name: "India", title: "India" },
@@ -18,12 +17,23 @@ export default function BankAccountsCountryPage() {
   const selectedCountrySlug = countryInfo.code;
 
   const [filterType, setFilterType] = useState<string>("all");
+  const [banks, setBanks] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredBanks = BANKS_DATA.filter((bank) => {
-    if (bank.countrySlug !== selectedCountrySlug) return false;
+  useEffect(() => {
+    setLoading(true);
+    fetch(`/api/banks?countrySlug=${selectedCountrySlug}`)
+      .then((res) => res.json())
+      .then((data) => { if (data.success) setBanks(data.banks); })
+      .catch((err) => console.error("Error fetching banks:", err))
+      .finally(() => setLoading(false));
+  }, [selectedCountrySlug]);
+
+  const filteredBanks = banks.filter((bank) => {
     if (filterType !== "all" && bank.type !== filterType) return false;
     return true;
   });
+
 
   return (
     <div className="app-container" style={{ paddingTop: "2.5rem" }}>

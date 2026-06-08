@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { CRYPTO_APPS_DATA } from "@/data/cryptoAppsData";
 
 const COUNTRY_MAP: Record<string, { name: string; title: string }> = {
   "india": { name: "India", title: "India" },
@@ -16,20 +15,31 @@ export default function CryptoAppsCountryPage() {
   const params = useParams();
   const countrySlug = (params?.country as string) || "india";
   const countryInfo = COUNTRY_MAP[countrySlug] || COUNTRY_MAP["india"];
-  const selectedCountryName = countryInfo.name;
 
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState("all");
+  const [apps, setApps] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredApps = CRYPTO_APPS_DATA.filter((app) => {
-    if (app.country.toLowerCase() !== selectedCountryName.toLowerCase()) return false;
+  useEffect(() => {
+    setLoading(true);
+    fetch(`/api/crypto-apps?countrySlug=${countrySlug}`)
+      .then((res) => res.json())
+      .then((data) => { if (data.success) setApps(data.cryptoApps); })
+      .catch((err) => console.error("Error fetching crypto apps:", err))
+      .finally(() => setLoading(false));
+  }, [countrySlug]);
+
+  const filteredApps = apps.filter((app) => {
     if (searchQuery && !app.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
     if (filterType !== "all") {
-      if (filterType === "Exchange" && !app.type.toLowerCase().includes("exchange")) return false;
-      if (filterType === "Wallet" && !app.type.toLowerCase().includes("wallet")) return false;
+      if (filterType === "Exchange" && !app.type?.toLowerCase().includes("exchange")) return false;
+      if (filterType === "Wallet" && !app.type?.toLowerCase().includes("wallet")) return false;
     }
     return true;
   });
+
+
 
   return (
     <div className="app-container" style={{ paddingTop: "2.5rem" }}>

@@ -6,7 +6,11 @@ import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { User } from "@/data/user";
 
-// No static content imports - all product data comes from DB
+// Static content imports
+import { BANKS_DATA as staticBanks } from "@/data/banksData";
+import { BROKERS_DATA as staticBrokers } from "@/data/brokersData";
+import { CREDIT_CARDS_CATALOG as staticCards } from "@/data/cardsData";
+import { CRYPTO_APPS_DATA as staticCryptos } from "@/data/cryptoAppsData";
 
 
 interface PendingSubmission {
@@ -34,12 +38,12 @@ export default function AdminConsolePage() {
   const country = (params?.country as string) || "india";
 
   // Sidebar navigation active tab
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState("draft");
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   // Initialize tabs depending on role
   useEffect(() => {
-    setActiveTab("overview");
+    setActiveTab("draft");
   }, [user]);
 
   // Real Database users state
@@ -246,7 +250,7 @@ export default function AdminConsolePage() {
 
   const fetchPaymentApps = async () => {
     try {
-      const res = await fetch("/api/admin/payment-apps");
+      const res = await fetch("/api/payment-apps?includePending=true");
       const data = await res.json();
       if (data.success) { setCustomPayments(data.paymentApps); }
     } catch (err) { console.error("Failed to fetch payment apps from database:", err); }
@@ -254,7 +258,7 @@ export default function AdminConsolePage() {
 
   const fetchBanks = async () => {
     try {
-      const res = await fetch("/api/admin/banks");
+      const res = await fetch("/api/banks?includePending=true");
       const data = await res.json();
       if (data.success) { setCustomBanks(data.banks); }
     } catch (err) { console.error("Failed to fetch banks from database:", err); }
@@ -262,7 +266,7 @@ export default function AdminConsolePage() {
 
   const fetchBrokers = async () => {
     try {
-      const res = await fetch("/api/admin/brokers");
+      const res = await fetch("/api/brokers?includePending=true");
       const data = await res.json();
       if (data.success) { setCustomBrokers(data.brokers); }
     } catch (err) { console.error("Failed to fetch brokers from database:", err); }
@@ -270,7 +274,7 @@ export default function AdminConsolePage() {
 
   const fetchCards = async () => {
     try {
-      const res = await fetch("/api/admin/credit-cards");
+      const res = await fetch("/api/credit-cards?includePending=true");
       const data = await res.json();
       if (data.success) { setCustomCards(data.creditCards); }
     } catch (err) { console.error("Failed to fetch credit cards from database:", err); }
@@ -278,7 +282,7 @@ export default function AdminConsolePage() {
 
   const fetchCryptos = async () => {
     try {
-      const res = await fetch("/api/admin/crypto-apps");
+      const res = await fetch("/api/crypto-apps?includePending=true");
       const data = await res.json();
       if (data.success) { setCustomCryptos(data.cryptoApps); }
     } catch (err) { console.error("Failed to fetch crypto apps from database:", err); }
@@ -344,8 +348,8 @@ export default function AdminConsolePage() {
     );
   }
 
-  // Guard: Unauthorized role (only ADMIN allowed)
-  if (user.role !== "ADMIN") {
+  // Guard: Unauthorized role (regular user)
+  if (user.role !== "ADMIN" && user.role !== "AUTHOR") {
     return (
       <div className="app-container" style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "60vh" }}>
         <div className="card" style={{ padding: "3rem", textAlign: "center", maxWidth: "450px", border: "1px solid var(--border-color)" }}>
@@ -494,7 +498,7 @@ export default function AdminConsolePage() {
           subscription: { qib: 0, nii: 0, retail: 0, total: 0 },
           segment: selectedSub.segment,
           logoLetter: selectedSub.name.charAt(0).toUpperCase(),
-          logoColor: "#" + Math.floor(Math.random()*16777215).toString(16),
+          logoColor: "#" + Math.floor(Math.random() * 16777215).toString(16),
           description: `Newly approved IPO listing managed by ${selectedSub.authorEmail}. Registered details are currently active for trading bidding.`,
           offerPriceNum: parseFloat(selectedSub.priceBand.replace(/[^0-9.]/g, "")) || 100,
           countrySlug: selectedSub.countrySlug
@@ -517,41 +521,6 @@ export default function AdminConsolePage() {
       setIpoCount(updated.length);
     }
   };
-
-  const handleApproveRejectProduct = async (id: string, decision: "approved" | "rejected", type: "payments" | "banks" | "brokers" | "cards" | "crypto") => {
-    const endpointMap: Record<string, { endpoint: string; fetchFn: () => void }> = {
-      payments: { endpoint: "/api/admin/payment-apps", fetchFn: fetchPaymentApps },
-      banks: { endpoint: "/api/admin/banks", fetchFn: fetchBanks },
-      brokers: { endpoint: "/api/admin/brokers", fetchFn: fetchBrokers },
-      cards: { endpoint: "/api/admin/credit-cards", fetchFn: fetchCards },
-      crypto: { endpoint: "/api/admin/crypto-apps", fetchFn: fetchCryptos },
-    };
-    const config = endpointMap[type];
-    if (!config) return;
-    try {
-      const res = await fetch(config.endpoint, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, status: decision })
-      });
-      const data = await res.json();
-      if (data.success) {
-        alert(`Product successfully ${decision}.`);
-        config.fetchFn();
-      } else {
-        alert(data.error || "Failed to update status.");
-      }
-    } catch (err) {
-      console.error("Error updating product status:", err);
-      alert("Error occurred while updating.");
-    }
-  };
-
-  // Keep backward-compatible payment app handler
-  const handleApproveRejectPaymentApp = (id: string, decision: "approved" | "rejected") =>
-    handleApproveRejectProduct(id, decision, "payments");
-
-
 
   // Add custom Select Category product listing
   const handleAddProduct = (e: React.FormEvent) => {
@@ -649,12 +618,12 @@ export default function AdminConsolePage() {
         opening: revBlock1 || "InstantDematapp KYC setup process."
       };
       compiledProduct.taxes = {
-        stt: { delivery: "0.1%", intraday: "0.025%", futures: "0.0125%", options: "0.0625%" },
-        stampDuty: { delivery: "0.015%", intraday: "0.003%", futures: "0.002%", options: "0.003%" },
-        exchangeCharges: { delivery: "0.003%", intraday: "0.003%", futures: "0.002%", options: "0.05%" },
-        sebiFees: { delivery: "₹10/Cr", intraday: "₹10/Cr", futures: "₹10/Cr", options: "₹10/Cr" },
-        gst: { delivery: "18%", intraday: "18%", futures: "18%", options: "18%" },
-        dpCharges: "₹13.5 + GST"
+        stt: { delivery: brokerTaxSttDelivery, intraday: brokerTaxSttIntraday, futures: brokerTaxSttFutures, options: brokerTaxSttOptions },
+        stampDuty: { delivery: brokerTaxStampDelivery, intraday: brokerTaxStampIntraday, futures: brokerTaxStampFutures, options: brokerTaxStampOptions },
+        exchangeCharges: { delivery: brokerTaxExchangeDelivery, intraday: brokerTaxExchangeIntraday, futures: brokerTaxExchangeFutures, options: brokerTaxExchangeOptions },
+        sebiFees: { delivery: brokerTaxSebiDelivery, intraday: brokerTaxSebiIntraday, futures: brokerTaxSebiFutures, options: brokerTaxSebiOptions },
+        gst: { delivery: brokerTaxGstDelivery, intraday: brokerTaxGstIntraday, futures: brokerTaxGstFutures, options: brokerTaxGstOptions },
+        dpCharges: brokerDpCharges
       };
     } else if (activeSelectType === "cards") {
       compiledProduct.overallRating = parseFloat(prodRating) || 4.0;
@@ -686,15 +655,15 @@ export default function AdminConsolePage() {
         joiningFee: cardChargeJoining,
         annualFee: cardChargeAnnual,
         apr: cardChargeApr,
-        addonFee: "Free",
-        minimumRepayment: "5%",
-        cashWithdrawalFee: "2.5% or ₹500",
-        cashAdvanceLimit: "40%",
-        cardReplacementFee: "₹100",
-        foreignTransactionFee: "3.5%",
-        overLimitPenalty: "2.5%",
-        fuelSurcharge: "1%",
-        rewardPointValue: "1%"
+        addonFee: cardAddonFee,
+        minimumRepayment: cardMinimumRepayment,
+        cashWithdrawalFee: cardCashWithdrawalFee,
+        cashAdvanceLimit: cardCashAdvanceLimit,
+        cardReplacementFee: cardReplacementFee,
+        foreignTransactionFee: cardForeignTransactionFee,
+        overLimitPenalty: cardOverLimitPenalty,
+        fuelSurcharge: cardFuelSurcharge,
+        rewardPointValue: cardRewardPointValue
       };
       compiledProduct.latePaymentCharges = [
         { range: "Standard Slab Outstanding", fee: "₹0 to ₹1300" }
@@ -769,9 +738,37 @@ export default function AdminConsolePage() {
       };
     }
 
-    const resetAdminForm = () => {
+    if (artTitle.trim()) {
+      compiledProduct.detailedArticle = {
+        title: artTitle.trim(),
+        intro: artIntro.trim(),
+        sections: [
+          ...(artSec1Heading.trim() ? [{
+            heading: artSec1Heading.trim(),
+            content: artSec1Content.trim(),
+            items: artSec1Items.split("\n").map(i => i.trim()).filter(Boolean)
+          }] : []),
+          ...(artSec2Heading.trim() ? [{
+            heading: artSec2Heading.trim(),
+            content: artSec2Content.trim(),
+            items: artSec2Items.split("\n").map(i => i.trim()).filter(Boolean)
+          }] : []),
+          ...(artSec3Heading.trim() ? [{
+            heading: artSec3Heading.trim(),
+            content: artSec3Content.trim(),
+            items: artSec3Items.split("\n").map(i => i.trim()).filter(Boolean)
+          }] : [])
+        ]
+      };
+    }
+
+    const resetForm = () => {
       setProdName(""); setProdSlug(""); setProdSummary(""); setProdPros(""); setProdCons("");
       setRevBlock1(""); setRevBlock2(""); setRevBlock3(""); setRevBlock4("");
+      setArtTitle(""); setArtIntro("");
+      setArtSec1Heading(""); setArtSec1Content(""); setArtSec1Items("");
+      setArtSec2Heading(""); setArtSec2Content(""); setArtSec2Items("");
+      setArtSec3Heading(""); setArtSec3Content(""); setArtSec3Items("");
     };
 
     const submitToAPI = (endpoint: string, fetchAfter: () => void) => {
@@ -780,25 +777,33 @@ export default function AdminConsolePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...compiledProduct, addedBy: user.email, userRole: user.role })
       })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          setProdSuccess("Product published directly to database!");
-          resetAdminForm();
-          fetchAfter();
-        } else {
-          alert(data.error || "Failed to submit product.");
-        }
-      })
-      .catch(err => { console.error("Error submitting:", err); alert("An error occurred during submission."); });
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            setProdSuccess(user.role === "ADMIN" ? "Published directly to database!" : "Submitted for admin approval.");
+            resetForm();
+            fetchAfter();
+          } else {
+            alert(data.error || "Failed to submit product.");
+          }
+        })
+        .catch(err => { console.error("Error submitting:", err); alert("An error occurred during submission."); });
     };
 
-    if (activeSelectType === "payments") submitToAPI("/api/payment-apps", fetchPaymentApps);
-    else if (activeSelectType === "banks") submitToAPI("/api/banks", fetchBanks);
-    else if (activeSelectType === "brokers") submitToAPI("/api/brokers", fetchBrokers);
-    else if (activeSelectType === "cards") submitToAPI("/api/credit-cards", fetchCards);
-    else if (activeSelectType === "crypto") submitToAPI("/api/crypto-apps", fetchCryptos);
+    if (activeSelectType === "payments") {
+      submitToAPI("/api/payment-apps", fetchPaymentApps);
+    } else if (activeSelectType === "banks") {
+      submitToAPI("/api/banks", fetchBanks);
+    } else if (activeSelectType === "brokers") {
+      submitToAPI("/api/brokers", fetchBrokers);
+    } else if (activeSelectType === "cards") {
+      submitToAPI("/api/credit-cards", fetchCards);
+    } else if (activeSelectType === "crypto") {
+      submitToAPI("/api/crypto-apps", fetchCryptos);
+    }
   };
+
+
 
   // Delete custom Select Product
   const handleDeleteProduct = (prodId: string, type: string) => {
@@ -817,16 +822,19 @@ export default function AdminConsolePage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ id: prodId })
         })
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) { alert("Product deleted successfully."); config.fetchFn(); }
-          else { alert(data.error || "Failed to delete product."); }
-        })
-        .catch(err => { console.error("Error deleting:", err); alert("Error occurred while deleting."); });
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              alert("Product deleted successfully.");
+              config.fetchFn();
+            } else {
+              alert(data.error || "Failed to delete product.");
+            }
+          })
+          .catch(err => { console.error("Error deleting:", err); alert("Error occurred while deleting."); });
       }
     }
   };
-
 
 
   // Reset local cache databases helper
@@ -845,8 +853,8 @@ export default function AdminConsolePage() {
   };
 
   // Filtered db users list
-  const filteredUsers = dbUsers.filter(u => 
-    u.name.toLowerCase().includes(userSearch.toLowerCase()) || 
+  const filteredUsers = dbUsers.filter(u =>
+    u.name.toLowerCase().includes(userSearch.toLowerCase()) ||
     u.email.toLowerCase().includes(userSearch.toLowerCase())
   );
 
@@ -860,10 +868,10 @@ export default function AdminConsolePage() {
 
   return (
     <div className="app-container" style={{ padding: "0", maxWidth: "100%", margin: "0" }}>
-      
+
       {/* ── Outer Re-Architected Admin Flex Layout ── */}
       <div style={{ display: "flex", minHeight: "calc(100vh - 60px)" }}>
-        
+
         {/* ── 1. Vertical Sidebar Navigation ── */}
         <aside style={{
           width: isCollapsed ? "76px" : "260px",
@@ -880,8 +888,8 @@ export default function AdminConsolePage() {
           {/* Console Branding */}
           <div style={{ display: "flex", flexDirection: "column", alignItems: isCollapsed ? "center" : "flex-start", gap: "0.25rem", minHeight: "44px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <span style={{ fontSize: "1.3rem" }} title="Control Center">🛡️</span>
-              {!isCollapsed && <span style={{ fontWeight: 800, fontSize: "0.95rem", letterSpacing: "-0.02em" }}>Control Center</span>}
+              <span style={{ fontSize: "1.3rem" }} title="Author Workspace">✍️</span>
+              {!isCollapsed && <span style={{ fontWeight: 800, fontSize: "0.95rem", letterSpacing: "-0.02em" }}>Author Workspace</span>}
             </div>
             {!isCollapsed && (
               <p style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>
@@ -894,74 +902,38 @@ export default function AdminConsolePage() {
 
           {/* Navigation Links Group */}
           <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", flex: 1 }}>
-            
-            {user.role === "ADMIN" && (
-              <button 
-                onClick={() => setActiveTab("overview")}
-                title="Overview"
-                style={{
-                  display: "flex", alignItems: "center", justifyContent: isCollapsed ? "center" : "flex-start", gap: "0.75rem", width: "100%",
-                  padding: "0.7rem 0.85rem", borderRadius: "8px", border: "none",
-                  background: activeTab === "overview" ? "rgba(var(--primary-rgb), 0.08)" : "transparent",
-                  color: activeTab === "overview" ? "var(--primary)" : "var(--text-secondary)",
-                  fontWeight: activeTab === "overview" ? 700 : 500, fontSize: "0.85rem",
-                  textAlign: "left", cursor: "pointer", transition: "all 0.15s"
-                }}
-              >
-                <span style={{ fontSize: "1.1rem" }}>📊</span> {!isCollapsed && "Overview"}
-              </button>
-            )}
 
-            {user.role === "ADMIN" && (
-              <button 
-                onClick={() => setActiveTab("users")}
-                title="Users Directory"
-                style={{
-                  display: "flex", alignItems: "center", justifyContent: isCollapsed ? "center" : "flex-start", gap: "0.75rem", width: "100%",
-                  padding: "0.7rem 0.85rem", borderRadius: "8px", border: "none",
-                  background: activeTab === "users" ? "rgba(var(--primary-rgb), 0.08)" : "transparent",
-                  color: activeTab === "users" ? "var(--primary)" : "var(--text-secondary)",
-                  fontWeight: activeTab === "users" ? 700 : 500, fontSize: "0.85rem",
-                  textAlign: "left", cursor: "pointer", transition: "all 0.15s"
-                }}
-              >
-                <span style={{ fontSize: "1.1rem" }}>👥</span> {!isCollapsed && "Users Directory"}
-              </button>
-            )}
-
-            {user.role === "ADMIN" && (
-              <button 
-                onClick={() => setActiveTab("authors")}
-                title="Authors & Editors"
-                style={{
-                  display: "flex", alignItems: "center", justifyContent: isCollapsed ? "center" : "flex-start", gap: "0.75rem", width: "100%",
-                  padding: "0.7rem 0.85rem", borderRadius: "8px", border: "none",
-                  background: activeTab === "authors" ? "rgba(var(--primary-rgb), 0.08)" : "transparent",
-                  color: activeTab === "authors" ? "var(--primary)" : "var(--text-secondary)",
-                  fontWeight: activeTab === "authors" ? 700 : 500, fontSize: "0.85rem",
-                  textAlign: "left", cursor: "pointer", transition: "all 0.15s"
-                }}
-              >
-                <span style={{ fontSize: "1.1rem" }}>✍️</span> {!isCollapsed && "Authors & Editors"}
-              </button>
-            )}
-
-            <button 
-              onClick={() => setActiveTab("queue")}
-              title={`Review Queue (${submissions.filter(s => s.status === "Pending").length})`}
+            <button
+              onClick={() => setActiveTab("draft")}
+              title="Submit Listing"
               style={{
                 display: "flex", alignItems: "center", justifyContent: isCollapsed ? "center" : "flex-start", gap: "0.75rem", width: "100%",
                 padding: "0.7rem 0.85rem", borderRadius: "8px", border: "none",
-                background: activeTab === "queue" ? "rgba(var(--primary-rgb), 0.08)" : "transparent",
-                color: activeTab === "queue" ? "var(--primary)" : "var(--text-secondary)",
-                fontWeight: activeTab === "queue" ? 700 : 500, fontSize: "0.85rem",
+                background: activeTab === "draft" ? "rgba(var(--primary-rgb), 0.08)" : "transparent",
+                color: activeTab === "draft" ? "var(--primary)" : "var(--text-secondary)",
+                fontWeight: activeTab === "draft" ? 700 : 500, fontSize: "0.85rem",
                 textAlign: "left", cursor: "pointer", transition: "all 0.15s"
               }}
             >
-              <span style={{ fontSize: "1.1rem" }}>📥</span> {!isCollapsed && `Review Queue (${submissions.filter(s => s.status === "Pending").length})`}
+              <span style={{ fontSize: "1.1rem" }}>✍️</span> {!isCollapsed && "Submit Listing"}
             </button>
 
-            <button 
+            <button
+              onClick={() => setActiveTab("my-drafts")}
+              title="My Submissions"
+              style={{
+                display: "flex", alignItems: "center", justifyContent: isCollapsed ? "center" : "flex-start", gap: "0.75rem", width: "100%",
+                padding: "0.7rem 0.85rem", borderRadius: "8px", border: "none",
+                background: activeTab === "my-drafts" ? "rgba(var(--primary-rgb), 0.08)" : "transparent",
+                color: activeTab === "my-drafts" ? "var(--primary)" : "var(--text-secondary)",
+                fontWeight: activeTab === "my-drafts" ? 700 : 500, fontSize: "0.85rem",
+                textAlign: "left", cursor: "pointer", transition: "all 0.15s"
+              }}
+            >
+              <span style={{ fontSize: "1.1rem" }}>📜</span> {!isCollapsed && "My Submissions"}
+            </button>
+
+            <button
               onClick={() => setActiveTab("ipos")}
               title="IPO Listings"
               style={{
@@ -976,7 +948,7 @@ export default function AdminConsolePage() {
               <span style={{ fontSize: "1.1rem" }}>📂</span> {!isCollapsed && "IPO Listings"}
             </button>
 
-            <button 
+            <button
               onClick={() => setActiveTab("products")}
               title="Select Products"
               style={{
@@ -991,7 +963,7 @@ export default function AdminConsolePage() {
               <span style={{ fontSize: "1.1rem" }}>🛍️</span> {!isCollapsed && "Select Products"}
             </button>
 
-            <button 
+            <button
               onClick={() => setActiveTab("config")}
               title="System Config"
               style={{
@@ -1009,7 +981,7 @@ export default function AdminConsolePage() {
           </div>
 
           {/* Sidebar Collapse Button */}
-          <button 
+          <button
             onClick={() => setIsCollapsed(!isCollapsed)}
             style={{
               display: "flex", alignItems: "center", justifyContent: "center",
@@ -1071,49 +1043,49 @@ export default function AdminConsolePage() {
 
               {/* Advanced statistics panels */}
               <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: "1.5rem" }}>
-                
+
                 {/* Database role breakdowns */}
                 <div className="card" style={{ padding: "1.75rem", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
                   <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text-primary)" }}>👥 Real-Time User Roles Allocation</h3>
                   <div style={{ display: "flex", flexDirection: "column", gap: "0.85rem" }}>
-                    
+
                     <div>
                       <div className="flex-between" style={{ fontSize: "0.82rem", marginBottom: "0.3rem" }}>
                         <span style={{ color: "var(--text-secondary)" }}>🛡️ Global Administrators</span>
-                        <strong style={{ color: "var(--text-primary)" }}>{adminCount} ({dbUsers.length ? Math.round((adminCount/dbUsers.length)*100) : 0}%)</strong>
+                        <strong style={{ color: "var(--text-primary)" }}>{adminCount} ({dbUsers.length ? Math.round((adminCount / dbUsers.length) * 100) : 0}%)</strong>
                       </div>
                       <div style={{ height: "6px", background: "var(--border-color)", borderRadius: "99px", overflow: "hidden" }}>
-                        <div style={{ width: `${dbUsers.length ? (adminCount/dbUsers.length)*100 : 0}%`, height: "100%", background: "#ef4444" }} />
+                        <div style={{ width: `${dbUsers.length ? (adminCount / dbUsers.length) * 100 : 0}%`, height: "100%", background: "#ef4444" }} />
                       </div>
                     </div>
 
                     <div>
                       <div className="flex-between" style={{ fontSize: "0.82rem", marginBottom: "0.3rem" }}>
                         <span style={{ color: "var(--text-secondary)" }}>✍️ Regional Editors / Authors</span>
-                        <strong style={{ color: "var(--text-primary)" }}>{authorCount} ({dbUsers.length ? Math.round((authorCount/dbUsers.length)*100) : 0}%)</strong>
+                        <strong style={{ color: "var(--text-primary)" }}>{authorCount} ({dbUsers.length ? Math.round((authorCount / dbUsers.length) * 100) : 0}%)</strong>
                       </div>
                       <div style={{ height: "6px", background: "var(--border-color)", borderRadius: "99px", overflow: "hidden" }}>
-                        <div style={{ width: `${dbUsers.length ? (authorCount/dbUsers.length)*100 : 0}%`, height: "100%", background: "rgb(var(--primary-rgb))" }} />
+                        <div style={{ width: `${dbUsers.length ? (authorCount / dbUsers.length) * 100 : 0}%`, height: "100%", background: "rgb(var(--primary-rgb))" }} />
                       </div>
                     </div>
 
                     <div>
                       <div className="flex-between" style={{ fontSize: "0.82rem", marginBottom: "0.3rem" }}>
                         <span style={{ color: "var(--text-secondary)" }}>⭐ Premium PRO Members</span>
-                        <strong style={{ color: "var(--text-primary)" }}>{proCount} ({dbUsers.length ? Math.round((proCount/dbUsers.length)*100) : 0}%)</strong>
+                        <strong style={{ color: "var(--text-primary)" }}>{proCount} ({dbUsers.length ? Math.round((proCount / dbUsers.length) * 100) : 0}%)</strong>
                       </div>
                       <div style={{ height: "6px", background: "var(--border-color)", borderRadius: "99px", overflow: "hidden" }}>
-                        <div style={{ width: `${dbUsers.length ? (proCount/dbUsers.length)*100 : 0}%`, height: "100%", background: "#10b981" }} />
+                        <div style={{ width: `${dbUsers.length ? (proCount / dbUsers.length) * 100 : 0}%`, height: "100%", background: "#10b981" }} />
                       </div>
                     </div>
 
                     <div>
                       <div className="flex-between" style={{ fontSize: "0.82rem", marginBottom: "0.3rem" }}>
                         <span style={{ color: "var(--text-secondary)" }}>👤 Regular Users</span>
-                        <strong style={{ color: "var(--text-primary)" }}>{regularCount} ({dbUsers.length ? Math.round((regularCount/dbUsers.length)*100) : 0}%)</strong>
+                        <strong style={{ color: "var(--text-primary)" }}>{regularCount} ({dbUsers.length ? Math.round((regularCount / dbUsers.length) * 100) : 0}%)</strong>
                       </div>
                       <div style={{ height: "6px", background: "var(--border-color)", borderRadius: "99px", overflow: "hidden" }}>
-                        <div style={{ width: `${dbUsers.length ? (regularCount/dbUsers.length)*100 : 0}%`, height: "100%", background: "#64748b" }} />
+                        <div style={{ width: `${dbUsers.length ? (regularCount / dbUsers.length) * 100 : 0}%`, height: "100%", background: "#64748b" }} />
                       </div>
                     </div>
 
@@ -1124,14 +1096,14 @@ export default function AdminConsolePage() {
                 <div className="card" style={{ padding: "1.75rem", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
                   <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text-primary)" }}>🔑 Authentications Source</h3>
                   <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                    
+
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "var(--spec-bg)", padding: "1rem", borderRadius: "10px", border: "1px solid var(--border-color)" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
                         <svg width="20" height="20" viewBox="0 0 24 24">
-                          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/>
-                          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/>
+                          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+                          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05" />
+                          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335" />
                         </svg>
                         <span style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--text-primary)" }}>Google OAuth</span>
                       </div>
@@ -1161,11 +1133,11 @@ export default function AdminConsolePage() {
                   <h2 style={{ fontSize: "1.35rem", fontWeight: 800, color: "var(--text-primary)" }}>👥 Real-Time User Accounts</h2>
                   <p style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>Direct connection to Neon PostgreSQL table `public.users`.</p>
                 </div>
-                
+
                 {/* Search */}
-                <input 
-                  type="text" 
-                  placeholder="Search users by name or email..." 
+                <input
+                  type="text"
+                  placeholder="Search users by name or email..."
                   value={userSearch}
                   onChange={(e) => setUserSearch(e.target.value)}
                   className="input-field"
@@ -1207,11 +1179,11 @@ export default function AdminConsolePage() {
                               {/* Avatar */}
                               <span className="nb-avatar" style={{ width: 34, height: 34, borderRadius: "50%" }}>
                                 {colUser.picture ? (
-                                  <img 
-                                    src={colUser.picture} 
-                                    alt={colUser.name} 
+                                  <img
+                                    src={colUser.picture}
+                                    alt={colUser.name}
                                     referrerPolicy="no-referrer"
-                                    style={{ width: "100%", height: "100%", borderRadius: "inherit", objectFit: "cover" }} 
+                                    style={{ width: "100%", height: "100%", borderRadius: "inherit", objectFit: "cover" }}
                                   />
                                 ) : (
                                   colUser.name.charAt(0).toUpperCase()
@@ -1285,310 +1257,204 @@ export default function AdminConsolePage() {
             </div>
           )}
 
-          {/* ── TAB: AUTHORS & EDITORS DIRECTORY (ADMIN ONLY) ── */}
-          {activeTab === "authors" && user.role === "ADMIN" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
-              
-              {/* Quick Promote Panel */}
-              <div className="card" style={{ padding: "2rem" }}>
-                <h3 style={{ fontSize: "1.1rem", fontWeight: 700, marginBottom: "1rem", color: "var(--text-primary)" }}>✍️ Promote User to Author / Editor</h3>
-                <div style={{ background: "var(--spec-bg)", padding: "1rem", borderRadius: "8px", border: "1px solid var(--border-color)", fontSize: "0.8rem", color: "var(--text-secondary)", marginBottom: "1.25rem" }}>
-                  Provide an existing user's details to grant them editorial access and assign specific country portal permissions.
+          {/* ── TAB: DRAFT LISTING SUBMISSION (AUTHOR ONLY) ── */}
+          {activeTab === "draft" && user.role === "AUTHOR" && (
+            <div className="card" style={{ maxWidth: "700px", margin: "0 auto", padding: "2rem" }}>
+              <h2 style={{ fontSize: "1.35rem", marginBottom: "1.25rem", borderBottom: "1px solid var(--border-color)", paddingBottom: "0.75rem", color: "var(--text-primary)" }}>
+                ✍️ Draft New Syndicate Listing
+              </h2>
+
+              {formSuccess && (
+                <div style={{ background: "rgba(16, 185, 129, 0.08)", border: "1px solid rgba(16, 185, 129, 0.2)", borderRadius: "8px", padding: "0.75rem 1rem", fontSize: "0.82rem", color: "var(--success)", marginBottom: "1.5rem" }}>
+                  ✓ {formSuccess}
                 </div>
-                
-                <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1.5fr 1fr", gap: "1rem", alignItems: "end" }}>
+              )}
+              {formError && (
+                <div style={{ background: "rgba(239, 68, 68, 0.08)", border: "1px solid rgba(239, 68, 68, 0.2)", borderRadius: "8px", padding: "0.75rem 1rem", fontSize: "0.82rem", color: "var(--danger)", marginBottom: "1.5rem" }}>
+                  ⚠️ {formError}
+                </div>
+              )}
+
+              <form onSubmit={handleDraftSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
                   <div>
-                    <label style={{ fontSize: "0.72rem", color: "var(--text-secondary)", fontWeight: 700, display: "block", marginBottom: "0.35rem" }}>Select Registered User</label>
-                    <select 
-                      className="input-field" 
-                      style={{ background: "var(--spec-bg)" }}
-                      onChange={(e) => {
-                        const targetUser = dbUsers.find(u => u.id === e.target.value);
-                        if (targetUser) {
-                          setEditingUserId(targetUser.id);
-                          setEditingRole("AUTHOR");
-                          setEditingCountries(targetUser.assignedCountries ? targetUser.assignedCountries.join(", ") : "india");
-                        }
-                      }}
-                      defaultValue=""
-                    >
-                      <option value="" disabled>-- Choose User --</option>
-                      {dbUsers.filter(u => u.role !== "AUTHOR" && u.role !== "ADMIN").map(u => (
-                        <option key={u.id} value={u.id}>{u.name} ({u.email}) [{u.role}]</option>
+                    <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)", fontWeight: 700, display: "block", marginBottom: "0.35rem", textTransform: "uppercase" }}>Target Country</label>
+                    <select className="input-field" value={targetCountry} onChange={(e) => setTargetCountry(e.target.value)} style={{ background: "var(--spec-bg)", cursor: "pointer" }}>
+                      {allowedCountries.map((c) => (
+                        <option key={c} value={c}>{c.toUpperCase().replace("-", " ")}</option>
                       ))}
                     </select>
                   </div>
-                  
                   <div>
-                    <label style={{ fontSize: "0.72rem", color: "var(--text-secondary)", fontWeight: 700, display: "block", marginBottom: "0.35rem" }}>Assigned Country Slugs (comma separated)</label>
-                    <input 
-                      type="text" 
-                      placeholder="e.g. india, united-states" 
-                      value={editingUserId && dbUsers.find(u => u.id === editingUserId)?.role !== "AUTHOR" ? editingCountries : ""}
-                      onChange={(e) => setEditingCountries(e.target.value)}
-                      className="input-field"
-                    />
+                    <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)", fontWeight: 700, display: "block", marginBottom: "0.35rem", textTransform: "uppercase" }}>IPO Segment</label>
+                    <select className="input-field" value={segment} onChange={(e) => setSegment(e.target.value as any)} style={{ background: "var(--spec-bg)", cursor: "pointer" }}>
+                      <option value="Mainboard">Mainboard / Major Exchange</option>
+                      <option value="SME">SME / OTC Market</option>
+                    </select>
                   </div>
-
-                  <button 
-                    onClick={() => {
-                      if (!editingUserId) {
-                        alert("Please select a user to promote first.");
-                        return;
-                      }
-                      handleSaveUserEdit(editingUserId);
-                    }}
-                    className="btn btn-primary"
-                    style={{ width: "100%", height: "42px" }}
-                  >
-                    Grant Author Access
-                  </button>
                 </div>
-              </div>
 
-              {/* Authors List */}
-              <div className="card" style={{ padding: "2rem" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", flexWrap: "wrap", gap: "1rem" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "2.5fr 1fr", gap: "1rem" }}>
                   <div>
-                    <h2 style={{ fontSize: "1.35rem", fontWeight: 800, color: "var(--text-primary)" }}>✍️ Editorial & Publishing Team</h2>
-                    <p style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>Users with role AUTHOR or ADMIN who have publishing and directory submission access.</p>
+                    <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)", fontWeight: 700, display: "block", marginBottom: "0.35rem", textTransform: "uppercase" }}>Company Name</label>
+                    <input type="text" placeholder="e.g. DeepMind Corporation" value={companyName} onChange={(e) => setCompanyName(e.target.value)} className="input-field" required />
                   </div>
-                  
-                  {/* Search */}
-                  <input 
-                    type="text" 
-                    placeholder="Search authors..." 
-                    value={userSearch}
-                    onChange={(e) => setUserSearch(e.target.value)}
-                    className="input-field"
-                    style={{ maxWidth: "300px", background: "var(--spec-bg)" }}
-                  />
+                  <div>
+                    <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)", fontWeight: 700, display: "block", marginBottom: "0.35rem", textTransform: "uppercase" }}>Ticker symbol</label>
+                    <input type="text" placeholder="e.g. MIND" value={ticker} onChange={(e) => setTicker(e.target.value)} className="input-field" required />
+                  </div>
                 </div>
 
-                {userActionMessage && (
-                  <div style={{ background: "rgba(16, 185, 129, 0.08)", border: "1px solid rgba(16, 185, 129, 0.2)", borderRadius: "8px", padding: "0.75rem 1rem", fontSize: "0.82rem", color: "var(--success)", marginBottom: "1.5rem" }}>
-                    ✓ {userActionMessage}
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1rem" }}>
+                  <div>
+                    <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)", fontWeight: 700, display: "block", marginBottom: "0.35rem", textTransform: "uppercase" }}>Price Band</label>
+                    <input type="text" placeholder="e.g. $42 - $45" value={priceBand} onChange={(e) => setPriceBand(e.target.value)} className="input-field" required />
                   </div>
-                )}
-
-                <div style={{ overflowX: "auto" }}>
-                  <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
-                    <thead>
-                      <tr style={{ borderBottom: "1px solid var(--border-color)", opacity: 0.8 }}>
-                        <th style={{ color: "var(--text-secondary)", fontSize: "0.75rem", padding: "1rem 0.5rem", fontWeight: "700", textTransform: "uppercase" }}>Author Info</th>
-                        <th style={{ color: "var(--text-secondary)", fontSize: "0.75rem", padding: "1rem 0.5rem", fontWeight: "700", textTransform: "uppercase" }}>Role</th>
-                        <th style={{ color: "var(--text-secondary)", fontSize: "0.75rem", padding: "1rem 0.5rem", fontWeight: "700", textTransform: "uppercase" }}>Assigned Portals</th>
-                        <th style={{ color: "var(--text-secondary)", fontSize: "0.75rem", padding: "1rem 0.5rem", fontWeight: "700", textTransform: "uppercase", textAlign: "right" }}>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {dbUsers.filter(u => (u.role === "AUTHOR" || u.role === "ADMIN") && (
-                        u.name.toLowerCase().includes(userSearch.toLowerCase()) || 
-                        u.email.toLowerCase().includes(userSearch.toLowerCase())
-                      )).length === 0 ? (
-                        <tr>
-                          <td colSpan={4} style={{ textAlign: "center", color: "var(--text-secondary)", padding: "2rem" }}>
-                            No authors or editors found.
-                          </td>
-                        </tr>
-                      ) : (
-                        dbUsers.filter(u => (u.role === "AUTHOR" || u.role === "ADMIN") && (
-                          u.name.toLowerCase().includes(userSearch.toLowerCase()) || 
-                          u.email.toLowerCase().includes(userSearch.toLowerCase())
-                        )).map((colUser) => (
-                          <tr key={colUser.id} style={{ borderBottom: "1px solid var(--border-color)" }}>
-                            <td style={{ padding: "1.25rem 0.5rem", display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                              <span className="nb-avatar" style={{ width: 34, height: 34, borderRadius: "50%" }}>
-                                {colUser.picture ? (
-                                  <img 
-                                    src={colUser.picture} 
-                                    alt={colUser.name} 
-                                    referrerPolicy="no-referrer"
-                                    style={{ width: "100%", height: "100%", borderRadius: "inherit", objectFit: "cover" }} 
-                                  />
-                                ) : (
-                                  colUser.name.charAt(0).toUpperCase()
-                                )}
-                              </span>
-                              <div>
-                                <strong style={{ fontSize: "0.9rem", color: "var(--text-primary)", display: "block" }}>{colUser.name}</strong>
-                                <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>{colUser.email}</span>
-                              </div>
-                            </td>
-                            <td style={{ padding: "1.25rem 0.5rem" }}>
-                              <span className={`badge ${colUser.role === "ADMIN" ? "badge-danger" : "badge-primary"}`} style={{ fontSize: "0.62rem" }}>
-                                {colUser.role}
-                              </span>
-                            </td>
-                            <td style={{ padding: "1.25rem 0.5rem", fontSize: "0.82rem", color: "var(--text-secondary)" }}>
-                              {colUser.role === "ADMIN" ? "All Portals (*)" : colUser.assignedCountries && colUser.assignedCountries.length > 0 ? colUser.assignedCountries.join(", ").toUpperCase() : "None"}
-                            </td>
-                            <td style={{ padding: "1.25rem 0.5rem", textAlign: "right" }}>
-                              {editingUserId === colUser.id && colUser.role === "AUTHOR" ? (
-                                <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", alignItems: "flex-end" }}>
-                                  <div style={{ display: "flex", gap: "0.35rem" }}>
-                                    <select value={editingRole} onChange={(e) => setEditingRole(e.target.value as any)} className="input-field" style={{ padding: "0.25rem", fontSize: "0.78rem", width: "90px", background: "var(--card-bg)" }}>
-                                      <option value="USER">USER (Revoke)</option>
-                                      <option value="AUTHOR">AUTHOR</option>
-                                      <option value="ADMIN">ADMIN</option>
-                                    </select>
-                                    <input type="text" placeholder="e.g. india, united-states" value={editingCountries} onChange={(e) => setEditingCountries(e.target.value)} className="input-field" style={{ padding: "0.25rem", fontSize: "0.78rem", width: "130px", background: "var(--card-bg)" }} />
-                                  </div>
-                                  <div style={{ display: "flex", gap: "0.35rem" }}>
-                                    <button onClick={() => handleSaveUserEdit(colUser.id)} style={{ fontSize: "0.72rem", color: "#10b981", fontWeight: 700, padding: "0.2rem 0.5rem", border: "1px solid #10b981", borderRadius: "4px", background: "none", cursor: "pointer" }}>Save</button>
-                                    <button onClick={() => setEditingUserId(null)} style={{ fontSize: "0.72rem", color: "var(--text-secondary)", fontWeight: 700, padding: "0.2rem 0.5rem", border: "1px solid var(--border-color)", borderRadius: "4px", background: "none", cursor: "pointer" }}>Cancel</button>
-                                  </div>
-                                </div>
-                              ) : (
-                                <div style={{ display: "inline-flex", gap: "0.5rem" }}>
-                                  {colUser.role === "AUTHOR" && (
-                                    <button
-                                      onClick={() => {
-                                        setEditingUserId(colUser.id);
-                                        setEditingRole(colUser.role);
-                                        setEditingCountries(colUser.assignedCountries ? colUser.assignedCountries.join(", ") : "");
-                                      }}
-                                      className="btn btn-secondary"
-                                      style={{ padding: "0.35rem 0.75rem", fontSize: "0.78rem", borderRadius: "6px" }}
-                                    >
-                                      ⚙️ Edit Scope
-                                    </button>
-                                  )}
-                                  {colUser.email !== user.email && (
-                                    <button
-                                      onClick={() => {
-                                        if (confirm(`Revoke editorial permissions for ${colUser.name}?`)) {
-                                          setEditingUserId(colUser.id);
-                                          setEditingRole("USER");
-                                          setEditingCountries("");
-                                          // Trigger update
-                                          fetch("/api/admin/users", {
-                                            method: "PUT",
-                                            headers: { "Content-Type": "application/json" },
-                                            body: JSON.stringify({
-                                              id: colUser.id,
-                                              role: "USER",
-                                              assignedCountries: []
-                                            }),
-                                          }).then(res => res.json()).then(data => {
-                                            if (data.success) {
-                                              setDbUsers(dbUsers.map(u => u.id === colUser.id ? data.user : u));
-                                              setUserActionMessage("Author role revoked successfully.");
-                                              setEditingUserId(null);
-                                            }
-                                          });
-                                        }
-                                      }}
-                                      className="btn btn-secondary"
-                                      style={{ padding: "0.35rem 0.75rem", fontSize: "0.78rem", borderRadius: "6px", color: "var(--danger)", borderColor: "rgba(239, 68, 68, 0.2)" }}
-                                    >
-                                      ✕ Revoke Role
-                                    </button>
-                                  )}
-                                </div>
-                              )}
-                            </td>
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
+                  <div>
+                    <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)", fontWeight: 700, display: "block", marginBottom: "0.35rem", textTransform: "uppercase" }}>Issue Size</label>
+                    <input type="text" placeholder="e.g. $850M" value={issueSize} onChange={(e) => setIssueSize(e.target.value)} className="input-field" required />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)", fontWeight: 700, display: "block", marginBottom: "0.35rem", textTransform: "uppercase" }}>Lot Size (Shares)</label>
+                    <input type="number" value={lotSize} onChange={(e) => setLotSize(parseInt(e.target.value) || 1)} className="input-field" required min={1} />
+                  </div>
                 </div>
-              </div>
 
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                  <div>
+                    <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)", fontWeight: 700, display: "block", marginBottom: "0.35rem", textTransform: "uppercase" }}>GMP Premium %</label>
+                    <input type="number" placeholder="e.g. 30" value={gmpPercent || ""} onChange={(e) => setGmpPercent(parseFloat(e.target.value) || 0)} className="input-field" />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)", fontWeight: 700, display: "block", marginBottom: "0.35rem", textTransform: "uppercase" }}>GMP Amount Suffix</label>
+                    <input type="text" placeholder="e.g. +$12" value={gmpAmount} onChange={(e) => setGmpAmount(e.target.value)} className="input-field" />
+                  </div>
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                  <div>
+                    <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)", fontWeight: 700, display: "block", marginBottom: "0.35rem", textTransform: "uppercase" }}>Bidding Open Date</label>
+                    <input type="date" value={openDate} onChange={(e) => setOpenDate(e.target.value)} className="input-field" required />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)", fontWeight: 700, display: "block", marginBottom: "0.35rem", textTransform: "uppercase" }}>Bidding Close Date</label>
+                    <input type="date" value={closeDate} onChange={(e) => setCloseDate(e.target.value)} className="input-field" required />
+                  </div>
+                </div>
+
+                <button type="submit" className="btn btn-primary" style={{ width: "100%", marginTop: "1rem" }}>
+                  📥 Submit Draft to Approval Queue
+                </button>
+              </form>
             </div>
           )}
 
+          {/* ── TAB: MY DRAFTS HISTORY (AUTHOR ONLY) ── */}
+          {activeTab === "my-drafts" && user.role === "AUTHOR" && (
+            <div className="card" style={{ padding: "2rem" }}>
+              <h2 style={{ fontSize: "1.35rem", marginBottom: "1.5rem", color: "var(--text-primary)" }}>📜 Editorial Submissions Log</h2>
 
+              <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
+                  <thead>
+                    <tr style={{ borderBottom: "1px solid var(--border-color)", opacity: 0.8 }}>
+                      <th style={{ color: "var(--text-secondary)", fontSize: "0.75rem", padding: "1rem 0.5rem", fontWeight: "700", textTransform: "uppercase" }}>Company</th>
+                      <th style={{ color: "var(--text-secondary)", fontSize: "0.75rem", padding: "1rem 0.5rem", fontWeight: "700", textTransform: "uppercase" }}>Country</th>
+                      <th style={{ color: "var(--text-secondary)", fontSize: "0.75rem", padding: "1rem 0.5rem", fontWeight: "700", textTransform: "uppercase" }}>Submitted Date</th>
+                      <th style={{ color: "var(--text-secondary)", fontSize: "0.75rem", padding: "1rem 0.5rem", fontWeight: "700", textTransform: "uppercase" }}>Price Band</th>
+                      <th style={{ color: "var(--text-secondary)", fontSize: "0.75rem", padding: "1rem 0.5rem", fontWeight: "700", textTransform: "uppercase", textAlign: "right" }}>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {submissions.filter(s => s.authorEmail === user.email).length === 0 ? (
+                      <tr>
+                        <td colSpan={5} style={{ textAlign: "center", color: "var(--text-secondary)", padding: "2rem" }}>
+                          You have not submitted any drafts yet.
+                        </td>
+                      </tr>
+                    ) : (
+                      submissions.filter(s => s.authorEmail === user.email).map((sub) => (
+                        <tr key={sub.id} style={{ borderBottom: "1px solid var(--border-color)" }}>
+                          <td style={{ padding: "1.25rem 0.5rem" }}>
+                            <strong style={{ fontSize: "0.9rem", color: "var(--text-primary)" }}>{sub.name}</strong>
+                            <div style={{ fontSize: "0.72rem", color: "var(--text-secondary)" }}>{sub.ticker} • {sub.segment}</div>
+                          </td>
+                          <td style={{ padding: "1.25rem 0.5rem", fontSize: "0.82rem", textTransform: "capitalize", color: "var(--text-primary)" }}>
+                            {sub.countrySlug.replace("-", " ")}
+                          </td>
+                          <td style={{ padding: "1.25rem 0.5rem", fontSize: "0.82rem", color: "var(--text-secondary)" }}>
+                            {new Date(sub.submittedAt).toLocaleDateString()}
+                          </td>
+                          <td style={{ padding: "1.25rem 0.5rem", fontSize: "0.85rem", fontWeight: 700, color: "var(--text-primary)" }}>
+                            {sub.priceBand}
+                          </td>
+                          <td style={{ padding: "1.25rem 0.5rem", textAlign: "right" }}>
+                            <span className={`badge ${sub.status === "Approved" ? "badge-success" : sub.status === "Pending" ? "badge-warning" : "badge-danger"}`} style={{ fontSize: "0.62rem" }}>
+                              {sub.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
 
           {/* ── TAB: EDITORIAL APPROVAL QUEUE (ADMIN ONLY) ── */}
           {activeTab === "queue" && user.role === "ADMIN" && (
             <div className="card" style={{ padding: "2rem" }}>
               <h2 style={{ fontSize: "1.35rem", marginBottom: "1.5rem", color: "var(--text-primary)" }}>📥 Pending Submissions Queue</h2>
-              
-              <div style={{ display: "flex", flexDirection: "column", gap: "2.5rem" }}>
-                
-                {/* Syndicate IPO Submissions */}
-                <div>
-                  <h3 style={{ fontSize: "1.05rem", fontWeight: 700, marginBottom: "1rem", color: "var(--primary)" }}>Syndicate IPO Submissions</h3>
-                  {submissions.filter(s => s.status === "Pending").length === 0 ? (
-                    <div style={{ padding: "1.5rem", border: "1px dashed var(--border-color)", borderRadius: "8px", textAlign: "center", color: "var(--text-secondary)", fontSize: "0.85rem" }}>
-                      No pending IPO submissions.
-                    </div>
-                  ) : (
-                    submissions.filter(s => s.status === "Pending").map((sub) => (
-                      <div key={sub.id} style={{ display: "flex", flexDirection: "column", gap: "1rem", border: "1px solid var(--border-color)", padding: "1.5rem", borderRadius: "12px", background: "var(--spec-bg)", marginBottom: "1rem" }}>
-                        <div className="flex-between">
-                          <div>
-                            <span style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>Submitted by: {sub.authorEmail}</span>
-                            <h3 style={{ fontSize: "1.25rem", fontWeight: 800, marginTop: "0.25rem", color: "var(--text-primary)" }}>{sub.name} ({sub.ticker})</h3>
-                          </div>
-                          <span className="badge badge-primary" style={{ textTransform: "uppercase" }}>{sub.countrySlug}</span>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+                {submissions.filter(s => s.status === "Pending").length === 0 ? (
+                  <div style={{ textAlign: "center", color: "var(--text-secondary)", padding: "3rem" }}>
+                    🎉 The review queue is clear! No pending submissions.
+                  </div>
+                ) : (
+                  submissions.filter(s => s.status === "Pending").map((sub) => (
+                    <div key={sub.id} style={{ display: "flex", flexDirection: "column", gap: "1rem", border: "1px solid var(--border-color)", padding: "1.5rem", borderRadius: "12px", background: "var(--spec-bg)" }}>
+
+                      <div className="flex-between">
+                        <div>
+                          <span style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>Submitted by: {sub.authorEmail}</span>
+                          <h3 style={{ fontSize: "1.25rem", fontWeight: 800, marginTop: "0.25rem", color: "var(--text-primary)" }}>{sub.name} ({sub.ticker})</h3>
                         </div>
-                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: "1rem", fontSize: "0.82rem" }}>
-                          <div>
-                            <span style={{ color: "var(--text-secondary)" }}>Segment:</span>
-                            <strong style={{ display: "block", color: "var(--text-primary)", marginTop: "2px" }}>{sub.segment}</strong>
-                          </div>
-                          <div>
-                            <span style={{ color: "var(--text-secondary)" }}>Price Band:</span>
-                            <strong style={{ display: "block", color: "var(--text-primary)", marginTop: "2px" }}>{sub.priceBand}</strong>
-                          </div>
-                          <div>
-                            <span style={{ color: "var(--text-secondary)" }}>Issue Size:</span>
-                            <strong style={{ display: "block", color: "var(--text-primary)", marginTop: "2px" }}>{sub.size}</strong>
-                          </div>
-                          <div>
-                            <span style={{ color: "var(--text-secondary)" }}>GMP Forecast:</span>
-                            <strong style={{ display: "block", color: "var(--success)", marginTop: "2px" }}>{sub.gmpAmount} ({sub.gmp}%)</strong>
-                          </div>
+                        <span className="badge badge-primary" style={{ textTransform: "uppercase" }}>{sub.countrySlug}</span>
+                      </div>
+
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: "1rem", fontSize: "0.82rem" }}>
+                        <div>
+                          <span style={{ color: "var(--text-secondary)" }}>Segment:</span>
+                          <strong style={{ display: "block", color: "var(--text-primary)", marginTop: "2px" }}>{sub.segment}</strong>
                         </div>
-                        <div style={{ display: "flex", gap: "1rem", marginTop: "0.5rem", borderTop: "1px solid var(--border-color)", paddingTop: "1rem" }}>
-                          <button onClick={() => handleReviewDecision(sub.id, "Approved")} className="btn btn-primary" style={{ padding: "0.5rem 1.5rem", fontSize: "0.8rem", borderRadius: "6px" }}>
-                            ✓ Approve & Publish Live
-                          </button>
-                          <button onClick={() => handleReviewDecision(sub.id, "Rejected")} className="btn btn-secondary" style={{ padding: "0.5rem 1.5rem", fontSize: "0.8rem", borderRadius: "6px", color: "var(--danger)", borderColor: "rgba(239, 68, 68, 0.2)" }}>
-                            ✕ Reject Draft
-                          </button>
+                        <div>
+                          <span style={{ color: "var(--text-secondary)" }}>Price Band:</span>
+                          <strong style={{ display: "block", color: "var(--text-primary)", marginTop: "2px" }}>{sub.priceBand}</strong>
+                        </div>
+                        <div>
+                          <span style={{ color: "var(--text-secondary)" }}>Issue Size:</span>
+                          <strong style={{ display: "block", color: "var(--text-primary)", marginTop: "2px" }}>{sub.size}</strong>
+                        </div>
+                        <div>
+                          <span style={{ color: "var(--text-secondary)" }}>GMP Forecast:</span>
+                          <strong style={{ display: "block", color: "var(--success)", marginTop: "2px" }}>{sub.gmpAmount} ({sub.gmp}%)</strong>
                         </div>
                       </div>
-                    ))
-                  )}
-                </div>
 
-                {/* Payment App Submissions */}
-                <div>
-                  <h3 style={{ fontSize: "1.05rem", fontWeight: 700, marginBottom: "1rem", color: "var(--success)" }}>Payment App Submissions</h3>
-                  {customPayments.filter(p => p.status === "pending").length === 0 ? (
-                    <div style={{ padding: "1.5rem", border: "1px dashed var(--border-color)", borderRadius: "8px", textAlign: "center", color: "var(--text-secondary)", fontSize: "0.85rem" }}>
-                      No pending Payment App submissions.
-                    </div>
-                  ) : (
-                    customPayments.filter(p => p.status === "pending").map((app) => (
-                      <div key={app.id} style={{ display: "flex", flexDirection: "column", gap: "1rem", border: "1px solid var(--border-color)", padding: "1.5rem", borderRadius: "12px", background: "var(--spec-bg)", marginBottom: "1rem" }}>
-                        <div className="flex-between">
-                          <div>
-                            <span style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>Submitted by: {app.addedBy}</span>
-                            <h3 style={{ fontSize: "1.25rem", fontWeight: 800, marginTop: "0.25rem", color: "var(--text-primary)" }}>{app.name} ({app.slug})</h3>
-                          </div>
-                          <span className="badge badge-success" style={{ textTransform: "uppercase" }}>{app.country}</span>
-                        </div>
-                        <div style={{ fontSize: "0.85rem", color: "var(--text-secondary)", lineHeight: 1.45 }}>
-                          {app.summary}
-                        </div>
-                        <div style={{ display: "flex", gap: "1rem", marginTop: "0.5rem", borderTop: "1px solid var(--border-color)", paddingTop: "1rem" }}>
-                          <button onClick={() => handleApproveRejectPaymentApp(app.id, "approved")} className="btn btn-primary" style={{ padding: "0.5rem 1.5rem", fontSize: "0.8rem", borderRadius: "6px" }}>
-                            ✓ Approve & Publish Live
-                          </button>
-                          <button onClick={() => handleApproveRejectPaymentApp(app.id, "rejected")} className="btn btn-secondary" style={{ padding: "0.5rem 1.5rem", fontSize: "0.8rem", borderRadius: "6px", color: "var(--danger)", borderColor: "rgba(239, 68, 68, 0.2)" }}>
-                            ✕ Reject
-                          </button>
-                        </div>
+                      <div style={{ display: "flex", gap: "1rem", marginTop: "0.5rem", borderTop: "1px solid var(--border-color)", paddingTop: "1rem" }}>
+                        <button onClick={() => handleReviewDecision(sub.id, "Approved")} className="btn btn-primary" style={{ padding: "0.5rem 1.5rem", fontSize: "0.8rem", borderRadius: "6px" }}>
+                          ✓ Approve & Publish Live
+                        </button>
+                        <button onClick={() => handleReviewDecision(sub.id, "Rejected")} className="btn btn-secondary" style={{ padding: "0.5rem 1.5rem", fontSize: "0.8rem", borderRadius: "6px", color: "var(--danger)", borderColor: "rgba(239, 68, 68, 0.2)" }}>
+                          ✕ Reject Draft
+                        </button>
                       </div>
-                    ))
-                  )}
-                </div>
 
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           )}
@@ -1660,14 +1526,14 @@ export default function AdminConsolePage() {
           {/* ── TAB: SELECT PRODUCTS MANAGER (DYNAMIC FOR EACH SPECIFIC REQUIREMENTS) ── */}
           {activeTab === "products" && (
             <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
-              
+
               {/* Selector Bar */}
               <div className="card" style={{ padding: "1.25rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
                 <div>
                   <h2 style={{ fontSize: "1.35rem", fontWeight: 800, color: "var(--text-primary)" }}>🛍️ Directory Catalog Manager</h2>
                   <p style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>Choose a Select Category directory to manage listings.</p>
                 </div>
-                
+
                 <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
                   {(["banks", "brokers", "cards", "payments", "crypto"] as const).map((type) => (
                     <button
@@ -1698,7 +1564,7 @@ export default function AdminConsolePage() {
                 )}
 
                 <form onSubmit={handleAddProduct} style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-                  
+
                   {/* --- SECTION 1: General Shared Info --- */}
                   <div>
                     <h4 style={{ fontSize: "0.85rem", color: "var(--primary)", textTransform: "uppercase", letterSpacing: "0.03em", fontWeight: 700, marginBottom: "1rem" }}>Section 1: General Product Information</h4>
@@ -2120,7 +1986,7 @@ export default function AdminConsolePage() {
                     <h4 style={{ fontSize: "0.85rem", color: "var(--primary)", textTransform: "uppercase", letterSpacing: "0.03em", fontWeight: 700, marginBottom: "1rem" }}>
                       Section 3: Detailed Editorial Review (Blog Post content)
                     </h4>
-                    
+
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem", marginBottom: "1rem" }}>
                       <div>
                         <label style={{ fontSize: "0.72rem", color: "var(--text-secondary)", display: "block", marginBottom: "0.25rem" }}>Charges Rating Score (1-5)</label>
@@ -2179,7 +2045,7 @@ export default function AdminConsolePage() {
               {/* Listings Catalog table */}
               <div className="card" style={{ padding: "2rem" }}>
                 <h3 style={{ fontSize: "1.1rem", fontWeight: 700, marginBottom: "1.25rem", color: "var(--text-primary)" }}>
-                  📂 Current Catalog Listings — Database
+                  📂 Current Catalog Listings
                 </h3>
 
                 <div style={{ overflowX: "auto" }}>
@@ -2188,79 +2054,55 @@ export default function AdminConsolePage() {
                       <tr style={{ borderBottom: "1px solid var(--border-color)", opacity: 0.8 }}>
                         <th style={{ color: "var(--text-secondary)", fontSize: "0.75rem", padding: "1rem 0.5rem", fontWeight: "700", textTransform: "uppercase" }}>Name</th>
                         <th style={{ color: "var(--text-secondary)", fontSize: "0.75rem", padding: "1rem 0.5rem", fontWeight: "700", textTransform: "uppercase" }}>Slug</th>
-                        <th style={{ color: "var(--text-secondary)", fontSize: "0.75rem", padding: "1rem 0.5rem", fontWeight: "700", textTransform: "uppercase" }}>Country</th>
-                        <th style={{ color: "var(--text-secondary)", fontSize: "0.75rem", padding: "1rem 0.5rem", fontWeight: "700", textTransform: "uppercase" }}>Status</th>
+                        <th style={{ color: "var(--text-secondary)", fontSize: "0.75rem", padding: "1rem 0.5rem", fontWeight: "700", textTransform: "uppercase" }}>Type</th>
+                        <th style={{ color: "var(--text-secondary)", fontSize: "0.75rem", padding: "1rem 0.5rem", fontWeight: "700", textTransform: "uppercase" }}>Source</th>
                         <th style={{ color: "var(--text-secondary)", fontSize: "0.75rem", padding: "1rem 0.5rem", fontWeight: "700", textTransform: "uppercase", textAlign: "right" }}>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {(
-                        activeSelectType === "banks" ? customBanks :
-                        activeSelectType === "brokers" ? customBrokers :
-                        activeSelectType === "cards" ? customCards :
-                        activeSelectType === "payments" ? customPayments :
-                        customCryptos
-                      ).map((item: any) => (
+                      {/* Combine static lists + custom lists */}
+                      {[
+                        ...(activeSelectType === "banks" ? staticBanks.map((b: any) => ({ ...b, type: "Static" })) : []),
+                        ...(activeSelectType === "banks" ? customBanks.map((b: any) => ({ ...b, type: "Custom" })) : []),
+                        ...(activeSelectType === "brokers" ? staticBrokers.map((b: any) => ({ ...b, type: "Static" })) : []),
+                        ...(activeSelectType === "brokers" ? customBrokers.map((b: any) => ({ ...b, type: "Custom" })) : []),
+                        ...(activeSelectType === "cards" ? staticCards.map((c: any) => ({ ...c, type: "Static" })) : []),
+                        ...(activeSelectType === "cards" ? customCards.map((c: any) => ({ ...c, type: "Custom" })) : []),
+                        ...(activeSelectType === "payments" ? customPayments.map((p: any) => ({ ...p, type: p.status === "approved" ? "Live (DB)" : "Pending (DB)" })) : []),
+                        ...(activeSelectType === "crypto" ? staticCryptos.map((cr: any) => ({ ...cr, type: "Static" })) : []),
+                        ...(activeSelectType === "crypto" ? customCryptos.map((cr: any) => ({ ...cr, type: "Custom" })) : []),
+                      ].map((item: any) => (
                         <tr key={item.id || item.slug} style={{ borderBottom: "1px solid var(--border-color)" }}>
                           <td style={{ padding: "1.1rem 0.5rem" }}>
                             <strong style={{ fontSize: "0.88rem", color: "var(--text-primary)" }}>{item.name}</strong>
-                            <div style={{ fontSize: "0.72rem", color: "var(--text-muted)", maxWidth: "350px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.summary || item.description}</div>
+                            <div style={{ fontSize: "0.72rem", color: "var(--text-muted)", maxWidth: "400px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.summary || item.description}</div>
                           </td>
                           <td style={{ padding: "1.1rem 0.5rem", fontSize: "0.82rem", color: "var(--text-secondary)" }}>
                             <code>{item.slug}</code>
                           </td>
-                          <td style={{ padding: "1.1rem 0.5rem", fontSize: "0.82rem", color: "var(--text-primary)" }}>
-                            {item.countrySlug || item.country_slug || item.country || "—"}
+                          <td style={{ padding: "1.1rem 0.5rem", fontSize: "0.82rem", textTransform: "capitalize", color: "var(--text-primary)" }}>
+                            {activeSelectType.replace("banks", "Bank").replace("cards", "Card")}
                           </td>
                           <td style={{ padding: "1.1rem 0.5rem" }}>
-                            <span className={`badge ${item.status === "approved" ? "badge-success" : "badge-warning"}`} style={{ fontSize: "0.6rem" }}>
-                              {item.status || "approved"}
+                            <span className={`badge ${item.type === "Static" ? "badge-secondary" : item.type.includes("Live") ? "badge-success" : "badge-warning"}`} style={{ fontSize: "0.6rem" }}>
+                              {item.type}
                             </span>
                           </td>
                           <td style={{ padding: "1.1rem 0.5rem", textAlign: "right" }}>
-                            <div style={{ display: "flex", gap: "0.5rem", justifyContent: "flex-end", flexWrap: "wrap" }}>
-                              {item.status === "pending" && (
-                                <>
-                                  <button
-                                    onClick={() => handleApproveRejectProduct(String(item.id), "approved", activeSelectType)}
-                                    className="btn btn-secondary"
-                                    style={{ padding: "0.3rem 0.65rem", fontSize: "0.72rem", borderRadius: "6px", color: "var(--success)", borderColor: "rgba(16, 185, 129, 0.25)" }}
-                                  >
-                                    ✓ Approve
-                                  </button>
-                                  <button
-                                    onClick={() => handleApproveRejectProduct(String(item.id), "rejected", activeSelectType)}
-                                    className="btn btn-secondary"
-                                    style={{ padding: "0.3rem 0.65rem", fontSize: "0.72rem", borderRadius: "6px", color: "var(--warning)", borderColor: "rgba(245, 158, 11, 0.25)" }}
-                                  >
-                                    ✕ Reject
-                                  </button>
-                                </>
-                              )}
+                            {item.type !== "Static" ? (
                               <button
-                                onClick={() => handleDeleteProduct(String(item.id), activeSelectType)}
+                                onClick={() => handleDeleteProduct(item.id || item.slug, activeSelectType)}
                                 className="btn btn-secondary"
-                                style={{ padding: "0.3rem 0.65rem", fontSize: "0.72rem", borderRadius: "6px", color: "var(--danger)", borderColor: "rgba(239, 68, 68, 0.2)" }}
+                                style={{ padding: "0.35rem 0.75rem", fontSize: "0.78rem", borderRadius: "6px", color: "var(--danger)", borderColor: "rgba(239, 68, 68, 0.2)" }}
                               >
-                                🗑 Delete
+                                ✕ Remove
                               </button>
-                            </div>
+                            ) : (
+                              <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontStyle: "italic" }}>System Protected</span>
+                            )}
                           </td>
                         </tr>
                       ))}
-                      {(
-                        activeSelectType === "banks" ? customBanks :
-                        activeSelectType === "brokers" ? customBrokers :
-                        activeSelectType === "cards" ? customCards :
-                        activeSelectType === "payments" ? customPayments :
-                        customCryptos
-                      ).length === 0 && (
-                        <tr>
-                          <td colSpan={5} style={{ textAlign: "center", color: "var(--text-secondary)", padding: "2rem" }}>
-                            No listings found in database for this category.
-                          </td>
-                        </tr>
-                      )}
                     </tbody>
                   </table>
                 </div>
@@ -2277,15 +2119,15 @@ export default function AdminConsolePage() {
               <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", lineHeight: 1.5 }}>
                 Manage local listings caching, restore seeded databases, or trigger local schema migrations.
               </p>
-              
+
               <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
                 <div style={{ background: "var(--spec-bg)", padding: "1rem", borderRadius: "8px", border: "1px solid var(--border-color)", fontSize: "0.8rem", color: "var(--text-secondary)" }}>
                   <strong>Important Notice:</strong> Seeding modifications and user permissions in the database are permanent on the Neon server. Resetting system caches will only restore IPOs and select custom catalogs back to their seeded state on your client local cache.
                 </div>
 
-                <button 
-                  onClick={handleRestoreSeeds} 
-                  className="btn btn-secondary" 
+                <button
+                  onClick={handleRestoreSeeds}
+                  className="btn btn-secondary"
                   style={{ width: "100%", color: "var(--danger)", border: "1px solid rgba(239, 68, 68, 0.2)", background: "rgba(239, 68, 68, 0.05)", fontWeight: 700 }}
                 >
                   ♻️ Clear Cache & Restore Seed Catalogs

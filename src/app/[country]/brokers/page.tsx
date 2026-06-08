@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { BROKERS_DATA } from "@/data/brokersData";
 
 const COUNTRY_MAP: Record<string, { code: string; name: string; title: string }> = {
   "india": { code: "IN", name: "India", title: "India" },
@@ -19,16 +18,28 @@ export default function BrokersCountryPage() {
 
   const [filterType, setFilterType] = useState<string>("all");
   const [filterSegment, setFilterSegment] = useState<string>("all");
+  const [brokers, setBrokers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredBrokers = BROKERS_DATA.filter((broker) => {
-    if (broker.country !== selectedCountry) return false;
-    if (filterType !== "all" && broker.type.toLowerCase() !== filterType.toLowerCase()) return false;
+  useEffect(() => {
+    setLoading(true);
+    fetch(`/api/brokers?countrySlug=${countrySlug}`)
+      .then((res) => res.json())
+      .then((data) => { if (data.success) setBrokers(data.brokers); })
+      .catch((err) => console.error("Error fetching brokers:", err))
+      .finally(() => setLoading(false));
+  }, [countrySlug]);
+
+  const filteredBrokers = brokers.filter((broker) => {
+    if (filterType !== "all" && broker.type?.toLowerCase() !== filterType.toLowerCase()) return false;
     if (filterSegment !== "all") {
-      const seg = filterSegment as keyof typeof broker.segments;
-      if (!broker.segments[seg]) return false;
+      const segs = broker.segments || {};
+      if (!segs[filterSegment]) return false;
     }
     return true;
   });
+
+
 
   return (
     <div className="app-container" style={{ paddingTop: "2.5rem" }}>

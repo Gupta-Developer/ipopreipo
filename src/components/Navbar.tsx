@@ -305,7 +305,7 @@ export default function Navbar() {
             )}
             {user?.role === "AUTHOR" && (
               <Link
-                href={`/${country}/admin`}
+                href={`/${country}/author`}
                 style={{
                   display: "inline-flex", alignItems: "center", gap: "0.35rem",
                   padding: "0.38rem 0.85rem", borderRadius: "8px", fontSize: "0.78rem",
@@ -329,7 +329,18 @@ export default function Navbar() {
                   aria-label="Account"
                   aria-expanded={showUserMenu}
                 >
-                  <span className="nb-avatar">{user.name.charAt(0).toUpperCase()}</span>
+                  <span className="nb-avatar">
+                    {user.picture ? (
+                      <img 
+                        src={user.picture} 
+                        alt={user.name} 
+                        referrerPolicy="no-referrer"
+                        style={{ width: "100%", height: "100%", borderRadius: "inherit", objectFit: "cover" }} 
+                      />
+                    ) : (
+                      user.name.charAt(0).toUpperCase()
+                    )}
+                  </span>
                   <span className="nb-user-info">
                     <span className="nb-user-name">{user.name}</span>
                     <span className="nb-user-badge">{user.role}</span>
@@ -354,7 +365,7 @@ export default function Navbar() {
                     )}
                     {user.role === "AUTHOR" && (
                       <Link
-                        href={`/${country}/admin`}
+                        href={`/${country}/author`}
                         className="nb-dropdown-item"
                         onClick={() => setShowUserMenu(false)}
                         style={{ textDecoration: "none", color: "rgb(var(--primary-rgb))" }}
@@ -462,7 +473,18 @@ export default function Navbar() {
           {user ? (
             <div style={{ padding: "0 0.5rem", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                <span className="nb-avatar" style={{ width: 32, height: 32, borderRadius: "6px" }}>{user.name.charAt(0).toUpperCase()}</span>
+                <span className="nb-avatar" style={{ width: 32, height: 32, borderRadius: "6px" }}>
+                  {user.picture ? (
+                    <img 
+                      src={user.picture} 
+                      alt={user.name} 
+                      referrerPolicy="no-referrer"
+                      style={{ width: "100%", height: "100%", borderRadius: "inherit", objectFit: "cover" }} 
+                    />
+                  ) : (
+                    user.name.charAt(0).toUpperCase()
+                  )}
+                </span>
                 <div style={{ display: "flex", flexDirection: "column" }}>
                   <span style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--text-primary)" }}>{user.name}</span>
                   <span style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>{user.email}</span>
@@ -484,7 +506,7 @@ export default function Navbar() {
               )}
               {user.role === "AUTHOR" && (
                 <Link
-                  href={`/${country}/admin`}
+                  href={`/${country}/author`}
                   onClick={() => setMobileOpen(false)}
                   style={{
                     display: "flex", alignItems: "center", gap: "0.6rem",

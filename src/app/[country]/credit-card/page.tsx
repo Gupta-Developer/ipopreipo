@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { CREDIT_CARDS_CATALOG } from "@/data/cardsData";
 
 const COUNTRY_MAP: Record<string, string> = {
   "india": "India",
@@ -20,16 +19,23 @@ export default function CreditCardCountryPage() {
 
   const [activeFilter, setActiveFilter] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const [cards, setCards] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const countries = ["India", "United States", "United Kingdom", "Singapore"];
   const categories = ["All", "Cashback", "Rewards", "Travel", "Premium"];
 
+  useEffect(() => {
+    setLoading(true);
+    fetch(`/api/credit-cards?countrySlug=${countrySlug}`)
+      .then((res) => res.json())
+      .then((data) => { if (data.success) setCards(data.creditCards); })
+      .catch((err) => console.error("Error fetching credit cards:", err))
+      .finally(() => setLoading(false));
+  }, [countrySlug]);
+
   // Filter cards based on tab, country, and search query
-  const filteredCards = CREDIT_CARDS_CATALOG.filter((card) => {
-    // Country filter
-    if (card.country.toLowerCase() !== selectedCountryName.toLowerCase()) {
-      return false;
-    }
+  const filteredCards = cards.filter((card) => {
     // Search query filter
     if (searchQuery && !card.name.toLowerCase().includes(searchQuery.toLowerCase())) {
       return false;
@@ -48,6 +54,7 @@ export default function CreditCardCountryPage() {
     const slug = val.toLowerCase().replace(/\s+/g, "-");
     router.push(`/${slug}/credit-card`);
   };
+
 
   return (
     <div className="app-container" style={{ paddingTop: "2.5rem" }}>

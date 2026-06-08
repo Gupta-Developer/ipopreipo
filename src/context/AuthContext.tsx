@@ -8,64 +8,18 @@ interface AuthContextType {
   loading: boolean;
   login: (email: string, password?: string) => Promise<{ success: boolean; error?: string }>;
   signup: (name: string, email: string, password?: string) => Promise<{ success: boolean; error?: string }>;
-  loginWithGoogle: (name: string, email: string) => Promise<{ success: boolean; error?: string }>;
+  loginWithGoogle: (credential: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Initial mock users directory persisted in localStorage if empty
-const DEFAULT_USERS: Record<string, User & { pass: string }> = {
-  "mayank@ipopreipo.com": {
-    id: "1",
-    email: "mayank@ipopreipo.com",
-    name: "Mayank Patel",
-    role: "PRO",
-    createdAt: "2026-06-01T00:00:00Z",
-    pass: "password123"
-  },
-  "admin@ipopreipo.com": {
-    id: "2",
-    email: "admin@ipopreipo.com",
-    name: "System Admin",
-    role: "ADMIN",
-    createdAt: "2026-06-05T00:00:00Z",
-    pass: "password123"
-  },
-  "author@ipopreipo.com": {
-    id: "3",
-    email: "author@ipopreipo.com",
-    name: "Regional Editor",
-    role: "AUTHOR",
-    createdAt: "2026-06-05T00:00:00Z",
-    pass: "password123",
-    assignedCountries: ["india", "united-states"]
-  }
-};
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Initialize session and directories on load
+  // Initialize session on load
   useEffect(() => {
-    const existingUsersStr = localStorage.getItem("registered_users");
-    if (!existingUsersStr) {
-      localStorage.setItem("registered_users", JSON.stringify(DEFAULT_USERS));
-    } else {
-      const existingUsers = JSON.parse(existingUsersStr);
-      let updated = false;
-      for (const [email, u] of Object.entries(DEFAULT_USERS)) {
-        if (!existingUsers[email]) {
-          existingUsers[email] = u;
-          updated = true;
-        }
-      }
-      if (updated) {
-        localStorage.setItem("registered_users", JSON.stringify(existingUsers));
-      }
-    }
-
     const session = localStorage.getItem("active_session");
     if (session) {
       try {
@@ -78,116 +32,66 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = async (email: string, password?: string) => {
-    // Simulate API query latency
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password: password || "password123" }),
+      });
 
-    const usersStr = localStorage.getItem("registered_users") || JSON.stringify(DEFAULT_USERS);
-    const users = JSON.parse(usersStr);
+      const data = await res.json();
+      if (!data.success) {
+        return { success: false, error: data.error };
+      }
 
-    const foundUser = users[email.toLowerCase().trim()];
-    if (!foundUser) {
-      return { success: false, error: "User profile not found. Please register." };
+      localStorage.setItem("active_session", JSON.stringify(data.user));
+      setUser(data.user);
+      return { success: true };
+    } catch (e: any) {
+      return { success: false, error: "Network error occurred. Please try again." };
     }
-
-    if (password && foundUser.pass !== password) {
-      return { success: false, error: "Incorrect password. Please try again." };
-    }
-
-    // Strip password before establishing session
-    const sessionUser: User = {
-      id: foundUser.id,
-      email: foundUser.email,
-      name: foundUser.name,
-      role: foundUser.role,
-      createdAt: foundUser.createdAt
-    };
-
-    localStorage.setItem("active_session", JSON.stringify(sessionUser));
-    setUser(sessionUser);
-    return { success: true };
   };
 
   const signup = async (name: string, email: string, password?: string) => {
-    await new Promise((resolve) => setTimeout(resolve, 600));
+    try {
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password: password || "password123" }),
+      });
 
-    const usersStr = localStorage.getItem("registered_users") || JSON.stringify(DEFAULT_USERS);
-    const users = JSON.parse(usersStr);
-    const normalizedEmail = email.toLowerCase().trim();
+      const data = await res.json();
+      if (!data.success) {
+        return { success: false, error: data.error };
+      }
 
-    if (users[normalizedEmail]) {
-      return { success: false, error: "Email is already registered. Please login." };
+      localStorage.setItem("active_session", JSON.stringify(data.user));
+      setUser(data.user);
+      return { success: true };
+    } catch (e: any) {
+      return { success: false, error: "Network error occurred. Please try again." };
     }
-
-    const newUser = {
-      id: String(Object.keys(users).length + 1),
-      email: normalizedEmail,
-      name: name.trim(),
-      role: "USER" as const,
-      createdAt: new Date().toISOString(),
-      pass: password || "password123"
-    };
-
-    // Update directories
-    users[normalizedEmail] = newUser;
-    localStorage.setItem("registered_users", JSON.stringify(users));
-
-    // Sign in automatically
-    const sessionUser: User = {
-      id: newUser.id,
-      email: newUser.email,
-      name: newUser.name,
-      role: newUser.role,
-      createdAt: newUser.createdAt
-    };
-
-    localStorage.setItem("active_session", JSON.stringify(sessionUser));
-    setUser(sessionUser);
-    return { success: true };
   };
 
-  const loginWithGoogle = async (name: string, email: string) => {
-    // Simulate API query latency
-    await new Promise((resolve) => setTimeout(resolve, 500));
+  const loginWithGoogle = async (credential: string) => {
+    try {
+      const res = await fetch("/api/auth/google", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ credential }),
+      });
 
-    const usersStr = localStorage.getItem("registered_users") || JSON.stringify(DEFAULT_USERS);
-    const users = JSON.parse(usersStr);
-    const normalizedEmail = email.toLowerCase().trim();
+      const data = await res.json();
+      if (!data.success) {
+        return { success: false, error: data.error };
+      }
 
-    let sessionUser: User;
-
-    if (users[normalizedEmail]) {
-      const foundUser = users[normalizedEmail];
-      sessionUser = {
-        id: foundUser.id,
-        email: foundUser.email,
-        name: foundUser.name,
-        role: foundUser.role,
-        createdAt: foundUser.createdAt
-      };
-    } else {
-      const newUser = {
-        id: String(Object.keys(users).length + 1),
-        email: normalizedEmail,
-        name: name.trim(),
-        role: "USER" as const,
-        createdAt: new Date().toISOString(),
-        pass: "google-oauth-managed"
-      };
-      users[normalizedEmail] = newUser;
-      localStorage.setItem("registered_users", JSON.stringify(users));
-
-      sessionUser = {
-        id: newUser.id,
-        email: newUser.email,
-        name: newUser.name,
-        role: newUser.role,
-        createdAt: newUser.createdAt
-      };
+      localStorage.setItem("active_session", JSON.stringify(data.user));
+      setUser(data.user);
+      return { success: true };
+    } catch (e: any) {
+      return { success: false, error: "Network error occurred. Please try again." };
     }
-
-    localStorage.setItem("active_session", JSON.stringify(sessionUser));
-    setUser(sessionUser);
-    return { success: true };
   };
 
   const logout = () => {

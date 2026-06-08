@@ -4,5 +4,7 @@ export interface User {
   name: string;
   role: "PRO" | "USER" | "ADMIN" | "AUTHOR";
   createdAt: string;
+  picture?: string;
   assignedCountries?: string[];
 }
+

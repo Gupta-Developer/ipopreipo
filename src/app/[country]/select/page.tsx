@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { BANKS_DATA } from "@/data/banksData";
 import { CREDIT_CARDS_CATALOG } from "@/data/cardsData";
-import { PAYMENT_APPS_DATA } from "@/data/paymentAppsData";
 import { CRYPTO_APPS_DATA } from "@/data/cryptoAppsData";
 import { BROKERS_DATA } from "@/data/brokersData";
 
@@ -22,11 +21,22 @@ export default function SelectFinologyDashboard() {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [showResults, setShowResults] = useState(false);
+  const [payments, setPayments] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch(`/api/payment-apps?countrySlug=${countrySlug}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          setPayments(data.paymentApps);
+        }
+      })
+      .catch((err) => console.error("Error fetching payment apps for dashboard:", err));
+  }, [countrySlug]);
 
   // Filter local country data
   const banks = BANKS_DATA.filter(b => b.countrySlug === countrySlug);
   const cards = CREDIT_CARDS_CATALOG.filter(c => c.country.toLowerCase() === countryInfo.name.toLowerCase());
-  const payments = PAYMENT_APPS_DATA.filter(p => p.country.toLowerCase() === countryInfo.name.toLowerCase());
   const crypto = CRYPTO_APPS_DATA.filter(c => c.country.toLowerCase() === countryInfo.name.toLowerCase());
   const brokers = BROKERS_DATA.filter(b => b.countryName.toLowerCase() === countryInfo.name.toLowerCase());
 

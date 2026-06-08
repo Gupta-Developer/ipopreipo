@@ -3,32 +3,46 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { CREDIT_CARDS_CATALOG, CreditCardDetail } from "@/data/cardsData";
 
 export default function CardReviewPage() {
   const params = useParams();
   const countrySlug = (params?.country as string) || "india";
   const slug = params?.slug as string;
 
-  const [card, setCard] = useState<CreditCardDetail | null>(null);
+  const [card, setCard] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const [likeCount, setLikeCount] = useState(0);
   const [hasLiked, setHasLiked] = useState(false);
 
   useEffect(() => {
-    if (slug) {
-      const found = CREDIT_CARDS_CATALOG.find((c) => c.slug === slug);
-      if (found) {
-        setCard(found);
-        setLikeCount(found.likes);
-      }
-    }
+    if (!slug) return;
+    setLoading(true);
+    fetch(`/api/credit-cards?slug=${slug}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.creditCards) {
+          setCard(data.creditCards);
+          setLikeCount(data.creditCards.likes || 0);
+        }
+      })
+      .catch((err) => console.error("Error fetching card:", err))
+      .finally(() => setLoading(false));
   }, [slug]);
 
-  if (!card) {
+  if (loading) {
     return (
       <div className="app-container" style={{ padding: "4rem 2rem", textAlign: "center" }}>
         <h2 style={{ color: "var(--text-primary)" }}>Loading Credit Card Details...</h2>
         <p style={{ color: "var(--text-secondary)", marginTop: "1rem" }}>Searching the select registry for {slug}</p>
+      </div>
+    );
+  }
+
+  if (!card) {
+    return (
+      <div className="app-container" style={{ padding: "4rem 2rem", textAlign: "center" }}>
+        <h2 style={{ color: "var(--text-primary)" }}>Card Not Found</h2>
+        <p style={{ color: "var(--text-secondary)", marginTop: "1rem" }}>We couldn't find "{slug}" in our catalog.</p>
         <Link href={`/${countrySlug}/credit-card`} className="btn btn-primary" style={{ marginTop: "2rem" }}>
           Back to Credit Cards
         </Link>
@@ -185,7 +199,7 @@ export default function CardReviewPage() {
       <section style={{ marginBottom: "2.5rem" }}>
         <h2 style={{ fontSize: "1.3rem", marginBottom: "1.25rem" }}>Detailed Privileges & Rewards</h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1.25rem" }}>
-          {card.perks.map((perk, index) => (
+          {card.perks.map((perk: any, index: number) => (
             <div key={index} className="card" style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                 <span style={{ fontSize: "1.5rem" }}>
@@ -194,7 +208,7 @@ export default function CardReviewPage() {
                 <h3 style={{ fontSize: "1.05rem" }}>{perk.title}</h3>
               </div>
               <ul style={{ listStyle: "none", padding: 0, display: "flex", flexDirection: "column", gap: "0.5rem", fontSize: "0.85rem", color: "var(--text-secondary)", marginTop: "0.5rem" }}>
-                {perk.details.map((bullet, idx) => (
+                {perk.details.map((bullet: string, idx: number) => (
                   <li key={idx} style={{ display: "flex", gap: "0.5rem" }}>
                     <span style={{ color: "var(--primary)" }}>•</span>
                     <span>{bullet}</span>
@@ -215,14 +229,14 @@ export default function CardReviewPage() {
 
         {/* Charges grid */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1.25rem", margin: "1rem 0" }}>
-          {Object.entries(card.fees).map(([key, value]) => {
+          {Object.entries(card.fees).map(([key, value]: [string, any]) => {
             const formattedLabel = key
               .replace(/([A-Z])/g, " $1")
               .replace(/^./, (str) => str.toUpperCase());
             return (
               <div key={key} style={{ borderBottom: "1px solid var(--border-color)", paddingBottom: "0.75rem" }}>
                 <div style={{ fontSize: "0.75rem", color: "var(--text-secondary)", marginBottom: "0.25rem" }}>{formattedLabel}</div>
-                <div style={{ fontSize: "0.95rem", fontWeight: "600", color: "var(--text-primary)" }}>{value}</div>
+                <div style={{ fontSize: "0.95rem", fontWeight: "600", color: "var(--text-primary)" }}>{String(value)}</div>
               </div>
             );
           })}
@@ -232,7 +246,7 @@ export default function CardReviewPage() {
         <div style={{ marginTop: "2rem", borderTop: "1px dashed var(--border-color)", paddingTop: "1.5rem" }}>
           <h3 style={{ fontSize: "1.1rem", marginBottom: "1rem" }}>Late Payment Penalty Slabs</h3>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "0.75rem" }}>
-            {card.latePaymentCharges.map((slab, idx) => (
+            {card.latePaymentCharges.map((slab: any, idx: number) => (
               <div key={idx} style={{ display: "flex", justifyContent: "space-between", background: "#090a0f", padding: "0.75rem", borderRadius: "var(--radius-sm)", border: "1px solid var(--border-color)", fontSize: "0.8rem" }}>
                 <span style={{ color: "var(--text-secondary)" }}>{slab.range}</span>
                 <strong style={{ color: "var(--text-primary)" }}>{slab.fee}</strong>
@@ -249,7 +263,7 @@ export default function CardReviewPage() {
             <span>✓</span> Pros / Benefits
           </h3>
           <ul style={{ listStyle: "none", padding: 0, marginTop: "1rem", display: "flex", flexDirection: "column", gap: "0.6rem", fontSize: "0.85rem", color: "var(--text-secondary)" }}>
-            {card.pros.map((pro, idx) => (
+            {card.pros.map((pro: string, idx: number) => (
               <li key={idx} style={{ display: "flex", gap: "0.5rem" }}>
                 <span style={{ color: "var(--success)" }}>✔</span>
                 <span>{pro}</span>
@@ -262,7 +276,7 @@ export default function CardReviewPage() {
             <span>✗</span> Cons / Limitations
           </h3>
           <ul style={{ listStyle: "none", padding: 0, marginTop: "1rem", display: "flex", flexDirection: "column", gap: "0.6rem", fontSize: "0.85rem", color: "var(--text-secondary)" }}>
-            {card.cons.map((con, idx) => (
+            {card.cons.map((con: string, idx: number) => (
               <li key={idx} style={{ display: "flex", gap: "0.5rem" }}>
                 <span style={{ color: "var(--danger)" }}>✖</span>
                 <span>{con}</span>
@@ -287,7 +301,7 @@ export default function CardReviewPage() {
             <h3 style={{ fontSize: "1.1rem", marginBottom: "1rem" }}>Card Specifications</h3>
             <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "0.85rem" }}>
               <tbody>
-                {card.reviewOverviewTable.map((row, idx) => (
+                {card.reviewOverviewTable.map((row: any, idx: number) => (
                   <tr key={idx} style={{ borderBottom: "1px solid var(--border-color)" }}>
                     <td style={{ padding: "0.75rem 0.5rem", color: "var(--text-secondary)", fontWeight: "500" }}>{row.label}</td>
                     <td style={{ padding: "0.75rem 0.5rem", color: "var(--text-primary)", fontWeight: "600" }}>{row.value}</td>
@@ -345,7 +359,7 @@ export default function CardReviewPage() {
           </p>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "2.25rem" }}>
-            {card.detailedArticle.sections.map((sect, idx) => (
+            {card.detailedArticle.sections.map((sect: any, idx: number) => (
               <div key={idx}>
                 <h3 style={{ fontSize: "1.2rem", fontWeight: "800", color: "var(--primary)", marginBottom: "0.85rem" }}>
                   {sect.heading}
@@ -357,7 +371,7 @@ export default function CardReviewPage() {
                 )}
                 {sect.items && sect.items.length > 0 && (
                   <ul style={{ display: "flex", flexDirection: "column", gap: "0.75rem", paddingLeft: "1.2rem", marginBottom: "1.5rem" }}>
-                    {sect.items.map((item, itemIdx) => (
+                    {sect.items.map((item: string, itemIdx: number) => (
                       <li key={itemIdx} style={{ color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: "1.5" }}>
                         {item}
                       </li>
@@ -369,15 +383,15 @@ export default function CardReviewPage() {
                     <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "0.85rem" }}>
                       <thead>
                         <tr style={{ borderBottom: "1px solid var(--border-color)", color: "var(--text-secondary)" }}>
-                          {sect.table.headers.map((th, thIdx) => (
+                          {sect.table.headers.map((th: string, thIdx: number) => (
                             <th key={thIdx} style={{ padding: "0.75rem 0.5rem" }}>{th}</th>
                           ))}
                         </tr>
                       </thead>
                       <tbody>
-                        {sect.table.rows.map((row, rowIdx) => (
+                        {sect.table.rows.map((row: string[], rowIdx: number) => (
                           <tr key={rowIdx} style={{ borderBottom: "1px solid var(--border-color)" }}>
-                            {row.map((td, tdIdx) => (
+                            {row.map((td: string, tdIdx: number) => (
                               <td key={tdIdx} style={{ padding: "0.75rem 0.5rem", color: tdIdx === 0 ? "var(--text-secondary)" : "var(--text-primary)", fontWeight: tdIdx === 0 ? "500" : "600" }}>{td}</td>
                             ))}
                           </tr>

@@ -1,26 +1,49 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { BANKS_DATA } from "@/data/banksData";
 
 export default function BankDetailPage() {
   const params = useParams();
   const countrySlug = (params?.country as string) || "india";
   const slug = params?.slug as string;
-  const bank = BANKS_DATA.find((b) => b.slug === slug);
 
-  // States inside hook
-  const [likes, setLikes] = useState(bank ? bank.likes : 0);
+  const [bank, setBank] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [likes, setLikes] = useState(0);
   const [liked, setLiked] = useState(false);
   const [activeTab, setActiveTab] = useState<"specs" | "fees" | "reviews">("specs");
 
-  if (!bank) {
+  useEffect(() => {
+    if (!slug) return;
+    setLoading(true);
+    fetch(`/api/banks?slug=${slug}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.banks) {
+          setBank(data.banks);
+          setLikes(data.banks.likes || 0);
+        }
+      })
+      .catch((err) => console.error("Error fetching bank:", err))
+      .finally(() => setLoading(false));
+  }, [slug]);
+
+  if (loading) {
     return (
       <div className="app-container" style={{ padding: "4rem 2rem", textAlign: "center" }}>
         <h2 style={{ color: "var(--text-primary)" }}>Loading Bank Details...</h2>
         <p style={{ color: "var(--text-secondary)", marginTop: "1rem" }}>Searching Directory...</p>
+      </div>
+    );
+  }
+
+  if (!bank) {
+    return (
+      <div className="app-container" style={{ padding: "4rem 2rem", textAlign: "center" }}>
+        <h2 style={{ color: "var(--text-primary)" }}>Bank Not Found</h2>
+        <p style={{ color: "var(--text-secondary)", marginTop: "1rem" }}>We couldn't find a bank with the slug "{slug}".</p>
         <Link href={`/${countrySlug}/bank-accounts`} className="btn btn-primary" style={{ marginTop: "2rem" }}>
           Back to Directory
         </Link>
@@ -29,17 +52,13 @@ export default function BankDetailPage() {
   }
 
   const handleLike = () => {
-    if (liked) {
-      setLikes((l) => l - 1);
-    } else {
-      setLikes((l) => l + 1);
-    }
+    if (liked) { setLikes((l) => l - 1); } else { setLikes((l) => l + 1); }
     setLiked(!liked);
   };
 
   return (
     <div className="app-container" style={{ paddingTop: "2.5rem" }}>
-      
+
       {/* Breadcrumbs */}
       <nav style={{ display: "flex", gap: "0.5rem", fontSize: "0.8rem", color: "var(--text-secondary)", marginBottom: "1.5rem" }}>
         <Link href="/" style={{ color: "var(--primary)" }}>Select</Link>
@@ -84,12 +103,12 @@ export default function BankDetailPage() {
 
         {/* CTAs & Socials */}
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem", alignItems: "stretch", minWidth: "200px" }}>
-          <a 
-            href="https://google.com" 
-            target="_blank" 
-            rel="noopener noreferrer" 
+          <a
+            href="https://google.com"
+            target="_blank"
+            rel="noopener noreferrer"
             className="btn btn-primary"
-            style={{ 
+            style={{
               background: `linear-gradient(135deg, ${bank.logoColor} 0%, rgba(var(--primary-rgb), 0.8) 100%)`,
               boxShadow: `0 10px 20px ${bank.logoColor}30`,
               color: "#fff",
@@ -99,14 +118,14 @@ export default function BankDetailPage() {
           >
             Apply Online
           </a>
-          
+
           <div style={{ display: "flex", gap: "0.5rem" }}>
-            <button 
+            <button
               onClick={handleLike}
-              className="btn btn-secondary" 
-              style={{ 
-                flex: 1, 
-                padding: "0.5rem 1rem", 
+              className="btn btn-secondary"
+              style={{
+                flex: 1,
+                padding: "0.5rem 1rem",
                 fontSize: "0.85rem",
                 color: liked ? "#ef4444" : "var(--text-primary)",
                 borderColor: liked ? "rgba(239, 68, 68, 0.3)" : "rgba(255,255,255,0.06)",
@@ -124,11 +143,11 @@ export default function BankDetailPage() {
 
       {/* Tabs Menu */}
       <div style={{ display: "flex", borderBottom: "1px solid var(--border-color)", marginBottom: "2.5rem", gap: "1rem" }}>
-        <button 
-          onClick={() => setActiveTab("specs")} 
-          style={{ 
-            padding: "0.85rem 1.5rem", 
-            borderBottom: activeTab === "specs" ? "2px solid var(--primary)" : "none", 
+        <button
+          onClick={() => setActiveTab("specs")}
+          style={{
+            padding: "0.85rem 1.5rem",
+            borderBottom: activeTab === "specs" ? "2px solid var(--primary)" : "none",
             fontWeight: activeTab === "specs" ? "700" : "500",
             color: activeTab === "specs" ? "var(--text-primary)" : "var(--text-secondary)",
             fontSize: "0.95rem"
@@ -136,11 +155,11 @@ export default function BankDetailPage() {
         >
           Account specs
         </button>
-        <button 
-          onClick={() => setActiveTab("fees")} 
-          style={{ 
-            padding: "0.85rem 1.5rem", 
-            borderBottom: activeTab === "fees" ? "2px solid var(--primary)" : "none", 
+        <button
+          onClick={() => setActiveTab("fees")}
+          style={{
+            padding: "0.85rem 1.5rem",
+            borderBottom: activeTab === "fees" ? "2px solid var(--primary)" : "none",
             fontWeight: activeTab === "fees" ? "700" : "500",
             color: activeTab === "fees" ? "var(--text-primary)" : "var(--text-secondary)",
             fontSize: "0.95rem"
@@ -148,11 +167,11 @@ export default function BankDetailPage() {
         >
           Fees & Charges
         </button>
-        <button 
-          onClick={() => setActiveTab("reviews")} 
-          style={{ 
-            padding: "0.85rem 1.5rem", 
-            borderBottom: activeTab === "reviews" ? "2px solid var(--primary)" : "none", 
+        <button
+          onClick={() => setActiveTab("reviews")}
+          style={{
+            padding: "0.85rem 1.5rem",
+            borderBottom: activeTab === "reviews" ? "2px solid var(--primary)" : "none",
             fontWeight: activeTab === "reviews" ? "700" : "500",
             color: activeTab === "reviews" ? "var(--text-primary)" : "var(--text-secondary)",
             fontSize: "0.95rem"
@@ -166,10 +185,10 @@ export default function BankDetailPage() {
 
       {activeTab === "specs" && (
         <div style={{ display: "flex", flexDirection: "column", gap: "2.5rem" }}>
-          
+
           {/* Main specifications grid */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "2rem" }} className="m-flex-column">
-            
+
             {/* Column 1: Balance & Yield */}
             <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
               <h3 style={{ borderBottom: "1px solid var(--border-color)", paddingBottom: "0.5rem", fontSize: "1.1rem", color: "var(--primary)" }}>Yield & Maintenance</h3>
@@ -213,7 +232,7 @@ export default function BankDetailPage() {
               <div>
                 <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Access Channels</span>
                 <div style={{ fontSize: "0.95rem", fontWeight: "600", marginTop: "0.35rem", color: "var(--text-primary)" }}>
-                  {bank.platforms.map((p, i) => <div key={i} style={{ marginBottom: "0.25rem" }}>📱 {p}</div>)}
+                  {bank.platforms.map((p: string, i: number) => <div key={i} style={{ marginBottom: "0.25rem" }}>📱 {p}</div>)}
                 </div>
               </div>
             </div>
@@ -222,14 +241,14 @@ export default function BankDetailPage() {
 
           {/* Pros & Cons Columns */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }} className="m-flex-column">
-            
+
             {/* Pros card */}
             <div className="card" style={{ borderLeft: "4px solid #10b981" }}>
               <h3 style={{ fontSize: "1.2rem", marginBottom: "1.25rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
                 <span style={{ color: "#10b981" }}>🟢</span> Advantages (Pros)
               </h3>
               <ul style={{ display: "flex", flexDirection: "column", gap: "0.85rem", paddingLeft: "1rem", color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.4 }}>
-                {bank.pros.map((pro, index) => (
+                {bank.pros.map((pro: string, index: number) => (
                   <li key={index}>{pro}</li>
                 ))}
               </ul>
@@ -241,7 +260,7 @@ export default function BankDetailPage() {
                 <span style={{ color: "#ef4444" }}>🔴</span> Disadvantages (Cons)
               </h3>
               <ul style={{ display: "flex", flexDirection: "column", gap: "0.85rem", paddingLeft: "1rem", color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.4 }}>
-                {bank.cons.map((con, index) => (
+                {bank.cons.map((con: string, index: number) => (
                   <li key={index}>{con}</li>
                 ))}
               </ul>
@@ -282,7 +301,7 @@ export default function BankDetailPage() {
 
       {activeTab === "reviews" && (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "2.5rem" }} className="m-flex-column">
-          
+
           {/* Category Stars Panel */}
           <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1.5rem", height: "fit-content" }}>
             <h3 style={{ fontSize: "1.2rem", borderBottom: "1px solid var(--border-color)", paddingBottom: "0.5rem" }}>Editorial Star Breakdown</h3>

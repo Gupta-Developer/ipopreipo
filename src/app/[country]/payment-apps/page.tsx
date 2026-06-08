@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { PAYMENT_APPS_DATA } from "@/data/paymentAppsData";
 
 const COUNTRY_MAP: Record<string, { name: string; title: string }> = {
   "india": { name: "India", title: "India" },
@@ -18,9 +17,23 @@ export default function PaymentAppsCountryPage() {
   const selectedCountryName = countryInfo.name;
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [apps, setApps] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredApps = PAYMENT_APPS_DATA.filter((app) => {
-    if (app.country.toLowerCase() !== selectedCountryName.toLowerCase()) return false;
+  useEffect(() => {
+    setLoading(true);
+    fetch(`/api/payment-apps?countrySlug=${countrySlug}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          setApps(data.paymentApps);
+        }
+      })
+      .catch((err) => console.error("Error fetching payment apps:", err))
+      .finally(() => setLoading(false));
+  }, [countrySlug]);
+
+  const filteredApps = apps.filter((app) => {
     if (searchQuery && !app.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
     return true;
   });

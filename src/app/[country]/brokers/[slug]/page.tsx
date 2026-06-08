@@ -2,51 +2,63 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { notFound, useParams } from "next/navigation";
-import { BROKERS_DATA } from "@/data/brokersData";
+import { useParams } from "next/navigation";
 
 export default function BrokerDetailPage() {
   const params = useParams();
   const countrySlug = (params?.country as string) || "india";
   const slug = params?.slug as string;
-  const broker = BROKERS_DATA.find((b) => b.slug === slug);
 
-  // States inside hook
-  const [likes, setLikes] = useState(broker ? broker.likes : 0);
+  const [broker, setBroker] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [likes, setLikes] = useState(0);
   const [liked, setLiked] = useState(false);
   const [activeSection, setActiveSection] = useState<string>("specs");
 
   useEffect(() => {
+    if (!slug) return;
+    setLoading(true);
+    fetch(`/api/brokers?slug=${slug}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.brokers) {
+          setBroker(data.brokers);
+          setLikes(data.brokers.likes || 0);
+        }
+      })
+      .catch((err) => console.error("Error fetching broker:", err))
+      .finally(() => setLoading(false));
+  }, [slug]);
+
+  useEffect(() => {
+    if (!broker) return;
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
-          }
+          if (entry.isIntersecting) { setActiveSection(entry.target.id); }
         });
       },
       { threshold: 0.15, rootMargin: "-100px 0px -60% 0px" }
     );
-
     const sections = ["specs", "taxes", "reviews"];
-    sections.forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) observer.observe(el);
-    });
+    sections.forEach((id) => { const el = document.getElementById(id); if (el) observer.observe(el); });
+    return () => { sections.forEach((id) => { const el = document.getElementById(id); if (el) observer.unobserve(el); }); };
+  }, [broker]);
 
-    return () => {
-      sections.forEach((id) => {
-        const el = document.getElementById(id);
-        if (el) observer.unobserve(el);
-      });
-    };
-  }, []);
-
-  if (!broker) {
+  if (loading) {
     return (
       <div className="app-container" style={{ padding: "4rem 2rem", textAlign: "center" }}>
         <h2 style={{ color: "var(--text-primary)" }}>Loading Broker Details...</h2>
         <p style={{ color: "var(--text-secondary)", marginTop: "1rem" }}>Searching Select Directory...</p>
+      </div>
+    );
+  }
+
+  if (!broker) {
+    return (
+      <div className="app-container" style={{ padding: "4rem 2rem", textAlign: "center" }}>
+        <h2 style={{ color: "var(--text-primary)" }}>Broker Not Found</h2>
+        <p style={{ color: "var(--text-secondary)", marginTop: "1rem" }}>We couldn't find "{slug}" in our directory.</p>
         <Link href={`/${countrySlug}/brokers`} className="btn btn-primary" style={{ marginTop: "2rem" }}>
           Back to Directory
         </Link>
@@ -65,7 +77,7 @@ export default function BrokerDetailPage() {
 
   return (
     <div className="app-container" style={{ paddingTop: "2.5rem" }}>
-      
+
       {/* Breadcrumbs */}
       <nav style={{ display: "flex", gap: "0.5rem", fontSize: "0.8rem", color: "var(--text-secondary)", marginBottom: "1.5rem" }}>
         <Link href="/" style={{ color: "var(--primary)" }}>Select</Link>
@@ -110,26 +122,26 @@ export default function BrokerDetailPage() {
 
         {/* CTAs & Socials */}
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem", alignItems: "stretch", minWidth: "200px" }}>
-          <a 
-            href="https://groww.in" 
-            target="_blank" 
-            rel="noopener noreferrer" 
+          <a
+            href="https://groww.in"
+            target="_blank"
+            rel="noopener noreferrer"
             className="btn btn-primary"
-            style={{ 
+            style={{
               background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
               boxShadow: "0 10px 20px rgba(16, 185, 129, 0.2)"
             }}
           >
             Open Demat Account
           </a>
-          
+
           <div style={{ display: "flex", gap: "0.5rem" }}>
-            <button 
+            <button
               onClick={handleLike}
-              className="btn btn-secondary" 
-              style={{ 
-                flex: 1, 
-                padding: "0.5rem 1rem", 
+              className="btn btn-secondary"
+              style={{
+                flex: 1,
+                padding: "0.5rem 1rem",
                 fontSize: "0.85rem",
                 color: liked ? "#ef4444" : "var(--text-primary)",
                 borderColor: liked ? "rgba(239, 68, 68, 0.3)" : "rgba(255,255,255,0.06)",
@@ -159,14 +171,14 @@ export default function BrokerDetailPage() {
             { label: "Futures", supported: broker.segments.futures, icon: "📊" },
             { label: "Options", supported: broker.segments.options, icon: "⚖️" },
           ].map((seg, idx) => (
-            <div 
-              key={idx} 
-              style={{ 
-                display: "flex", 
-                alignItems: "center", 
-                gap: "0.75rem", 
-                padding: "0.85rem 1.1rem", 
-                borderRadius: "12px", 
+            <div
+              key={idx}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "0.75rem",
+                padding: "0.85rem 1.1rem",
+                borderRadius: "12px",
                 background: seg.supported ? "rgba(16, 185, 129, 0.05)" : "rgba(255, 255, 255, 0.01)",
                 border: `1px solid ${seg.supported ? "rgba(16, 185, 129, 0.2)" : "rgba(255, 255, 255, 0.05)"}`,
                 transition: "all 0.2s"
@@ -187,32 +199,32 @@ export default function BrokerDetailPage() {
       </div>
 
       {/* Sticky Navigation Bar */}
-      <div style={{ 
-        position: "sticky", 
-        top: "1rem", 
-        zIndex: 100, 
+      <div style={{
+        position: "sticky",
+        top: "1rem",
+        zIndex: 100,
         display: "flex",
         justifyContent: "center",
         width: "100%",
         marginBottom: "3rem",
       }}>
         <div style={{
-          display: "flex", 
+          display: "flex",
           gap: "0.5rem",
           padding: "0.45rem",
-          background: "var(--card-bg)", 
-          backdropFilter: "blur(18px)", 
+          background: "var(--card-bg)",
+          backdropFilter: "blur(18px)",
           WebkitBackdropFilter: "blur(18px)",
-          borderRadius: "30px", 
-          border: "1px solid var(--border-color)", 
+          borderRadius: "30px",
+          border: "1px solid var(--border-color)",
           boxShadow: "var(--shadow-md)",
         }}>
-          <button 
+          <button
             onClick={() => {
               document.getElementById("specs")?.scrollIntoView({ behavior: "smooth", block: "start" });
             }}
-            style={{ 
-              padding: "0.6rem 1.25rem", 
+            style={{
+              padding: "0.6rem 1.25rem",
               borderRadius: "20px",
               background: activeSection === "specs" ? "var(--primary)" : "transparent",
               color: activeSection === "specs" ? "#ffffff" : "var(--text-secondary)",
@@ -226,12 +238,12 @@ export default function BrokerDetailPage() {
           >
             Charges & specs
           </button>
-          <button 
+          <button
             onClick={() => {
               document.getElementById("taxes")?.scrollIntoView({ behavior: "smooth", block: "start" });
             }}
-            style={{ 
-              padding: "0.6rem 1.25rem", 
+            style={{
+              padding: "0.6rem 1.25rem",
               borderRadius: "20px",
               background: activeSection === "taxes" ? "var(--primary)" : "transparent",
               color: activeSection === "taxes" ? "#ffffff" : "var(--text-secondary)",
@@ -245,12 +257,12 @@ export default function BrokerDetailPage() {
           >
             Transaction Taxes
           </button>
-          <button 
+          <button
             onClick={() => {
               document.getElementById("reviews")?.scrollIntoView({ behavior: "smooth", block: "start" });
             }}
-            style={{ 
-              padding: "0.6rem 1.25rem", 
+            style={{
+              padding: "0.6rem 1.25rem",
               borderRadius: "20px",
               background: activeSection === "reviews" ? "var(--primary)" : "transparent",
               color: activeSection === "reviews" ? "#ffffff" : "var(--text-secondary)",
@@ -269,14 +281,14 @@ export default function BrokerDetailPage() {
 
       {/* CONTENT FEED (SCROLLABLE SECTIONS) */}
       <div style={{ display: "flex", flexDirection: "column", gap: "4rem" }}>
-        
+
         {/* Section 1: Charges & Specs */}
         <section id="specs" style={{ scrollMarginTop: "80px" }}>
           <h2 style={{ fontSize: "1.5rem", fontWeight: "800", marginBottom: "1.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
             <span style={{ color: "var(--primary)" }}>📋</span> Charges & Specifications
           </h2>
           <div style={{ display: "flex", flexDirection: "column", gap: "2.5rem" }}>
-            
+
             {/* Brokerage Plans (Single Plan) */}
             <div className="card" style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
               <div style={{ borderBottom: "1px solid var(--border-color)", paddingBottom: "1rem", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "1rem" }}>
@@ -288,7 +300,7 @@ export default function BrokerDetailPage() {
                     Detailed account fees, segment brokerage rates, and margins offered by {broker.name}.
                   </p>
                 </div>
-                <Link 
+                <Link
                   href={`/${countrySlug}/calculator?tab=brokerage&broker=${broker.slug}`}
                   className="btn btn-secondary"
                   style={{ fontSize: "0.8rem", padding: "0.5rem 1rem", textDecoration: "none" }}
@@ -405,7 +417,7 @@ export default function BrokerDetailPage() {
             <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
               <h3 style={{ fontSize: "1.1rem", fontWeight: "800" }}>Available Trading Platforms</h3>
               <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
-                {broker.platforms.map((plat, idx) => (
+                {broker.platforms.map((plat: string, idx: number) => (
                   <span key={idx} className="badge badge-primary" style={{ fontSize: "0.85rem", padding: "0.45rem 0.85rem", borderRadius: "8px" }}>
                     🖥️ {plat}
                   </span>
@@ -415,14 +427,14 @@ export default function BrokerDetailPage() {
 
             {/* Pros & Cons Columns */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }} className="m-flex-column">
-              
+
               {/* Pros card */}
               <div className="card" style={{ borderLeft: "4px solid #10b981" }}>
                 <h3 style={{ fontSize: "1.2rem", marginBottom: "1.25rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
                   <span style={{ color: "#10b981" }}>🟢</span> Advantages (Pros)
                 </h3>
                 <ul style={{ display: "flex", flexDirection: "column", gap: "0.85rem", paddingLeft: "1rem", color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.4 }}>
-                  {broker.pros.map((pro, index) => (
+                  {broker.pros.map((pro: string, index: number) => (
                     <li key={index}>{pro}</li>
                   ))}
                 </ul>
@@ -434,7 +446,7 @@ export default function BrokerDetailPage() {
                   <span style={{ color: "#ef4444" }}>🔴</span> Disadvantages (Cons)
                 </h3>
                 <ul style={{ display: "flex", flexDirection: "column", gap: "0.85rem", paddingLeft: "1rem", color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.4 }}>
-                  {broker.cons.map((con, index) => (
+                  {broker.cons.map((con: string, index: number) => (
                     <li key={index}>{con}</li>
                   ))}
                 </ul>
@@ -448,7 +460,7 @@ export default function BrokerDetailPage() {
               <div className="card">
                 <h3 style={{ fontSize: "1.1rem", marginBottom: "1rem" }}>Additional Service Features</h3>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.85rem" }}>
-                  {broker.additionalFeatures.map((f, idx) => (
+                  {broker.additionalFeatures.map((f: any, idx: number) => (
                     <div key={idx} style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.85rem" }}>
                       <span className={`premium-indicator ${f.supported ? 'premium-indicator-checked' : 'premium-indicator-crossed'}`}>
                         {f.supported ? "✓" : "×"}
@@ -463,7 +475,7 @@ export default function BrokerDetailPage() {
               <div className="card">
                 <h3 style={{ fontSize: "1.1rem", marginBottom: "1rem" }}>Available Investment Products</h3>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.85rem" }}>
-                  {broker.otherInvestments.map((inv, idx) => (
+                  {broker.otherInvestments.map((inv: any, idx: number) => (
                     <div key={idx} style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.85rem" }}>
                       <span className={`premium-indicator ${inv.supported ? 'premium-indicator-checked' : 'premium-indicator-crossed'}`}>
                         {inv.supported ? "✓" : "×"}
@@ -552,7 +564,7 @@ export default function BrokerDetailPage() {
             <span style={{ color: "var(--warning)" }}>⭐</span> Ratings & Editorial Reviews
           </h2>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "2.5rem" }} className="m-flex-column">
-            
+
             {/* Category Stars Panel */}
             <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1.5rem", height: "fit-content" }}>
               <h3 style={{ fontSize: "1.2rem", borderBottom: "1px solid var(--border-color)", paddingBottom: "0.5rem" }}>Finology Star Breakdown</h3>
@@ -621,7 +633,7 @@ export default function BrokerDetailPage() {
           </p>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "2.25rem" }}>
-            {broker.detailedArticle.sections.map((sect, idx) => (
+            {broker.detailedArticle.sections.map((sect: any, idx: number) => (
               <div key={idx}>
                 <h3 style={{ fontSize: "1.2rem", fontWeight: "800", color: "var(--primary)", marginBottom: "0.85rem" }}>
                   {sect.heading}
@@ -633,7 +645,7 @@ export default function BrokerDetailPage() {
                 )}
                 {sect.items && sect.items.length > 0 && (
                   <ul style={{ display: "flex", flexDirection: "column", gap: "0.75rem", paddingLeft: "1.2rem" }}>
-                    {sect.items.map((item, itemIdx) => {
+                    {sect.items.map((item: string, itemIdx: number) => {
                       const splitIndex = item.indexOf(":");
                       if (splitIndex !== -1) {
                         const title = item.substring(0, splitIndex);

@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { BROKERS_DATA } from "@/data/brokersData";
 import { CRYPTO_APPS_DATA } from "@/data/cryptoAppsData";
-import { PAYMENT_APPS_DATA } from "@/data/paymentAppsData";
 import { CREDIT_CARDS_CATALOG } from "@/data/cardsData";
 import { BANKS_DATA } from "@/data/banksData";
 
@@ -44,6 +43,19 @@ export default function ComparePage() {
   const [country, setCountry] = useState<string>("all");
   const [item1Id, setItem1Id] = useState<string>("");
   const [item2Id, setItem2Id] = useState<string>("");
+  const [paymentsList, setPaymentsList] = useState<any[]>([]);
+
+  // Fetch approved payment apps on mount
+  useEffect(() => {
+    fetch("/api/payment-apps")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          setPaymentsList(data.paymentApps);
+        }
+      })
+      .catch((err) => console.error("Error fetching payment apps for compare:", err));
+  }, []);
 
   // Select defaults on category or country change
   useEffect(() => {
@@ -53,7 +65,7 @@ export default function ComparePage() {
     } else if (category === "crypto") {
       items = CRYPTO_APPS_DATA.filter(x => isFromCountry(x, country));
     } else if (category === "payments") {
-      items = PAYMENT_APPS_DATA.filter(x => isFromCountry(x, country));
+      items = paymentsList.filter(x => isFromCountry(x, country));
     } else if (category === "cards") {
       items = CREDIT_CARDS_CATALOG.filter(x => isFromCountry(x, country));
     } else if (category === "banks") {
@@ -67,7 +79,7 @@ export default function ComparePage() {
       setItem1Id("");
       setItem2Id("");
     }
-  }, [category, country]);
+  }, [category, country, paymentsList]);
 
   const handleCategoryChange = (cat: Category) => {
     setCategory(cat);
@@ -86,8 +98,8 @@ export default function ComparePage() {
       return { i1, i2 };
     }
     if (category === "payments") {
-      const i1 = PAYMENT_APPS_DATA.find((x) => x.slug === item1Id);
-      const i2 = PAYMENT_APPS_DATA.find((x) => x.slug === item2Id);
+      const i1 = paymentsList.find((x) => x.slug === item1Id);
+      const i2 = paymentsList.find((x) => x.slug === item2Id);
       return { i1, i2 };
     }
     if (category === "cards") {
@@ -257,8 +269,8 @@ export default function ComparePage() {
     }
 
     if (category === "payments") {
-      const p1 = i1 as typeof PAYMENT_APPS_DATA[0];
-      const p2 = i2 as typeof PAYMENT_APPS_DATA[0];
+      const p1 = i1 as any;
+      const p2 = i2 as any;
       return (
         <tbody style={{ fontSize: "0.9rem" }}>
           <tr>
@@ -313,12 +325,12 @@ export default function ComparePage() {
             <td><strong>Key Advantages</strong></td>
             <td>
               <ul style={{ paddingLeft: "1rem", margin: 0, fontSize: "0.85rem", color: "var(--text-secondary)" }}>
-                {p1.pros.slice(0, 3).map((p, index) => <li key={index}>{p}</li>)}
+                {p1.pros.slice(0, 3).map((p: any, index: number) => <li key={index}>{p}</li>)}
               </ul>
             </td>
             <td>
               <ul style={{ paddingLeft: "1rem", margin: 0, fontSize: "0.85rem", color: "var(--text-secondary)" }}>
-                {p2.pros.slice(0, 3).map((p, index) => <li key={index}>{p}</li>)}
+                {p2.pros.slice(0, 3).map((p: any, index: number) => <li key={index}>{p}</li>)}
               </ul>
             </td>
           </tr>
@@ -479,7 +491,7 @@ export default function ComparePage() {
     let rawList: any[] = [];
     if (category === "brokers") rawList = BROKERS_DATA;
     if (category === "crypto") rawList = CRYPTO_APPS_DATA;
-    if (category === "payments") rawList = PAYMENT_APPS_DATA;
+    if (category === "payments") rawList = paymentsList;
     if (category === "cards") rawList = CREDIT_CARDS_CATALOG;
     if (category === "banks") rawList = BANKS_DATA;
 
