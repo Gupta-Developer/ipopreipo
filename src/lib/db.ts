@@ -1,16 +1,15 @@
 import { Pool } from "@neondatabase/serverless";
 
-if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL is not defined in environment variables");
-}
-
 export const dbPool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: process.env.DATABASE_URL || "",
 });
 
 let isInitialized = false;
 
 export async function initDatabase() {
+  if (!process.env.DATABASE_URL) {
+    throw new Error("DATABASE_URL is not defined in environment variables");
+  }
   if (isInitialized) return;
   
   try {
