@@ -2784,7 +2784,7 @@ export default function AdminConsolePage() {
                           </tr>
                         ) : (
                           getAuthorItems(selectedAuthor.email).map((item) => (
-                            <tr key={item.id} style={{ borderBottom: "1px solid var(--border-color)" }}>
+                            <tr key={`${item.type}-${item.id}`} style={{ borderBottom: "1px solid var(--border-color)" }}>
                               <td style={{ padding: "1rem 0.5rem", fontSize: "0.85rem", color: "var(--text-secondary)" }}>
                                 {item.type}
                               </td>
