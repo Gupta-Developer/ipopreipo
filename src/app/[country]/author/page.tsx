@@ -1615,8 +1615,8 @@ export default function AdminConsolePage() {
                         <input type="text" placeholder="e.g. #0052ff" value={prodLogoColor} onChange={(e) => setProdLogoColor(e.target.value)} className="input-field" />
                       </div>
                       <div>
-                        <label style={{ fontSize: "0.72rem", color: "var(--text-secondary)", fontWeight: 700, display: "block", marginBottom: "0.35rem" }}>Logo Letter (Initials)</label>
-                        <input type="text" placeholder="e.g. C" value={prodLogoLetter} onChange={(e) => setProdLogoLetter(e.target.value)} className="input-field" maxLength={2} />
+                        <label style={{ fontSize: "0.72rem", color: "var(--text-secondary)", fontWeight: 700, display: "block", marginBottom: "0.35rem" }}>Logo Image Link / Initials</label>
+                        <input type="text" placeholder="e.g. https://domain.com/logo.png or C" value={prodLogoLetter} onChange={(e) => setProdLogoLetter(e.target.value)} className="input-field" />
                       </div>
                     </div>
 

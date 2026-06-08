@@ -6,6 +6,7 @@ import { BROKERS_DATA } from "@/data/brokersData";
 import { CRYPTO_APPS_DATA } from "@/data/cryptoAppsData";
 import { CREDIT_CARDS_CATALOG } from "@/data/cardsData";
 import { BANKS_DATA } from "@/data/banksData";
+import ProductLogo from "@/components/ProductLogo";
 
 type Category = "brokers" | "crypto" | "payments" | "cards" | "banks";
 
@@ -644,17 +645,13 @@ export default function ComparePage() {
                 <th style={{ padding: "1.5rem", width: "30%", fontSize: "0.9rem", color: "var(--text-secondary)" }}>Parameters Compare</th>
                 <th style={{ padding: "1.5rem", width: "35%", fontSize: "1.1rem", fontWeight: 800 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                    <span style={{ display: "inline-flex", width: "24px", height: "24px", borderRadius: "5px", background: `rgba(var(--primary-rgb), 0.08)`, border: "1px solid rgba(var(--primary-rgb), 0.15)", alignItems: "center", justifyContent: "center", fontSize: "0.8rem", color: "var(--primary)", fontWeight: "bold" }}>
-                      {('logoLetter' in i1 ? i1.logoLetter : '') || i1.name.charAt(0)}
-                    </span>
+                    <ProductLogo logoLetter={('logoLetter' in i1 ? (i1 as any).logoLetter : '')} logoColor={('logoColor' in i1 ? (i1 as any).logoColor : '#6366f1')} name={i1.name} size="24px" fontSize="0.75rem" borderRadius="5px" />
                     {i1.name}
                   </div>
                 </th>
                 <th style={{ padding: "1.5rem", width: "35%", fontSize: "1.1rem", fontWeight: 800 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                    <span style={{ display: "inline-flex", width: "24px", height: "24px", borderRadius: "5px", background: `rgba(var(--primary-rgb), 0.08)`, border: "1px solid rgba(var(--primary-rgb), 0.15)", alignItems: "center", justifyContent: "center", fontSize: "0.8rem", color: "var(--primary)", fontWeight: "bold" }}>
-                      {('logoLetter' in i2 ? i2.logoLetter : '') || i2.name.charAt(0)}
-                    </span>
+                    <ProductLogo logoLetter={('logoLetter' in i2 ? (i2 as any).logoLetter : '')} logoColor={('logoColor' in i2 ? (i2 as any).logoColor : '#6366f1')} name={i2.name} size="24px" fontSize="0.75rem" borderRadius="5px" />
                     {i2.name}
                   </div>
                 </th>

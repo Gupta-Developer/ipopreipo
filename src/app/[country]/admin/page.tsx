@@ -46,10 +46,42 @@ export default function AdminConsolePage() {
   const [activeTab, setActiveTab] = useState("overview");
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-  // Initialize tabs depending on role
+  // Initialize tabs depending on role and URL
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      const searchParams = new URLSearchParams(window.location.search);
+      const tabParam = searchParams.get("tab");
+      if (tabParam) {
+        setActiveTab(tabParam);
+        return;
+      }
+    }
     setActiveTab("overview");
   }, [user]);
+
+  // Support browser back/forward buttons
+  useEffect(() => {
+    const handlePopState = () => {
+      if (typeof window !== "undefined") {
+        const searchParams = new URLSearchParams(window.location.search);
+        const tabParam = searchParams.get("tab") || "overview";
+        setActiveTab(tabParam);
+        setSelectedAuthor(null);
+      }
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    setSelectedAuthor(null);
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      url.searchParams.set("tab", tab);
+      window.history.pushState({}, "", url.pathname + url.search);
+    }
+  };
 
   // Real Database users state
   const [dbUsers, setDbUsers] = useState<User[]>([]);
@@ -242,6 +274,7 @@ export default function AdminConsolePage() {
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
   const [editingRole, setEditingRole] = useState<"USER" | "PRO" | "ADMIN" | "AUTHOR">("USER");
   const [editingCountries, setEditingCountries] = useState("");
+  const [selectedAuthor, setSelectedAuthor] = useState<User | null>(null);
 
   // Fetch db users
   const fetchDbUsers = async () => {
@@ -948,6 +981,26 @@ export default function AdminConsolePage() {
   const googleOauthCount = dbUsers.filter(u => u.picture).length;
   const emailAuthCount = dbUsers.length - googleOauthCount;
 
+  // Helper to get all items written by a specific author email
+  const getAuthorItems = (email: string) => {
+    if (!email) return [];
+    const authorSubmissions = submissions.filter(s => s.authorEmail && s.authorEmail.toLowerCase() === email.toLowerCase());
+    const authorBanks = customBanks.filter(b => b.addedBy && b.addedBy.toLowerCase() === email.toLowerCase());
+    const authorBrokers = customBrokers.filter(b => b.addedBy && b.addedBy.toLowerCase() === email.toLowerCase());
+    const authorCards = customCards.filter(c => c.addedBy && c.addedBy.toLowerCase() === email.toLowerCase());
+    const authorPayments = customPayments.filter(p => p.addedBy && p.addedBy.toLowerCase() === email.toLowerCase());
+    const authorCryptos = customCryptos.filter(c => c.addedBy && c.addedBy.toLowerCase() === email.toLowerCase());
+
+    return [
+      ...authorSubmissions.map(s => ({ id: s.id, type: "IPO Submission", name: s.name, slug: s.ticker, status: s.status, date: s.submittedAt, originalItem: s, viewType: "ipos" })),
+      ...authorBanks.map(b => ({ id: b.id, type: "Bank Account", name: b.name, slug: b.slug, status: b.status || "approved", date: b.createdAt, originalItem: b, viewType: "banks" })),
+      ...authorBrokers.map(b => ({ id: b.id, type: "Stock Broker", name: b.name, slug: b.slug, status: b.status || "approved", date: b.createdAt, originalItem: b, viewType: "brokers" })),
+      ...authorCards.map(c => ({ id: c.id, type: "Credit Card", name: c.name, slug: c.slug, status: c.status || "approved", date: c.createdAt, originalItem: c, viewType: "cards" })),
+      ...authorPayments.map(p => ({ id: p.id, type: "Payment App", name: p.name, slug: p.slug, status: p.status || "approved", date: p.createdAt, originalItem: p, viewType: "payments" })),
+      ...authorCryptos.map(c => ({ id: c.id, type: "Crypto App", name: c.name, slug: c.slug, status: c.status || "approved", date: c.createdAt, originalItem: c, viewType: "crypto" })),
+    ];
+  };
+
   return (
     <div className="app-container" style={{ padding: "0", maxWidth: "100%", margin: "0" }}>
       
@@ -987,7 +1040,7 @@ export default function AdminConsolePage() {
             
             {user.role === "ADMIN" && (
               <button 
-                onClick={() => setActiveTab("overview")}
+                onClick={() => handleTabChange("overview")}
                 title="Overview"
                 style={{
                   display: "flex", alignItems: "center", justifyContent: isCollapsed ? "center" : "flex-start", gap: "0.75rem", width: "100%",
@@ -1004,7 +1057,7 @@ export default function AdminConsolePage() {
 
             {user.role === "ADMIN" && (
               <button 
-                onClick={() => setActiveTab("users")}
+                onClick={() => handleTabChange("users")}
                 title="Users Directory"
                 style={{
                   display: "flex", alignItems: "center", justifyContent: isCollapsed ? "center" : "flex-start", gap: "0.75rem", width: "100%",
@@ -1021,7 +1074,7 @@ export default function AdminConsolePage() {
 
             {user.role === "ADMIN" && (
               <button 
-                onClick={() => setActiveTab("authors")}
+                onClick={() => handleTabChange("authors")}
                 title="Authors & Editors"
                 style={{
                   display: "flex", alignItems: "center", justifyContent: isCollapsed ? "center" : "flex-start", gap: "0.75rem", width: "100%",
@@ -1036,8 +1089,25 @@ export default function AdminConsolePage() {
               </button>
             )}
 
+            {user.role === "ADMIN" && (
+              <button 
+                onClick={() => handleTabChange("approved-authors")}
+                title="Approved Authors"
+                style={{
+                  display: "flex", alignItems: "center", justifyContent: isCollapsed ? "center" : "flex-start", gap: "0.75rem", width: "100%",
+                  padding: "0.7rem 0.85rem", borderRadius: "8px", border: "none",
+                  background: activeTab === "approved-authors" ? "rgba(var(--primary-rgb), 0.08)" : "transparent",
+                  color: activeTab === "approved-authors" ? "var(--primary)" : "var(--text-secondary)",
+                  fontWeight: activeTab === "approved-authors" ? 700 : 500, fontSize: "0.85rem",
+                  textAlign: "left", cursor: "pointer", transition: "all 0.15s"
+                }}
+              >
+                <span style={{ fontSize: "1.1rem" }}>✍️</span> {!isCollapsed && "Approved Authors"}
+              </button>
+            )}
+
             <button 
-              onClick={() => setActiveTab("queue")}
+              onClick={() => handleTabChange("queue")}
               title={`Review Queue (${submissions.filter(s => s.status === "Pending").length})`}
               style={{
                 display: "flex", alignItems: "center", justifyContent: isCollapsed ? "center" : "flex-start", gap: "0.75rem", width: "100%",
@@ -1052,7 +1122,7 @@ export default function AdminConsolePage() {
             </button>
 
             <button 
-              onClick={() => setActiveTab("ipos")}
+              onClick={() => handleTabChange("ipos")}
               title="IPO Listings"
               style={{
                 display: "flex", alignItems: "center", justifyContent: isCollapsed ? "center" : "flex-start", gap: "0.75rem", width: "100%",
@@ -1067,7 +1137,7 @@ export default function AdminConsolePage() {
             </button>
 
             <button 
-              onClick={() => setActiveTab("products")}
+              onClick={() => handleTabChange("products")}
               title="Select Products"
               style={{
                 display: "flex", alignItems: "center", justifyContent: isCollapsed ? "center" : "flex-start", gap: "0.75rem", width: "100%",
@@ -1082,7 +1152,7 @@ export default function AdminConsolePage() {
             </button>
 
             <button 
-              onClick={() => setActiveTab("config")}
+              onClick={() => handleTabChange("config")}
               title="System Config"
               style={{
                 display: "flex", alignItems: "center", justifyContent: isCollapsed ? "center" : "flex-start", gap: "0.75rem", width: "100%",
@@ -2030,8 +2100,8 @@ export default function AdminConsolePage() {
                         <input type="text" placeholder="e.g. #0052ff" value={prodLogoColor} onChange={(e) => setProdLogoColor(e.target.value)} className="input-field" />
                       </div>
                       <div>
-                        <label style={{ fontSize: "0.72rem", color: "var(--text-secondary)", fontWeight: 700, display: "block", marginBottom: "0.35rem" }}>Logo Letter (Initials)</label>
-                        <input type="text" placeholder="e.g. C" value={prodLogoLetter} onChange={(e) => setProdLogoLetter(e.target.value)} className="input-field" maxLength={2} />
+                        <label style={{ fontSize: "0.72rem", color: "var(--text-secondary)", fontWeight: 700, display: "block", marginBottom: "0.35rem" }}>Logo Image Link / Initials</label>
+                        <input type="text" placeholder="e.g. https://domain.com/logo.png or C" value={prodLogoLetter} onChange={(e) => setProdLogoLetter(e.target.value)} className="input-field" />
                       </div>
                     </div>
 
@@ -2586,6 +2656,177 @@ export default function AdminConsolePage() {
                   ♻️ Clear Cache & Restore Seed Catalogs
                 </button>
               </div>
+            </div>
+          )}
+
+          {/* ── TAB: APPROVED AUTHORS (ADMIN ONLY) ── */}
+          {activeTab === "approved-authors" && user.role === "ADMIN" && (
+            <div className="card" style={{ padding: "2rem" }}>
+              {!selectedAuthor ? (
+                <>
+                  <div style={{ marginBottom: "1.5rem" }}>
+                    <h2 style={{ fontSize: "1.35rem", fontWeight: 800, color: "var(--text-primary)" }}>✍️ Approved Authors & Editorial Content</h2>
+                    <p style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>Inspect the listings and catalog submissions created by each regional author/editor.</p>
+                  </div>
+                  
+                  <div style={{ overflowX: "auto" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
+                      <thead>
+                        <tr style={{ borderBottom: "1px solid var(--border-color)", opacity: 0.8 }}>
+                          <th style={{ color: "var(--text-secondary)", fontSize: "0.75rem", padding: "1rem 0.5rem", fontWeight: "700", textTransform: "uppercase" }}>Author Info</th>
+                          <th style={{ color: "var(--text-secondary)", fontSize: "0.75rem", padding: "1rem 0.5rem", fontWeight: "700", textTransform: "uppercase" }}>Role</th>
+                          <th style={{ color: "var(--text-secondary)", fontSize: "0.75rem", padding: "1rem 0.5rem", fontWeight: "700", textTransform: "uppercase" }}>Assigned Portals</th>
+                          <th style={{ color: "var(--text-secondary)", fontSize: "0.75rem", padding: "1rem 0.5rem", fontWeight: "700", textTransform: "uppercase" }}>Articles / Submissions</th>
+                          <th style={{ color: "var(--text-secondary)", fontSize: "0.75rem", padding: "1rem 0.5rem", fontWeight: "700", textTransform: "uppercase", textAlign: "right" }}>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {dbUsers.filter(u => u.role === "AUTHOR" || u.role === "ADMIN").length === 0 ? (
+                          <tr>
+                            <td colSpan={5} style={{ textAlign: "center", color: "var(--text-secondary)", padding: "2rem" }}>
+                              No authors or editors registered.
+                            </td>
+                          </tr>
+                        ) : (
+                          dbUsers.filter(u => u.role === "AUTHOR" || u.role === "ADMIN").map((colUser) => {
+                            const items = getAuthorItems(colUser.email);
+                            return (
+                              <tr key={colUser.id} style={{ borderBottom: "1px solid var(--border-color)" }}>
+                                <td style={{ padding: "1.25rem 0.5rem", display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                                  <span className="nb-avatar" style={{ width: 34, height: 34, borderRadius: "50%" }}>
+                                    {colUser.picture ? (
+                                      <img 
+                                        src={colUser.picture} 
+                                        alt={colUser.name} 
+                                        referrerPolicy="no-referrer"
+                                        style={{ width: "100%", height: "100%", borderRadius: "inherit", objectFit: "cover" }} 
+                                      />
+                                    ) : (
+                                      colUser.name.charAt(0).toUpperCase()
+                                    )}
+                                  </span>
+                                  <div>
+                                    <strong style={{ fontSize: "0.9rem", color: "var(--text-primary)", display: "block" }}>{colUser.name}</strong>
+                                    <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>{colUser.email}</span>
+                                  </div>
+                                </td>
+                                <td style={{ padding: "1.25rem 0.5rem" }}>
+                                  <span className={`badge ${colUser.role === "ADMIN" ? "badge-danger" : "badge-primary"}`} style={{ fontSize: "0.62rem" }}>
+                                    {colUser.role}
+                                  </span>
+                                </td>
+                                <td style={{ padding: "1.25rem 0.5rem", fontSize: "0.82rem", color: "var(--text-secondary)" }}>
+                                  {colUser.role === "ADMIN" ? "All Portals (*)" : colUser.assignedCountries && colUser.assignedCountries.length > 0 ? colUser.assignedCountries.join(", ").toUpperCase() : "None"}
+                                </td>
+                                <td style={{ padding: "1.25rem 0.5rem", fontSize: "0.85rem", fontWeight: 700, color: "var(--text-primary)" }}>
+                                  {items.length} items
+                                </td>
+                                <td style={{ padding: "1.25rem 0.5rem", textAlign: "right" }}>
+                                  <button
+                                    onClick={() => setSelectedAuthor(colUser)}
+                                    className="btn btn-primary"
+                                    style={{ padding: "0.35rem 0.75rem", fontSize: "0.78rem", borderRadius: "6px" }}
+                                  >
+                                    🔍 View Submissions
+                                  </button>
+                                </td>
+                              </tr>
+                            );
+                          })
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem", borderBottom: "1px solid var(--border-color)", paddingBottom: "1.25rem" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                      <button 
+                        onClick={() => setSelectedAuthor(null)} 
+                        className="btn btn-secondary" 
+                        style={{ padding: "0.45rem 1rem", fontSize: "0.82rem", borderRadius: "8px" }}
+                      >
+                        ← Back to Authors
+                      </button>
+                      <div>
+                        <h2 style={{ fontSize: "1.35rem", fontWeight: 800, color: "var(--text-primary)" }}>
+                          Submissions by {selectedAuthor.name}
+                        </h2>
+                        <p style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>
+                          {selectedAuthor.email} | Scope: {selectedAuthor.role === "ADMIN" ? "All Portals (*)" : selectedAuthor.assignedCountries?.join(", ").toUpperCase() || "None"}
+                        </p>
+                      </div>
+                    </div>
+                    <span className={`badge ${selectedAuthor.role === "ADMIN" ? "badge-danger" : "badge-primary"}`} style={{ fontSize: "0.75rem" }}>
+                      {selectedAuthor.role}
+                    </span>
+                  </div>
+
+                  <div style={{ overflowX: "auto" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
+                      <thead>
+                        <tr style={{ borderBottom: "1px solid var(--border-color)", opacity: 0.8 }}>
+                          <th style={{ color: "var(--text-secondary)", fontSize: "0.75rem", padding: "1rem 0.5rem", fontWeight: "700", textTransform: "uppercase" }}>Item Type</th>
+                          <th style={{ color: "var(--text-secondary)", fontSize: "0.75rem", padding: "1rem 0.5rem", fontWeight: "700", textTransform: "uppercase" }}>Name</th>
+                          <th style={{ color: "var(--text-secondary)", fontSize: "0.75rem", padding: "1rem 0.5rem", fontWeight: "700", textTransform: "uppercase" }}>Ticker/Slug</th>
+                          <th style={{ color: "var(--text-secondary)", fontSize: "0.75rem", padding: "1rem 0.5rem", fontWeight: "700", textTransform: "uppercase" }}>Status</th>
+                          <th style={{ color: "var(--text-secondary)", fontSize: "0.75rem", padding: "1rem 0.5rem", fontWeight: "700", textTransform: "uppercase" }}>Date Added</th>
+                          <th style={{ color: "var(--text-secondary)", fontSize: "0.75rem", padding: "1rem 0.5rem", fontWeight: "700", textTransform: "uppercase", textAlign: "right" }}>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {getAuthorItems(selectedAuthor.email).length === 0 ? (
+                          <tr>
+                            <td colSpan={6} style={{ textAlign: "center", color: "var(--text-secondary)", padding: "2rem" }}>
+                              No items written by this author yet.
+                            </td>
+                          </tr>
+                        ) : (
+                          getAuthorItems(selectedAuthor.email).map((item) => (
+                            <tr key={item.id} style={{ borderBottom: "1px solid var(--border-color)" }}>
+                              <td style={{ padding: "1rem 0.5rem", fontSize: "0.85rem", color: "var(--text-secondary)" }}>
+                                {item.type}
+                              </td>
+                              <td style={{ padding: "1rem 0.5rem", fontSize: "0.88rem", fontWeight: "600", color: "var(--text-primary)" }}>
+                                {item.name}
+                              </td>
+                              <td style={{ padding: "1rem 0.5rem", fontSize: "0.82rem" }}>
+                                <code>{item.slug}</code>
+                              </td>
+                              <td style={{ padding: "1rem 0.5rem" }}>
+                                <span className={`badge ${
+                                  item.status.toLowerCase() === "approved" ? "badge-success" :
+                                  item.status.toLowerCase() === "pending" ? "badge-warning" :
+                                  "badge-danger"
+                                }`} style={{ fontSize: "0.62rem" }}>
+                                  {item.status}
+                                </span>
+                              </td>
+                              <td style={{ padding: "1rem 0.5rem", fontSize: "0.8rem", color: "var(--text-muted)" }}>
+                                {item.date ? new Date(item.date).toLocaleDateString() : "—"}
+                              </td>
+                              <td style={{ padding: "1rem 0.5rem", textAlign: "right" }}>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setViewItem(item.originalItem);
+                                    setViewItemType(item.viewType);
+                                  }}
+                                  className="btn btn-secondary"
+                                  style={{ padding: "0.35rem 0.75rem", fontSize: "0.72rem", borderRadius: "6px" }}
+                                >
+                                  👁 View Details
+                                </button>
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
+              )}
             </div>
           )}
 

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import ProductLogo from "@/components/ProductLogo";
 
 export default function BrokerDetailPage() {
   const params = useParams();
@@ -89,22 +90,7 @@ export default function BrokerDetailPage() {
 
       <div className="card m-flex-column" style={{ display: "grid", gridTemplateColumns: "110px 1fr auto", gap: "2.5rem", alignItems: "center", marginBottom: "3rem" }}>
         {/* Logo */}
-        <div style={{
-          width: "110px",
-          height: "110px",
-          borderRadius: "20px",
-          border: `3px solid ${broker.logoColor}`,
-          boxShadow: `0 0 25px ${broker.logoColor}30`,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          background: "rgba(0,0,0,0.5)",
-          flexShrink: 0
-        }}>
-          <span style={{ fontSize: "2.8rem", fontWeight: "900", color: broker.logoColor }}>
-            {broker.logoLetter}
-          </span>
-        </div>
+        <ProductLogo logoLetter={broker.logoLetter} logoColor={broker.logoColor} name={broker.name} size="110px" fontSize="2.8rem" borderRadius="20px" />
 
         {/* Info */}
         <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>

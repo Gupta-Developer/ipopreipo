@@ -3,6 +3,7 @@
 import React, { useState, useEffect, Suspense } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import ProductLogo from "@/components/ProductLogo";
 
 interface IPODetails {
   id: string;
@@ -547,9 +548,7 @@ function LocalizedIPOPageContent() {
                       
                       <div className="ipo-card-header-flex">
                         <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                          <div className="ipo-avatar-box" style={{ background: `${ipo.logoColor}12`, border: `1.5px solid ${ipo.logoColor}40`, color: ipo.logoColor }}>
-                            {ipo.logoLetter}
-                          </div>
+                          <ProductLogo logoLetter={ipo.logoLetter} logoColor={ipo.logoColor} name={ipo.name} size="40px" fontSize="1.25rem" borderRadius="10px" />
                           <div>
                             <h3 style={{ fontSize: "1.05rem", fontWeight: 800 }}>{ipo.name}</h3>
                             <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", fontFamily: "var(--font-mono)", fontWeight: 700 }}>{ipo.ticker}</span>
@@ -718,9 +717,7 @@ function LocalizedIPOPageContent() {
                 
                 <div className="flex-between" style={{ marginBottom: "1.5rem" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                    <div className="ipo-avatar-box" style={{ background: `${selectedIPO.logoColor}15`, color: selectedIPO.logoColor, width: 44, height: 44 }}>
-                      {selectedIPO.logoLetter}
-                    </div>
+                    <ProductLogo logoLetter={selectedIPO.logoLetter} logoColor={selectedIPO.logoColor} name={selectedIPO.name} size="44px" fontSize="1.35rem" borderRadius="10px" />
                     <div>
                       <h2 style={{ fontSize: "1.5rem", fontWeight: 900, letterSpacing: "-0.03em" }}>{selectedIPO.name}</h2>
                       <span className="badge badge-primary">{selectedIPO.ticker}</span>

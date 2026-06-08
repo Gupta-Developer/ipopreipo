@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import ProductLogo from "@/components/ProductLogo";
 
 const COUNTRY_MAP: Record<string, { code: string; name: string; title: string }> = {
   "india": { code: "IN", name: "India", title: "India" },
@@ -175,21 +176,7 @@ export default function BrokersCountryPage() {
           >
             {/* Left Column */}
             <div style={{ display: "flex", justifyContent: "center" }}>
-              <div style={{
-                width: "88px",
-                height: "88px",
-                borderRadius: "16px",
-                border: `2px solid ${broker.logoColor}`,
-                boxShadow: `0 0 20px ${broker.logoColor}30`,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                background: `${broker.logoColor}12`
-              }}>
-                <div style={{ fontSize: "2rem", fontWeight: "900", color: broker.logoColor }}>
-                  {broker.logoLetter}
-                </div>
-              </div>
+              <ProductLogo logoLetter={broker.logoLetter} logoColor={broker.logoColor} name={broker.name} />
             </div>
 
             {/* Right Column */}

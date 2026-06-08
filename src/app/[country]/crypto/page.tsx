@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import ProductLogo from "@/components/ProductLogo";
 
 const COUNTRY_MAP: Record<string, { name: string; title: string }> = {
   "india": { name: "India", title: "India" },
@@ -145,21 +146,7 @@ export default function CryptoAppsCountryPage() {
           >
             {/* Left Column Logo */}
             <div style={{ display: "flex", justifyContent: "center" }}>
-              <div style={{
-                width: "88px",
-                height: "88px",
-                borderRadius: "16px",
-                border: `2px solid ${app.logoColor}`,
-                boxShadow: `0 0 20px ${app.logoColor}30`,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                background: `${app.logoColor}12`
-              }}>
-                <div style={{ fontSize: "2rem", fontWeight: "900", color: app.logoColor }}>
-                  {app.logoLetter}
-                </div>
-              </div>
+              <ProductLogo logoLetter={app.logoLetter} logoColor={app.logoColor} name={app.name} />
             </div>
 
             {/* Right Column Details */}

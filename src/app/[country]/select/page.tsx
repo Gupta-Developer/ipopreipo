@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import ProductLogo from "@/components/ProductLogo";
 import { BANKS_DATA } from "@/data/banksData";
 import { CREDIT_CARDS_CATALOG } from "@/data/cardsData";
 import { CRYPTO_APPS_DATA } from "@/data/cryptoAppsData";
@@ -270,9 +271,7 @@ export default function SelectFinologyDashboard() {
                     
                     {/* Logo letter */}
                     <div style={{ display: "flex", justifyContent: "center" }}>
-                      <div style={{ width: "84px", height: "84px", borderRadius: "14px", border: `2px solid ${b.logoColor}`, background: `${b.logoColor}0c`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "2rem", fontWeight: 900, color: b.logoColor }}>
-                        {b.logoLetter}
-                      </div>
+                      <ProductLogo logoLetter={b.logoLetter} logoColor={b.logoColor} name={b.name} size="84px" fontSize="2rem" borderRadius="14px" />
                     </div>
 
                     {/* Details Column */}
