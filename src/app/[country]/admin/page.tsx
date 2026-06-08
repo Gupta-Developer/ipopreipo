@@ -2985,6 +2985,22 @@ export default function AdminConsolePage() {
               )}
             </div>
 
+            {editItemType !== "ipos" && (
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                <div>
+                  <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)", fontWeight: 700 }}>Logo Image Link / Initials</label>
+                  <input type="text" value={editItem.logoLetter || ""} onChange={(e) => setEditItem({ ...editItem, logoLetter: e.target.value })} className="input-field" />
+                </div>
+                <div>
+                  <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)", fontWeight: 700 }}>Logo Theme Color</label>
+                  <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+                    <input type="color" value={editItem.logoColor || "#6366f1"} onChange={(e) => setEditItem({ ...editItem, logoColor: e.target.value })} style={{ width: "50px", height: "40px", padding: 0, border: "1px solid var(--border-color)", borderRadius: "8px", background: "none", cursor: "pointer" }} />
+                    <input type="text" value={editItem.logoColor || "#6366f1"} onChange={(e) => setEditItem({ ...editItem, logoColor: e.target.value })} className="input-field" style={{ flex: 1 }} />
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* IPO Fields */}
             {editItemType === "ipos" && (
               <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
@@ -3060,13 +3076,259 @@ export default function AdminConsolePage() {
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
                   <div>
                     <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Pros (one per line)</label>
-                    <textarea rows={2} value={editItem.pros ? editItem.pros.join("\n") : ""} onChange={(e) => setEditItem({ ...editItem, pros: e.target.value.split("\n") })} className="input-field" style={{ fontFamily: "inherit" }} />
+                    <textarea rows={2} value={editItem.pros ? (Array.isArray(editItem.pros) ? editItem.pros.join("\n") : editItem.pros) : ""} onChange={(e) => setEditItem({ ...editItem, pros: e.target.value.split("\n") })} className="input-field" style={{ fontFamily: "inherit" }} />
                   </div>
                   <div>
                     <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Cons (one per line)</label>
-                    <textarea rows={2} value={editItem.cons ? editItem.cons.join("\n") : ""} onChange={(e) => setEditItem({ ...editItem, cons: e.target.value.split("\n") })} className="input-field" style={{ fontFamily: "inherit" }} />
+                    <textarea rows={2} value={editItem.cons ? (Array.isArray(editItem.cons) ? editItem.cons.join("\n") : editItem.cons) : ""} onChange={(e) => setEditItem({ ...editItem, cons: e.target.value.split("\n") })} className="input-field" style={{ fontFamily: "inherit" }} />
                   </div>
                 </div>
+
+                {/* ── 1. BANKS SPECIFIC FIELDS ── */}
+                {editItemType === "banks" && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "1rem", borderTop: "1px solid var(--border-color)", paddingTop: "1rem" }}>
+                    <h3 style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--primary)" }}>🏦 Bank Account Details</h3>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                      <div>
+                        <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Interest Rate</label>
+                        <input type="text" value={editItem.interestRate || ""} onChange={(e) => setEditItem({ ...editItem, interestRate: e.target.value })} className="input-field" />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Minimum Balance Charge</label>
+                        <input type="text" value={editItem.charges?.minBal || ""} onChange={(e) => setEditItem({ ...editItem, charges: { ...(editItem.charges || {}), minBal: e.target.value } })} className="input-field" />
+                      </div>
+                    </div>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
+                      <div>
+                        <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Maintenance Charge</label>
+                        <input type="text" value={editItem.charges?.maint || ""} onChange={(e) => setEditItem({ ...editItem, charges: { ...(editItem.charges || {}), maint: e.target.value } })} className="input-field" />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>ATM Charge</label>
+                        <input type="text" value={editItem.charges?.atm || ""} onChange={(e) => setEditItem({ ...editItem, charges: { ...(editItem.charges || {}), atm: e.target.value } })} className="input-field" />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>FX Markup</label>
+                        <input type="text" value={editItem.charges?.fx || ""} onChange={(e) => setEditItem({ ...editItem, charges: { ...(editItem.charges || {}), fx: e.target.value } })} className="input-field" />
+                      </div>
+                    </div>
+                    <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", margin: "0.5rem 0" }}>
+                      {["onboarding", "mobileApp", "freeDebit", "highInterest", "zeroBalance"].map((feat) => (
+                        <label key={feat} style={{ display: "flex", alignItems: "center", gap: "0.35rem", fontSize: "0.82rem", cursor: "pointer" }}>
+                          <input type="checkbox" checked={editItem.features?.[feat] ?? false} onChange={(e) => setEditItem({ ...editItem, features: { ...(editItem.features || {}), [feat]: e.target.checked } })} />
+                          {feat.replace(/([A-Z])/g, " $1")}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* ── 2. BROKERS SPECIFIC FIELDS ── */}
+                {editItemType === "brokers" && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "1rem", borderTop: "1px solid var(--border-color)", paddingTop: "1rem" }}>
+                    <h3 style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--primary)" }}>📈 Broker Details</h3>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                      <div>
+                        <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Depository</label>
+                        <input type="text" value={editItem.depository || ""} onChange={(e) => setEditItem({ ...editItem, depository: e.target.value })} className="input-field" />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Opening Charge</label>
+                        <input type="text" value={editItem.charges?.opening || ""} onChange={(e) => setEditItem({ ...editItem, charges: { ...(editItem.charges || {}), opening: e.target.value } })} className="input-field" />
+                      </div>
+                    </div>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                      <div>
+                        <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>AMC</label>
+                        <input type="text" value={editItem.charges?.amc || ""} onChange={(e) => setEditItem({ ...editItem, charges: { ...(editItem.charges || {}), amc: e.target.value } })} className="input-field" />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Call & Trade Charge</label>
+                        <input type="text" value={editItem.charges?.callTrade || ""} onChange={(e) => setEditItem({ ...editItem, charges: { ...(editItem.charges || {}), callTrade: e.target.value } })} className="input-field" />
+                      </div>
+                    </div>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "0.5rem" }}>
+                      <div>
+                        <label style={{ fontSize: "0.7rem", color: "var(--text-secondary)" }}>Brokerage Delivery</label>
+                        <input type="text" value={editItem.brokerage?.delivery || ""} onChange={(e) => setEditItem({ ...editItem, brokerage: { ...(editItem.brokerage || {}), delivery: e.target.value } })} className="input-field" style={{ fontSize: "0.8rem" }} />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: "0.7rem", color: "var(--text-secondary)" }}>Brokerage Intraday</label>
+                        <input type="text" value={editItem.brokerage?.intraday || ""} onChange={(e) => setEditItem({ ...editItem, brokerage: { ...(editItem.brokerage || {}), intraday: e.target.value } })} className="input-field" style={{ fontSize: "0.8rem" }} />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: "0.7rem", color: "var(--text-secondary)" }}>Brokerage Futures</label>
+                        <input type="text" value={editItem.brokerage?.futures || ""} onChange={(e) => setEditItem({ ...editItem, brokerage: { ...(editItem.brokerage || {}), futures: e.target.value } })} className="input-field" style={{ fontSize: "0.8rem" }} />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: "0.7rem", color: "var(--text-secondary)" }}>Brokerage Options</label>
+                        <input type="text" value={editItem.brokerage?.options || ""} onChange={(e) => setEditItem({ ...editItem, brokerage: { ...(editItem.brokerage || {}), options: e.target.value } })} className="input-field" style={{ fontSize: "0.8rem" }} />
+                      </div>
+                    </div>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                      <div>
+                        <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Margin Delivery</label>
+                        <input type="text" value={editItem.margins?.delivery || ""} onChange={(e) => setEditItem({ ...editItem, margins: { ...(editItem.margins || {}), delivery: e.target.value } })} className="input-field" />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Margin Intraday</label>
+                        <input type="text" value={editItem.margins?.intraday || ""} onChange={(e) => setEditItem({ ...editItem, margins: { ...(editItem.margins || {}), intraday: e.target.value } })} className="input-field" />
+                      </div>
+                    </div>
+                    <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", margin: "0.5rem 0" }}>
+                      {["equity", "commodity", "currency", "futures", "options"].map((seg) => (
+                        <label key={seg} style={{ display: "flex", alignItems: "center", gap: "0.35rem", fontSize: "0.82rem", cursor: "pointer" }}>
+                          <input type="checkbox" checked={editItem.segments?.[seg] ?? false} onChange={(e) => setEditItem({ ...editItem, segments: { ...(editItem.segments || {}), [seg]: e.target.checked } })} />
+                          {seg.toUpperCase()}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* ── 3. CREDIT CARDS SPECIFIC FIELDS ── */}
+                {editItemType === "cards" && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "1rem", borderTop: "1px solid var(--border-color)", paddingTop: "1rem" }}>
+                    <h3 style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--primary)" }}>💳 Credit Card Details</h3>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
+                      <div>
+                        <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Best For</label>
+                        <input type="text" value={editItem.bestFor || ""} onChange={(e) => setEditItem({ ...editItem, bestFor: e.target.value })} className="input-field" />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Issuer</label>
+                        <input type="text" value={editItem.issuer || ""} onChange={(e) => setEditItem({ ...editItem, issuer: e.target.value })} className="input-field" />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Issuer Code (e.g. sbi, hdfc)</label>
+                        <input type="text" value={editItem.issuerCode || ""} onChange={(e) => setEditItem({ ...editItem, issuerCode: e.target.value })} className="input-field" />
+                      </div>
+                    </div>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
+                      <div>
+                        <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Network</label>
+                        <input type="text" value={editItem.network || ""} onChange={(e) => setEditItem({ ...editItem, network: e.target.value })} className="input-field" />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Joining Fee</label>
+                        <input type="text" value={editItem.fees?.joiningFee || ""} onChange={(e) => setEditItem({ ...editItem, fees: { ...(editItem.fees || {}), joiningFee: e.target.value } })} className="input-field" />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Annual Fee</label>
+                        <input type="text" value={editItem.fees?.annualFee || ""} onChange={(e) => setEditItem({ ...editItem, fees: { ...(editItem.fees || {}), annualFee: e.target.value } })} className="input-field" />
+                      </div>
+                    </div>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
+                      <div>
+                        <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>APR</label>
+                        <input type="text" value={editItem.fees?.apr || ""} onChange={(e) => setEditItem({ ...editItem, fees: { ...(editItem.fees || {}), apr: e.target.value } })} className="input-field" />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Addon Card Fee</label>
+                        <input type="text" value={editItem.fees?.addonFee || ""} onChange={(e) => setEditItem({ ...editItem, fees: { ...(editItem.fees || {}), addonFee: e.target.value } })} className="input-field" />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Minimum Repayment</label>
+                        <input type="text" value={editItem.fees?.minimumRepayment || ""} onChange={(e) => setEditItem({ ...editItem, fees: { ...(editItem.fees || {}), minimumRepayment: e.target.value } })} className="input-field" />
+                      </div>
+                    </div>
+                    <div>
+                      <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Perks Details (one per line)</label>
+                      <textarea rows={2} value={editItem.perks?.[0]?.details ? editItem.perks[0].details.join("\n") : ""} onChange={(e) => {
+                        const newDetails = e.target.value.split("\n").map(d => d.trim()).filter(Boolean);
+                        const oldPerks = editItem.perks || [];
+                        const firstPerk = oldPerks[0] || { title: "Primary Reward Perks", category: "rewards" };
+                        setEditItem({ ...editItem, perks: [{ ...firstPerk, details: newDetails }, ...oldPerks.slice(1)] });
+                      }} className="input-field" style={{ fontFamily: "inherit" }} />
+                    </div>
+                    <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", margin: "0.5rem 0" }}>
+                      {["welcomeBonus", "travel", "fuel", "rewards", "shopping", "cashback", "dining", "insurance", "interest", "lounge"].map((feat) => (
+                        <label key={feat} style={{ display: "flex", alignItems: "center", gap: "0.35rem", fontSize: "0.82rem", cursor: "pointer" }}>
+                          <input type="checkbox" checked={editItem.featuresChecklist?.[feat] ?? false} onChange={(e) => setEditItem({ ...editItem, featuresChecklist: { ...(editItem.featuresChecklist || {}), [feat]: e.target.checked } })} />
+                          {feat.replace(/([A-Z])/g, " $1")}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* ── 4. PAYMENT APPS SPECIFIC FIELDS ── */}
+                {editItemType === "payments" && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "1rem", borderTop: "1px solid var(--border-color)", paddingTop: "1rem" }}>
+                    <h3 style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--primary)" }}>📱 Payment App Details</h3>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                      <div>
+                        <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Wallet Loading Charge</label>
+                        <input type="text" value={editItem.charges?.walletLoading || ""} onChange={(e) => setEditItem({ ...editItem, charges: { ...(editItem.charges || {}), walletLoading: e.target.value } })} className="input-field" />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Bank Transfer Charge</label>
+                        <input type="text" value={editItem.charges?.bankTransfer || ""} onChange={(e) => setEditItem({ ...editItem, charges: { ...(editItem.charges || {}), bankTransfer: e.target.value } })} className="input-field" />
+                      </div>
+                    </div>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
+                      <div>
+                        <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Card Payments Charge</label>
+                        <input type="text" value={editItem.charges?.cardPayments || ""} onChange={(e) => setEditItem({ ...editItem, charges: { ...(editItem.charges || {}), cardPayments: e.target.value } })} className="input-field" />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Daily Limit</label>
+                        <input type="text" value={editItem.limits?.dailyLimit || ""} onChange={(e) => setEditItem({ ...editItem, limits: { ...(editItem.limits || {}), dailyLimit: e.target.value } })} className="input-field" />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Transaction Limit</label>
+                        <input type="text" value={editItem.limits?.transactionLimit || ""} onChange={(e) => setEditItem({ ...editItem, limits: { ...(editItem.limits || {}), transactionLimit: e.target.value } })} className="input-field" />
+                      </div>
+                    </div>
+                    <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", margin: "0.5rem 0" }}>
+                      {["upi", "wallet", "bankTransfer", "cards", "international"].map((feat) => (
+                        <label key={feat} style={{ display: "flex", alignItems: "center", gap: "0.35rem", fontSize: "0.82rem", cursor: "pointer" }}>
+                          <input type="checkbox" checked={editItem.features?.[feat] ?? false} onChange={(e) => setEditItem({ ...editItem, features: { ...(editItem.features || {}), [feat]: e.target.checked } })} />
+                          {feat.replace(/([A-Z])/g, " $1")}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* ── 5. CRYPTO APPS SPECIFIC FIELDS ── */}
+                {editItemType === "crypto" && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "1rem", borderTop: "1px solid var(--border-color)", paddingTop: "1rem" }}>
+                    <h3 style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--primary)" }}>🪙 Crypto App Details</h3>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
+                      <div>
+                        <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Maker Fee</label>
+                        <input type="text" value={editItem.charges?.makerFee || ""} onChange={(e) => setEditItem({ ...editItem, charges: { ...(editItem.charges || {}), makerFee: e.target.value } })} className="input-field" />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Taker Fee</label>
+                        <input type="text" value={editItem.charges?.takerFee || ""} onChange={(e) => setEditItem({ ...editItem, charges: { ...(editItem.charges || {}), takerFee: e.target.value } })} className="input-field" />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Withdrawal Fee</label>
+                        <input type="text" value={editItem.charges?.withdrawalFee || ""} onChange={(e) => setEditItem({ ...editItem, charges: { ...(editItem.charges || {}), withdrawalFee: e.target.value } })} className="input-field" />
+                      </div>
+                    </div>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                      <div>
+                        <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Daily Withdrawal Limit</label>
+                        <input type="text" value={editItem.limits?.dailyWithdrawal || ""} onChange={(e) => setEditItem({ ...editItem, limits: { ...(editItem.limits || {}), dailyWithdrawal: e.target.value } })} className="input-field" />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Minimum Deposit Limit</label>
+                        <input type="text" value={editItem.limits?.minimumDeposit || ""} onChange={(e) => setEditItem({ ...editItem, limits: { ...(editItem.limits || {}), minimumDeposit: e.target.value } })} className="input-field" />
+                      </div>
+                    </div>
+                    <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", margin: "0.5rem 0" }}>
+                      {["spotTrading", "futuresTrading", "staking", "wallet", "fiatDeposit"].map((feat) => (
+                        <label key={feat} style={{ display: "flex", alignItems: "center", gap: "0.35rem", fontSize: "0.82rem", cursor: "pointer" }}>
+                          <input type="checkbox" checked={editItem.features?.[feat] ?? false} onChange={(e) => setEditItem({ ...editItem, features: { ...(editItem.features || {}), [feat]: e.target.checked } })} />
+                          {feat.replace(/([A-Z])/g, " $1")}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
