@@ -61,35 +61,125 @@ export async function GET(request: Request) {
   }
 }
 
-// PUT - Update approval status of a broker
+// PUT - Update approval status or full details of a broker
 export async function PUT(request: Request) {
   try {
-    const { id, status } = await request.json();
+    const body = await request.json();
+    const { id, status, name } = body;
 
-    if (!id || !status) {
+    if (!id) {
       return NextResponse.json(
-        { success: false, error: "Broker ID and status are required." },
+        { success: false, error: "Broker ID is required." },
         { status: 400 }
       );
     }
 
-    const result = await query(
-      "UPDATE brokers SET status = $1 WHERE id = $2 RETURNING id, name, status;",
-      [status, id]
-    );
+    if (name) {
+      const {
+        slug,
+        country,
+        countryName,
+        rating,
+        type,
+        depository,
+        activeClients,
+        likes,
+        summary,
+        logoColor,
+        logoLetter,
+        segments,
+        charges,
+        brokerage,
+        margins,
+        platforms,
+        pros,
+        cons,
+        additionalFeatures,
+        otherInvestments,
+        categoryRatings,
+        detailedReviews,
+        taxes,
+        detailedArticle,
+      } = body;
 
-    if (result.rows.length === 0) {
-      return NextResponse.json(
-        { success: false, error: "Broker not found." },
-        { status: 404 }
+      const result = await query(
+        `UPDATE brokers SET 
+          slug = $1, name = $2, country = $3, country_name = $4, rating = $5,
+          type = $6, depository = $7, active_clients = $8, likes = $9, summary = $10,
+          logo_color = $11, logo_letter = $12, segments = $13, charges = $14, brokerage = $15,
+          margins = $16, platforms = $17, pros = $18, cons = $19, additional_features = $20,
+          other_investments = $21, category_ratings = $22, detailed_reviews = $23, taxes = $24,
+          detailed_article = $25, status = COALESCE($26, status)
+        WHERE id = $27 RETURNING *;`,
+        [
+          slug,
+          name,
+          country,
+          countryName,
+          Number(rating) || 4.0,
+          type,
+          depository,
+          activeClients,
+          Number(likes) || 0,
+          summary,
+          logoColor,
+          logoLetter,
+          JSON.stringify(segments || {}),
+          JSON.stringify(charges || {}),
+          JSON.stringify(brokerage || {}),
+          JSON.stringify(margins || {}),
+          platforms,
+          pros,
+          cons,
+          JSON.stringify(additionalFeatures || {}),
+          JSON.stringify(otherInvestments || {}),
+          JSON.stringify(categoryRatings || {}),
+          JSON.stringify(detailedReviews || {}),
+          JSON.stringify(taxes || {}),
+          detailedArticle ? JSON.stringify(detailedArticle) : null,
+          status,
+          id,
+        ]
       );
-    }
 
-    return NextResponse.json({
-      success: true,
-      broker: result.rows[0],
-      message: `Broker status updated to ${status}.`,
-    });
+      if (result.rows.length === 0) {
+        return NextResponse.json(
+          { success: false, error: "Broker not found." },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json({
+        success: true,
+        broker: result.rows[0],
+        message: "Broker details updated successfully.",
+      });
+    } else {
+      if (!status) {
+        return NextResponse.json(
+          { success: false, error: "Broker ID and status are required." },
+          { status: 400 }
+        );
+      }
+
+      const result = await query(
+        "UPDATE brokers SET status = $1 WHERE id = $2 RETURNING id, name, status;",
+        [status, id]
+      );
+
+      if (result.rows.length === 0) {
+        return NextResponse.json(
+          { success: false, error: "Broker not found." },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json({
+        success: true,
+        broker: result.rows[0],
+        message: `Broker status updated to ${status}.`,
+      });
+    }
   } catch (error: any) {
     console.error("Admin update broker status error:", error);
     return NextResponse.json(

@@ -61,6 +61,12 @@ export default function AdminConsolePage() {
   const [customPayments, setCustomPayments] = useState<any[]>([]);
   const [customCryptos, setCustomCryptos] = useState<any[]>([]);
 
+  // View & Edit Modal States
+  const [viewItem, setViewItem] = useState<any | null>(null);
+  const [viewItemType, setViewItemType] = useState<string>("");
+  const [editItem, setEditItem] = useState<any | null>(null);
+  const [editItemType, setEditItemType] = useState<string>("");
+
   // Add Product Form State - General Shared Info
   const [prodName, setProdName] = useState("");
   const [prodSlug, setProdSlug] = useState("");
@@ -844,6 +850,81 @@ export default function AdminConsolePage() {
     }
   };
 
+  // Handle Save Edited Submission/Product
+  const handleSaveEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editItem) return;
+
+    if (editItemType === "ipos") {
+      const updatedSubs = submissions.map((sub) => {
+        if (sub.id === editItem.id) {
+          return { ...sub, ...editItem };
+        }
+        return sub;
+      });
+      localStorage.setItem("pending_submissions", JSON.stringify(updatedSubs));
+      setSubmissions(updatedSubs);
+      
+      // Also update in live ipos if it was already approved/live
+      const ipoDb = localStorage.getItem("ipo_database");
+      if (ipoDb) {
+        const parsed = JSON.parse(ipoDb);
+        const updatedIpos = parsed.map((ipo: any) => {
+          if (ipo.name === editItem.name || ipo.ticker === editItem.ticker) {
+            return {
+              ...ipo,
+              name: editItem.name,
+              ticker: editItem.ticker,
+              segment: editItem.segment,
+              priceBand: editItem.priceBand,
+              size: editItem.size,
+              lotSize: editItem.lotSize,
+              gmp: editItem.gmp,
+              gmpAmount: editItem.gmpAmount,
+              openDate: editItem.openDate,
+              closeDate: editItem.closeDate,
+            };
+          }
+          return ipo;
+        });
+        localStorage.setItem("ipo_database", JSON.stringify(updatedIpos));
+        setLiveIpos(updatedIpos);
+      }
+      
+      alert("IPO details updated successfully.");
+      setEditItem(null);
+    } else {
+      const endpointMap: Record<string, { endpoint: string; fetchFn: () => void }> = {
+        banks: { endpoint: "/api/admin/banks", fetchFn: fetchBanks },
+        brokers: { endpoint: "/api/admin/brokers", fetchFn: fetchBrokers },
+        cards: { endpoint: "/api/admin/credit-cards", fetchFn: fetchCards },
+        payments: { endpoint: "/api/admin/payment-apps", fetchFn: fetchPaymentApps },
+        crypto: { endpoint: "/api/admin/crypto-apps", fetchFn: fetchCryptos },
+      };
+      const config = endpointMap[editItemType];
+      if (config) {
+        try {
+          const res = await fetch(config.endpoint, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(editItem)
+          });
+          const data = await res.json();
+          if (data.success) {
+            alert("Product details updated successfully.");
+            setEditItem(null);
+            config.fetchFn();
+          } else {
+            alert(data.error || "Failed to update product details.");
+          }
+        } catch (err) {
+          console.error("Error updating product:", err);
+          alert("Error updating product.");
+        }
+      }
+    }
+  };
+
   // Filtered db users list
   const filteredUsers = dbUsers.filter(u => 
     u.name.toLowerCase().includes(userSearch.toLowerCase()) || 
@@ -1543,12 +1624,174 @@ export default function AdminConsolePage() {
                             <strong style={{ display: "block", color: "var(--success)", marginTop: "2px" }}>{sub.gmpAmount} ({sub.gmp}%)</strong>
                           </div>
                         </div>
-                        <div style={{ display: "flex", gap: "1rem", marginTop: "0.5rem", borderTop: "1px solid var(--border-color)", paddingTop: "1rem" }}>
-                          <button onClick={() => handleReviewDecision(sub.id, "Approved")} className="btn btn-primary" style={{ padding: "0.5rem 1.5rem", fontSize: "0.8rem", borderRadius: "6px" }}>
-                            ✓ Approve & Publish Live
+                        <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem", borderTop: "1px solid var(--border-color)", paddingTop: "1rem", flexWrap: "wrap" }}>
+                          <button onClick={() => handleReviewDecision(sub.id, "Approved")} className="btn btn-primary" style={{ padding: "0.45rem 1.25rem", fontSize: "0.78rem", borderRadius: "6px" }}>
+                            ✓ Approve
                           </button>
-                          <button onClick={() => handleReviewDecision(sub.id, "Rejected")} className="btn btn-secondary" style={{ padding: "0.5rem 1.5rem", fontSize: "0.8rem", borderRadius: "6px", color: "var(--danger)", borderColor: "rgba(239, 68, 68, 0.2)" }}>
+                          <button onClick={() => { setEditItem(sub); setEditItemType("ipos"); }} style={{ padding: "0.45rem 1.25rem", fontSize: "0.78rem", borderRadius: "6px", backgroundColor: "rgba(99, 102, 241, 0.1)", color: "var(--primary)", border: "1px solid rgba(99, 102, 241, 0.25)", cursor: "pointer" }}>
+                            ✏️ Edit details
+                          </button>
+                          <button onClick={() => { setViewItem(sub); setViewItemType("ipos"); }} style={{ padding: "0.45rem 1.25rem", fontSize: "0.78rem", borderRadius: "6px", backgroundColor: "rgba(255, 255, 255, 0.05)", color: "var(--text-secondary)", border: "1px solid var(--border-color)", cursor: "pointer" }}>
+                            👁 View Details
+                          </button>
+                          <button onClick={() => handleReviewDecision(sub.id, "Rejected")} className="btn btn-secondary" style={{ padding: "0.45rem 1.25rem", fontSize: "0.78rem", borderRadius: "6px", color: "var(--danger)", borderColor: "rgba(239, 68, 68, 0.2)" }}>
                             ✕ Reject Draft
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                {/* Bank Account Submissions */}
+                <div>
+                  <h3 style={{ fontSize: "1.05rem", fontWeight: 700, marginBottom: "1rem", color: "var(--primary)" }}>Bank Account Submissions</h3>
+                  {customBanks.filter(b => b.status === "pending").length === 0 ? (
+                    <div style={{ padding: "1.5rem", border: "1px dashed var(--border-color)", borderRadius: "8px", textAlign: "center", color: "var(--text-secondary)", fontSize: "0.85rem" }}>
+                      No pending Bank Account submissions.
+                    </div>
+                  ) : (
+                    customBanks.filter(b => b.status === "pending").map((bank) => (
+                      <div key={bank.id} style={{ display: "flex", flexDirection: "column", gap: "1rem", border: "1px solid var(--border-color)", padding: "1.5rem", borderRadius: "12px", background: "var(--spec-bg)", marginBottom: "1rem" }}>
+                        <div className="flex-between">
+                          <div>
+                            <span style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>Submitted by: {bank.addedBy}</span>
+                            <h3 style={{ fontSize: "1.25rem", fontWeight: 800, marginTop: "0.25rem", color: "var(--text-primary)" }}>{bank.name} ({bank.slug})</h3>
+                          </div>
+                          <span className="badge badge-primary" style={{ textTransform: "uppercase" }}>{bank.countrySlug}</span>
+                        </div>
+                        <div style={{ fontSize: "0.85rem", color: "var(--text-secondary)", lineHeight: 1.45 }}>
+                          {bank.summary}
+                        </div>
+                        <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem", borderTop: "1px solid var(--border-color)", paddingTop: "1rem", flexWrap: "wrap" }}>
+                          <button onClick={() => handleApproveRejectProduct(bank.id, "approved", "banks")} className="btn btn-primary" style={{ padding: "0.45rem 1.25rem", fontSize: "0.78rem", borderRadius: "6px" }}>
+                            ✓ Approve
+                          </button>
+                          <button onClick={() => { setEditItem(bank); setEditItemType("banks"); }} style={{ padding: "0.45rem 1.25rem", fontSize: "0.78rem", borderRadius: "6px", backgroundColor: "rgba(99, 102, 241, 0.1)", color: "var(--primary)", border: "1px solid rgba(99, 102, 241, 0.25)", cursor: "pointer" }}>
+                            ✏️ Edit details
+                          </button>
+                          <button onClick={() => { setViewItem(bank); setViewItemType("banks"); }} style={{ padding: "0.45rem 1.25rem", fontSize: "0.78rem", borderRadius: "6px", backgroundColor: "rgba(255, 255, 255, 0.05)", color: "var(--text-secondary)", border: "1px solid var(--border-color)", cursor: "pointer" }}>
+                            👁 View Details
+                          </button>
+                          <button onClick={() => handleApproveRejectProduct(bank.id, "rejected", "banks")} className="btn btn-secondary" style={{ padding: "0.45rem 1.25rem", fontSize: "0.78rem", borderRadius: "6px", color: "var(--danger)", borderColor: "rgba(239, 68, 68, 0.2)" }}>
+                            ✕ Reject
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                {/* Broker Submissions */}
+                <div>
+                  <h3 style={{ fontSize: "1.05rem", fontWeight: 700, marginBottom: "1rem", color: "var(--primary)" }}>Stock Broker Submissions</h3>
+                  {customBrokers.filter(b => b.status === "pending").length === 0 ? (
+                    <div style={{ padding: "1.5rem", border: "1px dashed var(--border-color)", borderRadius: "8px", textAlign: "center", color: "var(--text-secondary)", fontSize: "0.85rem" }}>
+                      No pending Broker submissions.
+                    </div>
+                  ) : (
+                    customBrokers.filter(b => b.status === "pending").map((broker) => (
+                      <div key={broker.id} style={{ display: "flex", flexDirection: "column", gap: "1rem", border: "1px solid var(--border-color)", padding: "1.5rem", borderRadius: "12px", background: "var(--spec-bg)", marginBottom: "1rem" }}>
+                        <div className="flex-between">
+                          <div>
+                            <span style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>Submitted by: {broker.addedBy}</span>
+                            <h3 style={{ fontSize: "1.25rem", fontWeight: 800, marginTop: "0.25rem", color: "var(--text-primary)" }}>{broker.name} ({broker.slug})</h3>
+                          </div>
+                          <span className="badge badge-primary" style={{ textTransform: "uppercase" }}>{broker.country}</span>
+                        </div>
+                        <div style={{ fontSize: "0.85rem", color: "var(--text-secondary)", lineHeight: 1.45 }}>
+                          {broker.summary}
+                        </div>
+                        <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem", borderTop: "1px solid var(--border-color)", paddingTop: "1rem", flexWrap: "wrap" }}>
+                          <button onClick={() => handleApproveRejectProduct(broker.id, "approved", "brokers")} className="btn btn-primary" style={{ padding: "0.45rem 1.25rem", fontSize: "0.78rem", borderRadius: "6px" }}>
+                            ✓ Approve
+                          </button>
+                          <button onClick={() => { setEditItem(broker); setEditItemType("brokers"); }} style={{ padding: "0.45rem 1.25rem", fontSize: "0.78rem", borderRadius: "6px", backgroundColor: "rgba(99, 102, 241, 0.1)", color: "var(--primary)", border: "1px solid rgba(99, 102, 241, 0.25)", cursor: "pointer" }}>
+                            ✏️ Edit details
+                          </button>
+                          <button onClick={() => { setViewItem(broker); setViewItemType("brokers"); }} style={{ padding: "0.45rem 1.25rem", fontSize: "0.78rem", borderRadius: "6px", backgroundColor: "rgba(255, 255, 255, 0.05)", color: "var(--text-secondary)", border: "1px solid var(--border-color)", cursor: "pointer" }}>
+                            👁 View Details
+                          </button>
+                          <button onClick={() => handleApproveRejectProduct(broker.id, "rejected", "brokers")} className="btn btn-secondary" style={{ padding: "0.45rem 1.25rem", fontSize: "0.78rem", borderRadius: "6px", color: "var(--danger)", borderColor: "rgba(239, 68, 68, 0.2)" }}>
+                            ✕ Reject
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                {/* Credit Card Submissions */}
+                <div>
+                  <h3 style={{ fontSize: "1.05rem", fontWeight: 700, marginBottom: "1rem", color: "var(--primary)" }}>Credit Card Submissions</h3>
+                  {customCards.filter(c => c.status === "pending").length === 0 ? (
+                    <div style={{ padding: "1.5rem", border: "1px dashed var(--border-color)", borderRadius: "8px", textAlign: "center", color: "var(--text-secondary)", fontSize: "0.85rem" }}>
+                      No pending Credit Card submissions.
+                    </div>
+                  ) : (
+                    customCards.filter(c => c.status === "pending").map((card) => (
+                      <div key={card.id} style={{ display: "flex", flexDirection: "column", gap: "1rem", border: "1px solid var(--border-color)", padding: "1.5rem", borderRadius: "12px", background: "var(--spec-bg)", marginBottom: "1rem" }}>
+                        <div className="flex-between">
+                          <div>
+                            <span style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>Submitted by: {card.addedBy}</span>
+                            <h3 style={{ fontSize: "1.25rem", fontWeight: 800, marginTop: "0.25rem", color: "var(--text-primary)" }}>{card.name} ({card.slug})</h3>
+                          </div>
+                          <span className="badge badge-primary" style={{ textTransform: "uppercase" }}>{card.country}</span>
+                        </div>
+                        <div style={{ fontSize: "0.85rem", color: "var(--text-secondary)", lineHeight: 1.45 }}>
+                          {card.description}
+                        </div>
+                        <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem", borderTop: "1px solid var(--border-color)", paddingTop: "1rem", flexWrap: "wrap" }}>
+                          <button onClick={() => handleApproveRejectProduct(card.id, "approved", "cards")} className="btn btn-primary" style={{ padding: "0.45rem 1.25rem", fontSize: "0.78rem", borderRadius: "6px" }}>
+                            ✓ Approve
+                          </button>
+                          <button onClick={() => { setEditItem(card); setEditItemType("cards"); }} style={{ padding: "0.45rem 1.25rem", fontSize: "0.78rem", borderRadius: "6px", backgroundColor: "rgba(99, 102, 241, 0.1)", color: "var(--primary)", border: "1px solid rgba(99, 102, 241, 0.25)", cursor: "pointer" }}>
+                            ✏️ Edit details
+                          </button>
+                          <button onClick={() => { setViewItem(card); setViewItemType("cards"); }} style={{ padding: "0.45rem 1.25rem", fontSize: "0.78rem", borderRadius: "6px", backgroundColor: "rgba(255, 255, 255, 0.05)", color: "var(--text-secondary)", border: "1px solid var(--border-color)", cursor: "pointer" }}>
+                            👁 View Details
+                          </button>
+                          <button onClick={() => handleApproveRejectProduct(card.id, "rejected", "cards")} className="btn btn-secondary" style={{ padding: "0.45rem 1.25rem", fontSize: "0.78rem", borderRadius: "6px", color: "var(--danger)", borderColor: "rgba(239, 68, 68, 0.2)" }}>
+                            ✕ Reject
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                {/* Crypto App Submissions */}
+                <div>
+                  <h3 style={{ fontSize: "1.05rem", fontWeight: 700, marginBottom: "1rem", color: "var(--primary)" }}>Crypto App Submissions</h3>
+                  {customCryptos.filter(c => c.status === "pending").length === 0 ? (
+                    <div style={{ padding: "1.5rem", border: "1px dashed var(--border-color)", borderRadius: "8px", textAlign: "center", color: "var(--text-secondary)", fontSize: "0.85rem" }}>
+                      No pending Crypto App submissions.
+                    </div>
+                  ) : (
+                    customCryptos.filter(c => c.status === "pending").map((crypto) => (
+                      <div key={crypto.id} style={{ display: "flex", flexDirection: "column", gap: "1rem", border: "1px solid var(--border-color)", padding: "1.5rem", borderRadius: "12px", background: "var(--spec-bg)", marginBottom: "1rem" }}>
+                        <div className="flex-between">
+                          <div>
+                            <span style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>Submitted by: {crypto.addedBy}</span>
+                            <h3 style={{ fontSize: "1.25rem", fontWeight: 800, marginTop: "0.25rem", color: "var(--text-primary)" }}>{crypto.name} ({crypto.slug})</h3>
+                          </div>
+                          <span className="badge badge-primary" style={{ textTransform: "uppercase" }}>{crypto.countrySlug}</span>
+                        </div>
+                        <div style={{ fontSize: "0.85rem", color: "var(--text-secondary)", lineHeight: 1.45 }}>
+                          {crypto.summary}
+                        </div>
+                        <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem", borderTop: "1px solid var(--border-color)", paddingTop: "1rem", flexWrap: "wrap" }}>
+                          <button onClick={() => handleApproveRejectProduct(crypto.id, "approved", "crypto")} className="btn btn-primary" style={{ padding: "0.45rem 1.25rem", fontSize: "0.78rem", borderRadius: "6px" }}>
+                            ✓ Approve
+                          </button>
+                          <button onClick={() => { setEditItem(crypto); setEditItemType("crypto"); }} style={{ padding: "0.45rem 1.25rem", fontSize: "0.78rem", borderRadius: "6px", backgroundColor: "rgba(99, 102, 241, 0.1)", color: "var(--primary)", border: "1px solid rgba(99, 102, 241, 0.25)", cursor: "pointer" }}>
+                            ✏️ Edit details
+                          </button>
+                          <button onClick={() => { setViewItem(crypto); setViewItemType("crypto"); }} style={{ padding: "0.45rem 1.25rem", fontSize: "0.78rem", borderRadius: "6px", backgroundColor: "rgba(255, 255, 255, 0.05)", color: "var(--text-secondary)", border: "1px solid var(--border-color)", cursor: "pointer" }}>
+                            👁 View Details
+                          </button>
+                          <button onClick={() => handleApproveRejectProduct(crypto.id, "rejected", "crypto")} className="btn btn-secondary" style={{ padding: "0.45rem 1.25rem", fontSize: "0.78rem", borderRadius: "6px", color: "var(--danger)", borderColor: "rgba(239, 68, 68, 0.2)" }}>
+                            ✕ Reject
                           </button>
                         </div>
                       </div>
@@ -1576,11 +1819,17 @@ export default function AdminConsolePage() {
                         <div style={{ fontSize: "0.85rem", color: "var(--text-secondary)", lineHeight: 1.45 }}>
                           {app.summary}
                         </div>
-                        <div style={{ display: "flex", gap: "1rem", marginTop: "0.5rem", borderTop: "1px solid var(--border-color)", paddingTop: "1rem" }}>
-                          <button onClick={() => handleApproveRejectPaymentApp(app.id, "approved")} className="btn btn-primary" style={{ padding: "0.5rem 1.5rem", fontSize: "0.8rem", borderRadius: "6px" }}>
-                            ✓ Approve & Publish Live
+                        <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem", borderTop: "1px solid var(--border-color)", paddingTop: "1rem", flexWrap: "wrap" }}>
+                          <button onClick={() => handleApproveRejectProduct(app.id, "approved", "payments")} className="btn btn-primary" style={{ padding: "0.45rem 1.25rem", fontSize: "0.78rem", borderRadius: "6px" }}>
+                            ✓ Approve
                           </button>
-                          <button onClick={() => handleApproveRejectPaymentApp(app.id, "rejected")} className="btn btn-secondary" style={{ padding: "0.5rem 1.5rem", fontSize: "0.8rem", borderRadius: "6px", color: "var(--danger)", borderColor: "rgba(239, 68, 68, 0.2)" }}>
+                          <button onClick={() => { setEditItem(app); setEditItemType("payments"); }} style={{ padding: "0.45rem 1.25rem", fontSize: "0.78rem", borderRadius: "6px", backgroundColor: "rgba(99, 102, 241, 0.1)", color: "var(--primary)", border: "1px solid rgba(99, 102, 241, 0.25)", cursor: "pointer" }}>
+                            ✏️ Edit details
+                          </button>
+                          <button onClick={() => { setViewItem(app); setViewItemType("payments"); }} style={{ padding: "0.45rem 1.25rem", fontSize: "0.78rem", borderRadius: "6px", backgroundColor: "rgba(255, 255, 255, 0.05)", color: "var(--text-secondary)", border: "1px solid var(--border-color)", cursor: "pointer" }}>
+                            👁 View Details
+                          </button>
+                          <button onClick={() => handleApproveRejectProduct(app.id, "rejected", "payments")} className="btn btn-secondary" style={{ padding: "0.45rem 1.25rem", fontSize: "0.78rem", borderRadius: "6px", color: "var(--danger)", borderColor: "rgba(239, 68, 68, 0.2)" }}>
                             ✕ Reject
                           </button>
                         </div>
@@ -2238,6 +2487,20 @@ export default function AdminConsolePage() {
                                 </>
                               )}
                               <button
+                                 onClick={() => { setViewItem(item); setViewItemType(activeSelectType); }}
+                                 className="btn btn-secondary"
+                                 style={{ padding: "0.3rem 0.65rem", fontSize: "0.72rem", borderRadius: "6px" }}
+                               >
+                                 👁 View
+                               </button>
+                               <button
+                                 onClick={() => { setEditItem(item); setEditItemType(activeSelectType); }}
+                                 className="btn btn-secondary"
+                                 style={{ padding: "0.3rem 0.65rem", fontSize: "0.72rem", borderRadius: "6px" }}
+                               >
+                                 ✏️ Edit
+                               </button>
+                              <button
                                 onClick={() => handleDeleteProduct(String(item.id), activeSelectType)}
                                 className="btn btn-secondary"
                                 style={{ padding: "0.3rem 0.65rem", fontSize: "0.72rem", borderRadius: "6px", color: "var(--danger)", borderColor: "rgba(239, 68, 68, 0.2)" }}
@@ -2297,6 +2560,250 @@ export default function AdminConsolePage() {
         </main>
 
       </div>
+
+      {/* ── VIEW DETAILS MODAL ── */}
+      {viewItem && (
+        <div style={{
+          position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: "rgba(0, 0, 0, 0.75)", zIndex: 1000,
+          display: "flex", justifyContent: "center", alignItems: "center",
+          backdropFilter: "blur(5px)", padding: "1rem"
+        }}>
+          <div style={{
+            backgroundColor: "var(--card-bg)", border: "1px solid var(--border-color)",
+            borderRadius: "16px", padding: "2rem", maxWidth: "800px", width: "100%",
+            maxHeight: "90vh", overflowY: "auto", position: "relative"
+          }}>
+            <button 
+              onClick={() => setViewItem(null)} 
+              style={{
+                position: "absolute", top: "1rem", right: "1rem", background: "none",
+                border: "none", color: "var(--text-secondary)", fontSize: "1.5rem",
+                cursor: "pointer"
+              }}
+            >
+              ✕
+            </button>
+            <h2 style={{ fontSize: "1.5rem", fontWeight: 800, marginBottom: "1rem", color: "var(--primary)" }}>
+              👁 View Details: {viewItem.name}
+            </h2>
+            <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem", fontSize: "0.88rem" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", background: "var(--spec-bg)", padding: "1rem", borderRadius: "8px" }}>
+                <div><strong>Slug:</strong> <code>{viewItem.slug || viewItem.ticker}</code></div>
+                <div><strong>Category/Type:</strong> {viewItem.type || viewItem.segment || "IPO Submission"}</div>
+                <div><strong>Status:</strong> <span className={`badge ${viewItem.status === "approved" || viewItem.status === "Approved" ? "badge-success" : "badge-warning"}`}>{viewItem.status}</span></div>
+                <div><strong>Submitted By:</strong> {viewItem.addedBy || viewItem.authorEmail || "seed"}</div>
+              </div>
+
+              {viewItemType === "ipos" ? (
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.85rem" }}>
+                  <div><strong>Price Band:</strong> {viewItem.priceBand}</div>
+                  <div><strong>Size:</strong> {viewItem.size}</div>
+                  <div><strong>Lot Size:</strong> {viewItem.lotSize}</div>
+                  <div><strong>GMP Forecast:</strong> {viewItem.gmpAmount} ({viewItem.gmp}%)</div>
+                  <div><strong>Open Date:</strong> {viewItem.openDate}</div>
+                  <div><strong>Close Date:</strong> {viewItem.closeDate}</div>
+                </div>
+              ) : (
+                <>
+                  <div>
+                    <strong>Summary / Description:</strong>
+                    <p style={{ marginTop: "0.25rem", color: "var(--text-secondary)" }}>{viewItem.summary || viewItem.description}</p>
+                  </div>
+                  
+                  {viewItem.features && (
+                    <div>
+                      <strong>Features Checklist:</strong>
+                      <ul style={{ margin: "0.25rem 0 0 1.25rem", padding: 0 }}>
+                        {Object.entries(viewItem.features).map(([key, val]) => (
+                          <li key={key} style={{ textTransform: "capitalize", color: val ? "var(--success)" : "var(--text-muted)" }}>
+                            {key.replace(/([A-Z])/g, ' $1')}: {val ? "✓ Enabled" : "✗ Disabled"}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {viewItem.charges && (
+                    <div>
+                      <strong>Fees & Charges:</strong>
+                      <ul style={{ margin: "0.25rem 0 0 1.25rem", padding: 0 }}>
+                        {Object.entries(viewItem.charges).map(([key, val]: any) => (
+                          <li key={key} style={{ textTransform: "capitalize" }}>
+                            <strong>{key.replace(/([A-Z])/g, ' $1')}:</strong> {val}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {(viewItem.pros && viewItem.pros.length > 0) && (
+                    <div>
+                      <strong>Pros:</strong>
+                      <ul style={{ margin: "0.25rem 0 0 1.25rem", color: "var(--success)" }}>
+                        {viewItem.pros.map((pro: string, idx: number) => <li key={idx}>{pro}</li>)}
+                      </ul>
+                    </div>
+                  )}
+
+                  {(viewItem.cons && viewItem.cons.length > 0) && (
+                    <div>
+                      <strong>Cons:</strong>
+                      <ul style={{ margin: "0.25rem 0 0 1.25rem", color: "var(--danger)" }}>
+                        {viewItem.cons.map((con: string, idx: number) => <li key={idx}>{con}</li>)}
+                      </ul>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+            <div style={{ marginTop: "2rem", display: "flex", justifyContent: "flex-end" }}>
+              <button onClick={() => setViewItem(null)} className="btn btn-secondary" style={{ padding: "0.5rem 1.5rem" }}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── EDIT DETAILS MODAL ── */}
+      {editItem && (
+        <div style={{
+          position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: "rgba(0, 0, 0, 0.75)", zIndex: 1000,
+          display: "flex", justifyContent: "center", alignItems: "center",
+          backdropFilter: "blur(5px)", padding: "1rem"
+        }}>
+          <form onSubmit={handleSaveEdit} style={{
+            backgroundColor: "var(--card-bg)", border: "1px solid var(--border-color)",
+            borderRadius: "16px", padding: "2rem", maxWidth: "800px", width: "100%",
+            maxHeight: "90vh", overflowY: "auto", position: "relative",
+            display: "flex", flexDirection: "column", gap: "1.25rem"
+          }}>
+            <button 
+              type="button"
+              onClick={() => setEditItem(null)} 
+              style={{
+                position: "absolute", top: "1rem", right: "1rem", background: "none",
+                border: "none", color: "var(--text-secondary)", fontSize: "1.5rem",
+                cursor: "pointer"
+              }}
+            >
+              ✕
+            </button>
+            <h2 style={{ fontSize: "1.5rem", fontWeight: 800, color: "var(--primary)" }}>
+              ✏️ Edit Details: {editItem.name}
+            </h2>
+
+            {/* General Shared Inputs */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+              <div>
+                <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)", fontWeight: 700 }}>Name</label>
+                <input type="text" value={editItem.name || ""} onChange={(e) => setEditItem({ ...editItem, name: e.target.value })} className="input-field" required />
+              </div>
+              {editItemType === "ipos" ? (
+                <div>
+                  <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)", fontWeight: 700 }}>Ticker</label>
+                  <input type="text" value={editItem.ticker || ""} onChange={(e) => setEditItem({ ...editItem, ticker: e.target.value })} className="input-field" required />
+                </div>
+              ) : (
+                <div>
+                  <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)", fontWeight: 700 }}>Slug</label>
+                  <input type="text" value={editItem.slug || ""} onChange={(e) => setEditItem({ ...editItem, slug: e.target.value })} className="input-field" required />
+                </div>
+              )}
+            </div>
+
+            {/* IPO Fields */}
+            {editItemType === "ipos" && (
+              <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
+                  <div>
+                    <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Segment</label>
+                    <select value={editItem.segment || "Mainboard"} onChange={(e) => setEditItem({ ...editItem, segment: e.target.value })} className="input-field">
+                      <option value="Mainboard">Mainboard</option>
+                      <option value="SME">SME</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Price Band</label>
+                    <input type="text" value={editItem.priceBand || ""} onChange={(e) => setEditItem({ ...editItem, priceBand: e.target.value })} className="input-field" />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Issue Size</label>
+                    <input type="text" value={editItem.size || ""} onChange={(e) => setEditItem({ ...editItem, size: e.target.value })} className="input-field" />
+                  </div>
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
+                  <div>
+                    <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Lot Size</label>
+                    <input type="number" value={editItem.lotSize || 1} onChange={(e) => setEditItem({ ...editItem, lotSize: parseInt(e.target.value) || 1 })} className="input-field" />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>GMP Forecast Amount</label>
+                    <input type="text" value={editItem.gmpAmount || ""} onChange={(e) => setEditItem({ ...editItem, gmpAmount: e.target.value })} className="input-field" />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>GMP Forecast %</label>
+                    <input type="number" value={editItem.gmp || 0} onChange={(e) => setEditItem({ ...editItem, gmp: parseInt(e.target.value) || 0 })} className="input-field" />
+                  </div>
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                  <div>
+                    <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Open Date</label>
+                    <input type="date" value={editItem.openDate || ""} onChange={(e) => setEditItem({ ...editItem, openDate: e.target.value })} className="input-field" />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Close Date</label>
+                    <input type="date" value={editItem.closeDate || ""} onChange={(e) => setEditItem({ ...editItem, closeDate: e.target.value })} className="input-field" />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Product Fields */}
+            {editItemType !== "ipos" && (
+              <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                <div>
+                  <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Summary / Description</label>
+                  <textarea rows={2} value={editItem.summary || editItem.description || ""} onChange={(e) => setEditItem({ ...editItem, summary: e.target.value, description: e.target.value })} className="input-field" style={{ fontFamily: "inherit" }} required />
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
+                  <div>
+                    <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Rating</label>
+                    <input type="number" step="0.1" value={editItem.rating || editItem.overallRating || "4.0"} onChange={(e) => setEditItem({ ...editItem, rating: parseFloat(e.target.value) || 4.0, overallRating: parseFloat(e.target.value) || 4.0 })} className="input-field" />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Users/Clients</label>
+                    <input type="text" value={editItem.activeUsers || editItem.activeClients || ""} onChange={(e) => setEditItem({ ...editItem, activeUsers: e.target.value, activeClients: e.target.value })} className="input-field" />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Category Type (Label)</label>
+                    <input type="text" value={editItem.type || ""} onChange={(e) => setEditItem({ ...editItem, type: e.target.value })} className="input-field" />
+                  </div>
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                  <div>
+                    <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Pros (one per line)</label>
+                    <textarea rows={2} value={editItem.pros ? editItem.pros.join("\n") : ""} onChange={(e) => setEditItem({ ...editItem, pros: e.target.value.split("\n") })} className="input-field" style={{ fontFamily: "inherit" }} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Cons (one per line)</label>
+                    <textarea rows={2} value={editItem.cons ? editItem.cons.join("\n") : ""} onChange={(e) => setEditItem({ ...editItem, cons: e.target.value.split("\n") })} className="input-field" style={{ fontFamily: "inherit" }} />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem", marginTop: "1rem" }}>
+              <button type="button" onClick={() => setEditItem(null)} className="btn btn-secondary" style={{ padding: "0.5rem 1.5rem" }}>Cancel</button>
+              <button type="submit" className="btn btn-primary" style={{ padding: "0.5rem 1.5rem" }}>Save Changes</button>
+            </div>
+          </form>
+        </div>
+      )}
 
       {/* ── Dynamic Light/Dark Mode Contrast Styling ── */}
       <style>{`

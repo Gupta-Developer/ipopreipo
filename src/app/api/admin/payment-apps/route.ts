@@ -56,35 +56,114 @@ export async function GET(request: Request) {
   }
 }
 
-// PUT - Update approval status of a payment app
+// PUT - Update approval status or full details of a payment app
 export async function PUT(request: Request) {
   try {
-    const { id, status } = await request.json();
+    const body = await request.json();
+    const { id, status, name } = body;
 
-    if (!id || !status) {
+    if (!id) {
       return NextResponse.json(
-        { success: false, error: "App ID and status are required." },
+        { success: false, error: "App ID is required." },
         { status: 400 }
       );
     }
 
-    const result = await query(
-      "UPDATE payment_apps SET status = $1 WHERE id = $2 RETURNING id, name, status;",
-      [status, id]
-    );
+    if (name) {
+      const {
+        slug,
+        rating,
+        activeUsers,
+        likes,
+        country,
+        countrySlug,
+        type,
+        logoColor,
+        logoLetter,
+        summary,
+        features,
+        charges,
+        limits,
+        platforms,
+        pros,
+        cons,
+        categoryRatings,
+        detailedReview,
+        detailedArticle,
+      } = body;
 
-    if (result.rows.length === 0) {
-      return NextResponse.json(
-        { success: false, error: "Payment app not found." },
-        { status: 404 }
+      const result = await query(
+        `UPDATE payment_apps SET 
+          slug = $1, name = $2, rating = $3, active_users = $4, likes = $5,
+          country = $6, country_slug = $7, type = $8, logo_color = $9, logo_letter = $10,
+          summary = $11, features = $12, charges = $13, limits = $14,
+          platforms = $15, pros = $16, cons = $17, category_ratings = $18,
+          detailed_review = $19, detailed_article = $20, status = COALESCE($21, status)
+        WHERE id = $22 RETURNING *;`,
+        [
+          slug,
+          name,
+          Number(rating) || 4.0,
+          activeUsers,
+          Number(likes) || 0,
+          country,
+          countrySlug,
+          type,
+          logoColor,
+          logoLetter,
+          summary,
+          JSON.stringify(features || {}),
+          JSON.stringify(charges || {}),
+          JSON.stringify(limits || {}),
+          platforms,
+          pros,
+          cons,
+          JSON.stringify(categoryRatings || {}),
+          JSON.stringify(detailedReview || {}),
+          detailedArticle ? JSON.stringify(detailedArticle) : null,
+          status,
+          id,
+        ]
       );
-    }
 
-    return NextResponse.json({
-      success: true,
-      paymentApp: result.rows[0],
-      message: `Payment app status updated to ${status}.`,
-    });
+      if (result.rows.length === 0) {
+        return NextResponse.json(
+          { success: false, error: "Payment app not found." },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json({
+        success: true,
+        paymentApp: result.rows[0],
+        message: "Payment app details updated successfully.",
+      });
+    } else {
+      if (!status) {
+        return NextResponse.json(
+          { success: false, error: "App ID and status are required." },
+          { status: 400 }
+        );
+      }
+
+      const result = await query(
+        "UPDATE payment_apps SET status = $1 WHERE id = $2 RETURNING id, name, status;",
+        [status, id]
+      );
+
+      if (result.rows.length === 0) {
+        return NextResponse.json(
+          { success: false, error: "Payment app not found." },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json({
+        success: true,
+        paymentApp: result.rows[0],
+        message: `Payment app status updated to ${status}.`,
+      });
+    }
   } catch (error: any) {
     console.error("Admin update payment app status error:", error);
     return NextResponse.json(
