@@ -194,20 +194,20 @@ export default function PaymentAppsCountryPage() {
               {/* Specification Grid */}
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: "0.75rem", marginTop: "0.25rem" }}>
                 <div className="premium-spec-cell" style={{ padding: "0.6rem 0.85rem" }}>
-                  <div style={{ fontSize: "0.65rem", color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.03em" }}>Daily Max Limit</div>
-                  <strong style={{ color: "var(--text-primary)", fontSize: "0.85rem" }}>{app.limits.dailyLimit}</strong>
+                  <div style={{ fontSize: "0.65rem", color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.03em" }}>Joining Bonus</div>
+                  <strong style={{ color: "var(--text-primary)", fontSize: "0.85rem" }}>{app.charges.joiningBonus || "₹0"}</strong>
                 </div>
                 <div className="premium-spec-cell" style={{ padding: "0.6rem 0.85rem" }}>
-                  <div style={{ fontSize: "0.65rem", color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.03em" }}>Wallet Load Fee</div>
-                  <strong style={{ color: "var(--text-primary)", fontSize: "0.85rem" }}>{app.charges.walletLoading}</strong>
+                  <div style={{ fontSize: "0.65rem", color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.03em" }}>Success Rate</div>
+                  <strong style={{ color: "var(--success)", fontSize: "0.85rem" }}>{app.charges.paymentSuccessRate || "99%+"}</strong>
                 </div>
                 <div className="premium-spec-cell" style={{ padding: "0.6rem 0.85rem" }}>
-                  <div style={{ fontSize: "0.65rem", color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.03em" }}>Bank Outgoing Fee</div>
-                  <strong style={{ color: "var(--success)", fontSize: "0.85rem" }}>{app.charges.bankTransfer}</strong>
+                  <div style={{ fontSize: "0.65rem", color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.03em" }}>First Tx Cashback</div>
+                  <strong style={{ color: "var(--text-primary)", fontSize: "0.85rem" }}>{app.charges.firstTransactionCashback || "N/A"}</strong>
                 </div>
                 <div className="premium-spec-cell" style={{ padding: "0.6rem 0.85rem" }}>
-                  <div style={{ fontSize: "0.65rem", color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.03em" }}>Platforms</div>
-                  <strong style={{ color: "var(--warning)", fontSize: "0.85rem" }}>{app.platforms.join(", ")}</strong>
+                  <div style={{ fontSize: "0.65rem", color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.03em" }}>Recharge Charges</div>
+                  <strong style={{ color: "var(--warning)", fontSize: "0.85rem" }}>{app.charges.chargesOnRecharge || "Free"}</strong>
                 </div>
               </div>
 

@@ -7,6 +7,10 @@ export interface AppCharges {
   walletLoading: string;
   bankTransfer: string;
   cardPayments: string;
+  joiningBonus?: string;
+  paymentSuccessRate?: string;
+  firstTransactionCashback?: string;
+  chargesOnRecharge?: string;
 }
 
 export interface PaymentAppDetail {
@@ -64,7 +68,11 @@ export const PAYMENT_APPS_DATA: PaymentAppDetail[] = [
     charges: {
       walletLoading: "Free (via UPI/Debit card) | 1-2% via Credit cards",
       bankTransfer: "0% for standard UPI transactions",
-      cardPayments: "Free for merchants | standard merchant discount rates apply"
+      cardPayments: "Free for merchants | standard merchant discount rates apply",
+      joiningBonus: "₹0",
+      paymentSuccessRate: "99.4%",
+      firstTransactionCashback: "Up to ₹50",
+      chargesOnRecharge: "₹1 - ₹2 convenience fee"
     },
     limits: {
       dailyLimit: "₹1,00,000 max (standard UPI daily cap)",
@@ -110,7 +118,11 @@ export const PAYMENT_APPS_DATA: PaymentAppDetail[] = [
     charges: {
       walletLoading: "Not Applicable (No native wallet model)",
       bankTransfer: "0% (Direct bank-to-bank via UPI)",
-      cardPayments: "Free for personal transfers"
+      cardPayments: "Free for personal transfers",
+      joiningBonus: "₹21 (Referral)",
+      paymentSuccessRate: "98.9%",
+      firstTransactionCashback: "Flat ₹51 on first transaction",
+      chargesOnRecharge: "Free"
     },
     limits: {
       dailyLimit: "₹1,00,000 / 10 transactions daily limit",
@@ -158,7 +170,11 @@ export const PAYMENT_APPS_DATA: PaymentAppDetail[] = [
     charges: {
       walletLoading: "Free (via linked bank accounts) | 2.9% + $0.30 via credit cards",
       bankTransfer: "Free for standard transfers (1-3 days) | 1.75% for instant transfers",
-      cardPayments: "Free for consumer purchases | 3.49% + $0.49 for merchant invoicing"
+      cardPayments: "Free for consumer purchases | 3.49% + $0.49 for merchant invoicing",
+      joiningBonus: "$0",
+      paymentSuccessRate: "99.9%",
+      firstTransactionCashback: "Not Applicable",
+      chargesOnRecharge: "Free"
     },
     limits: {
       dailyLimit: "$10,000 max per single transaction limit",
@@ -204,7 +220,11 @@ export const PAYMENT_APPS_DATA: PaymentAppDetail[] = [
     charges: {
       walletLoading: "Free (bank/debit) | 3% for credit cards",
       bankTransfer: "Free (standard 1-3 business days) | 1.75% ($0.25 min, $25 max) for instant",
-      cardPayments: "Free for purchases | 3% for credit card transfers to friends"
+      cardPayments: "Free for purchases | 3% for credit card transfers to friends",
+      joiningBonus: "$5",
+      paymentSuccessRate: "99.5%",
+      firstTransactionCashback: "$10 after first pay",
+      chargesOnRecharge: "Free"
     },
     limits: {
       dailyLimit: "$4,999.99 rolling weekly limit for peer-to-peer transfers",
@@ -252,7 +272,11 @@ export const PAYMENT_APPS_DATA: PaymentAppDetail[] = [
     charges: {
       walletLoading: "Free (bank transfer or local debit cards)",
       bankTransfer: "Free (Local GBP and SEPA transfers)",
-      cardPayments: "Free for purchases | FX conversion margins apply during weekends"
+      cardPayments: "Free for purchases | FX conversion margins apply during weekends",
+      joiningBonus: "£10",
+      paymentSuccessRate: "99.8%",
+      firstTransactionCashback: "Not Applicable",
+      chargesOnRecharge: "Free"
     },
     limits: {
       dailyLimit: "£100,000 maximum daily bank transfer limit",
