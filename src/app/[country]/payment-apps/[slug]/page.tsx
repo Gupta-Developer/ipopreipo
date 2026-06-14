@@ -14,7 +14,22 @@ export default function PaymentAppDetailPage() {
   const [loading, setLoading] = useState(true);
   const [likes, setLikes] = useState(0);
   const [liked, setLiked] = useState(false);
-  const [activeTab, setActiveTab] = useState<"specs" | "fees" | "reviews">("specs");
+  const [activeSection, setActiveSection] = useState<string>("rewards");
+
+  useEffect(() => {
+    if (!app) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) { setActiveSection(entry.target.id); }
+        });
+      },
+      { threshold: 0.15, rootMargin: "-100px 0px -60% 0px" }
+    );
+    const sections = ["rewards", "fees", "features", "specs", "reviews"];
+    sections.forEach((id) => { const el = document.getElementById(id); if (el) observer.observe(el); });
+    return () => { sections.forEach((id) => { const el = document.getElementById(id); if (el) observer.unobserve(el); }); };
+  }, [app]);
 
   useEffect(() => {
     if (!slug) return;
@@ -126,201 +141,397 @@ export default function PaymentAppDetailPage() {
         </div>
       </div>
 
-      {/* Tabs Selector */}
-      <div style={{ display: "flex", borderBottom: "1px solid var(--border-color)", marginBottom: "2.5rem", gap: "1rem" }}>
-        <button 
-          onClick={() => setActiveTab("specs")} 
-          style={{ 
-            padding: "0.85rem 1.5rem", 
-            borderBottom: activeTab === "specs" ? "2px solid var(--primary)" : "none", 
-            fontWeight: activeTab === "specs" ? "700" : "500",
-            color: activeTab === "specs" ? "var(--text-primary)" : "var(--text-secondary)",
-            fontSize: "0.95rem",
-            background: "none",
-            border: "none",
-            cursor: "pointer"
-          }}
-        >
-          Limits & specs
-        </button>
-        <button 
-          onClick={() => setActiveTab("fees")} 
-          style={{ 
-            padding: "0.85rem 1.5rem", 
-            borderBottom: activeTab === "fees" ? "2px solid var(--primary)" : "none", 
-            fontWeight: activeTab === "fees" ? "700" : "500",
-            color: activeTab === "fees" ? "var(--text-primary)" : "var(--text-secondary)",
-            fontSize: "0.95rem",
-            background: "none",
-            border: "none",
-            cursor: "pointer"
-          }}
-        >
-          Fees & Charges
-        </button>
-        <button 
-          onClick={() => setActiveTab("reviews")} 
-          style={{ 
-            padding: "0.85rem 1.5rem", 
-            borderBottom: activeTab === "reviews" ? "2px solid var(--primary)" : "none", 
-            fontWeight: activeTab === "reviews" ? "700" : "500",
-            color: activeTab === "reviews" ? "var(--text-primary)" : "var(--text-secondary)",
-            fontSize: "0.95rem",
-            background: "none",
-            border: "none",
-            cursor: "pointer"
-          }}
-        >
-          Expert Review
-        </button>
+      {/* Sticky Navigation Bar */}
+      <div style={{
+        position: "sticky",
+        top: "1rem",
+        zIndex: 100,
+        display: "flex",
+        justifyContent: "center",
+        width: "100%",
+        marginBottom: "3rem",
+      }}>
+        <div style={{
+          display: "flex",
+          gap: "0.5rem",
+          padding: "0.45rem",
+          background: "var(--card-bg)",
+          backdropFilter: "blur(18px)",
+          WebkitBackdropFilter: "blur(18px)",
+          borderRadius: "30px",
+          border: "1px solid var(--border-color)",
+          boxShadow: "var(--shadow-md)",
+        }}>
+          <button
+            onClick={() => {
+              document.getElementById("rewards")?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
+            style={{
+              padding: "0.6rem 1.25rem",
+              borderRadius: "20px",
+              background: activeSection === "rewards" ? "var(--primary)" : "transparent",
+              color: activeSection === "rewards" ? "#ffffff" : "var(--text-secondary)",
+              fontWeight: "700",
+              fontSize: "0.9rem",
+              border: "none",
+              cursor: "pointer",
+              transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+              boxShadow: activeSection === "rewards" ? "0 4px 14px rgba(99, 102, 241, 0.4)" : "none"
+            }}
+          >
+            Cashback & Rewards
+          </button>
+          <button
+            onClick={() => {
+              document.getElementById("fees")?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
+            style={{
+              padding: "0.6rem 1.25rem",
+              borderRadius: "20px",
+              background: activeSection === "fees" ? "var(--primary)" : "transparent",
+              color: activeSection === "fees" ? "#ffffff" : "var(--text-secondary)",
+              fontWeight: "700",
+              fontSize: "0.9rem",
+              border: "none",
+              cursor: "pointer",
+              transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+              boxShadow: activeSection === "fees" ? "0 4px 14px rgba(99, 102, 250, 0.4)" : "none"
+            }}
+          >
+            Fees & Charges
+          </button>
+          <button
+            onClick={() => {
+              document.getElementById("features")?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
+            style={{
+              padding: "0.6rem 1.25rem",
+              borderRadius: "20px",
+              background: activeSection === "features" ? "var(--primary)" : "transparent",
+              color: activeSection === "features" ? "#ffffff" : "var(--text-secondary)",
+              fontWeight: "700",
+              fontSize: "0.9rem",
+              border: "none",
+              cursor: "pointer",
+              transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+              boxShadow: activeSection === "features" ? "0 4px 14px rgba(99, 102, 241, 0.4)" : "none"
+            }}
+          >
+            Key Features
+          </button>
+          <button
+            onClick={() => {
+              document.getElementById("specs")?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
+            style={{
+              padding: "0.6rem 1.25rem",
+              borderRadius: "20px",
+              background: activeSection === "specs" ? "var(--primary)" : "transparent",
+              color: activeSection === "specs" ? "#ffffff" : "var(--text-secondary)",
+              fontWeight: "700",
+              fontSize: "0.9rem",
+              border: "none",
+              cursor: "pointer",
+              transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+              boxShadow: activeSection === "specs" ? "0 4px 14px rgba(99, 102, 241, 0.4)" : "none"
+            }}
+          >
+            Specs
+          </button>
+          <button
+            onClick={() => {
+              document.getElementById("reviews")?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
+            style={{
+              padding: "0.6rem 1.25rem",
+              borderRadius: "20px",
+              background: activeSection === "reviews" ? "var(--primary)" : "transparent",
+              color: activeSection === "reviews" ? "#ffffff" : "var(--text-secondary)",
+              fontWeight: "700",
+              fontSize: "0.9rem",
+              border: "none",
+              cursor: "pointer",
+              transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+              boxShadow: activeSection === "reviews" ? "0 4px 14px rgba(99, 102, 241, 0.4)" : "none"
+            }}
+          >
+            Our Review
+          </button>
+        </div>
       </div>
 
-      {/* RENDER ACTIVE MODULES */}
+      {/* CONTENT FEED (SCROLLABLE SECTIONS) */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "4rem" }}>
 
-      {activeTab === "specs" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "2.5rem" }}>
-          
-          {/* Main specifications grids */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }} className="m-flex-column">
+        {/* Section 1: Cashback & Rewards */}
+        <section id="rewards" style={{ scrollMarginTop: "80px" }}>
+          <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1.5rem", borderLeft: "4px solid var(--primary)" }}>
+            <h3 style={{ fontSize: "1.3rem", fontWeight: "800", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <span style={{ color: "var(--primary)" }}>🎁</span> Cashback & Rewards Program
+            </h3>
+            <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "-1rem" }}>
+              Rewards, scratch cards, loyalty programs, and seasonal cashbacks active for {app.name} clients.
+            </p>
+            {app.detailedReview.cashbackRewards ? (
+              <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem", lineHeight: "1.6" }}>
+                {app.detailedReview.cashbackRewards}
+              </p>
+            ) : (
+              <p style={{ color: "var(--text-muted)", fontSize: "0.9rem" }}>No specific cashback/rewards details registered.</p>
+            )}
+          </div>
+        </section>
+
+        {/* Section 2: Fees & Charges */}
+        <section id="fees" style={{ scrollMarginTop: "80px" }}>
+          <div className="card" style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
             
-            {/* Spec Card: Transaction Limits */}
-            <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-              <h3 style={{ borderBottom: "1px solid var(--border-color)", paddingBottom: "0.5rem", fontSize: "1.1rem", color: "var(--primary)" }}>Transaction Limits</h3>
-              <div>
-                <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Daily Cumulative Limit</span>
-                <div style={{ fontSize: "1.1rem", fontWeight: "700", marginTop: "0.15rem", color: "var(--text-primary)" }}>{app.limits.dailyLimit}</div>
-              </div>
-              <div>
-                <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Per Transaction Ticket Limit</span>
-                <div style={{ fontSize: "1.1rem", fontWeight: "700", marginTop: "0.15rem", color: "var(--text-primary)" }}>{app.limits.transactionLimit}</div>
-              </div>
-            </div>
-
-            {/* Spec Card: Technical & Support specs */}
-            <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-              <h3 style={{ borderBottom: "1px solid var(--border-color)", paddingBottom: "0.5rem", fontSize: "1.1rem", color: "var(--warning)" }}>System Parameters</h3>
-              <div>
-                <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Supported App Ecosystems</span>
-                <div style={{ fontSize: "1.1rem", fontWeight: "700", marginTop: "0.15rem" }}>{app.platforms.join(", ")}</div>
-              </div>
-              <div>
-                <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Target Country</span>
-                <div style={{ fontSize: "1.1rem", fontWeight: "700", marginTop: "0.15rem", color: "var(--warning)" }}>{app.country}</div>
-              </div>
-            </div>
-
-          </div>
-
-          {/* Pros & Cons */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }} className="m-flex-column">
-            <div className="card" style={{ borderLeft: "4px solid #10b981" }}>
-              <h3 style={{ fontSize: "1.2rem", marginBottom: "1.25rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                <span style={{ color: "#10b981" }}>🟢</span> Pros / Advantages
+            <div style={{ borderBottom: "1px solid var(--border-color)", paddingBottom: "1rem" }}>
+              <h3 style={{ fontSize: "1.3rem", fontWeight: "800", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                Detailed Transaction Charges <span style={{ fontSize: "0.75rem", fontWeight: "600", color: "var(--primary)", background: "rgba(99, 102, 241, 0.1)", padding: "0.15rem 0.5rem", borderRadius: "6px", border: "1px solid rgba(99, 102, 241, 0.2)" }}>Standard Tariffs</span>
               </h3>
-              <ul style={{ display: "flex", flexDirection: "column", gap: "0.85rem", paddingLeft: "1rem", color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.4 }}>
-                {app.pros.map((pro: any, index: number) => (
-                  <li key={index}>{pro}</li>
+              <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", margin: "0.25rem 0 0" }}>
+                Brokerage-style structure of user fees and transaction charges.
+              </p>
+            </div>
+
+            {/* Visual Brokerage Plan style Grid */}
+            {app.charges.standardUpi !== undefined ? (
+              // Indian/UPI App Charges layout
+              <div>
+                <h4 style={{ fontSize: "0.95rem", fontWeight: "800", color: "var(--text-primary)", marginBottom: "1.2rem", paddingBottom: "0.4rem", borderBottom: "1px solid var(--border-color)", textTransform: "uppercase", letterSpacing: "0.03em" }}>
+                  Product Transaction Fees (UPI & Utility)
+                </h4>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1.5rem 2rem" }}>
+                  <div>
+                    <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginBottom: "0.3rem" }}>Standard UPI (Bank-to-Bank)</p>
+                    <span style={{ fontSize: "1.1rem", fontWeight: "700", color: "var(--success)" }}>{app.charges.standardUpi}</span>
+                  </div>
+                  <div>
+                    <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginBottom: "0.3rem" }}>UPI via RuPay Credit Card</p>
+                    <span style={{ fontSize: "1.1rem", fontWeight: "700", color: "var(--success)" }}>{app.charges.upiRuPay}</span>
+                  </div>
+                  <div>
+                    <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginBottom: "0.3rem" }}>Mobile Recharges</p>
+                    <span style={{ fontSize: "1.1rem", fontWeight: "700", color: "var(--warning)" }}>{app.charges.mobileRecharges}</span>
+                  </div>
+                  <div>
+                    <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginBottom: "0.3rem" }}>Utility Bill Payments</p>
+                    <span style={{ fontSize: "1.1rem", fontWeight: "700", color: "var(--text-primary)" }}>{app.charges.utilityBills}</span>
+                  </div>
+                  <div>
+                    <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginBottom: "0.3rem" }}>Wallet Loading Fees</p>
+                    <span style={{ fontSize: "1.1rem", fontWeight: "700", color: "var(--text-primary)" }}>{app.charges.walletLoadingFees}</span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              // International App Charges layout
+              <div>
+                <h4 style={{ fontSize: "0.95rem", fontWeight: "800", color: "var(--text-primary)", marginBottom: "1.2rem", paddingBottom: "0.4rem", borderBottom: "1px solid var(--border-color)", textTransform: "uppercase", letterSpacing: "0.03em" }}>
+                  P2P & Account Funding Fees
+                </h4>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1.5rem 2rem" }}>
+                  <div>
+                    <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginBottom: "0.3rem" }}>Standard P2P Transfers</p>
+                    <span style={{ fontSize: "1.1rem", fontWeight: "700", color: "var(--success)" }}>{app.charges.standardUpi || "$0 (via Linked account)"}</span>
+                  </div>
+                  <div>
+                    <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginBottom: "0.3rem" }}>Instant Bank Transfer Out</p>
+                    <span style={{ fontSize: "1.1rem", fontWeight: "700", color: "var(--text-primary)" }}>{app.charges.bankTransfer}</span>
+                  </div>
+                  <div>
+                    <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginBottom: "0.3rem" }}>Credit Card Funding Fee</p>
+                    <span style={{ fontSize: "1.1rem", fontWeight: "700", color: "var(--warning)" }}>{app.charges.walletLoading}</span>
+                  </div>
+                  <div>
+                    <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginBottom: "0.3rem" }}>Card Purchase (Commercial)</p>
+                    <span style={{ fontSize: "1.1rem", fontWeight: "700", color: "var(--text-primary)" }}>{app.charges.cardPayments}</span>
+                  </div>
+                  {app.charges.joiningBonus && (
+                    <div>
+                      <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginBottom: "0.3rem" }}>Signup / Referral Bonus</p>
+                      <span style={{ fontSize: "1.1rem", fontWeight: "700", color: "var(--success)" }}>{app.charges.joiningBonus}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Limits & Platform Availability info integrated into Fees & Charges */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2.5rem", borderTop: "1px solid var(--border-color)", paddingTop: "1.5rem" }} className="m-flex-column">
+              <div>
+                <h4 style={{ fontSize: "0.95rem", fontWeight: "800", color: "var(--text-primary)", marginBottom: "0.75rem", display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                  <span>⏱️</span> Transaction Limits
+                </h4>
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", fontSize: "0.85rem" }}>
+                  <div className="flex-between">
+                    <span style={{ color: "var(--text-secondary)" }}>Daily Cumulative Limit:</span>
+                    <strong style={{ color: "var(--text-primary)" }}>{app.limits.dailyLimit}</strong>
+                  </div>
+                  <div className="flex-between">
+                    <span style={{ color: "var(--text-secondary)" }}>Per Transaction Ticket Limit:</span>
+                    <strong style={{ color: "var(--text-primary)" }}>{app.limits.transactionLimit}</strong>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <h4 style={{ fontSize: "0.95rem", fontWeight: "800", color: "var(--text-primary)", marginBottom: "0.75rem", display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                  <span>📱</span> Platform Availability
+                </h4>
+                <div style={{ fontSize: "0.85rem" }}>
+                  <span style={{ color: "var(--text-secondary)" }}>Available on:</span>{" "}
+                  <strong style={{ color: "var(--primary)" }}>{app.platforms.join(", ")}</strong>
+                </div>
+              </div>
+            </div>
+
+            {/* Standard summary list fallback */}
+            <div style={{ marginTop: "0.5rem", borderTop: "1px solid var(--border-color)", paddingTop: "1.5rem" }}>
+              <h4 style={{ fontSize: "0.9rem", color: "var(--text-primary)", marginBottom: "1rem" }}>Fee System Specifications</h4>
+              <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                <div style={{ borderBottom: "1px solid var(--border-color)", paddingBottom: "0.75rem" }}>
+                  <strong style={{ fontSize: "0.95rem", color: "var(--text-primary)" }}>Wallet Loading</strong>
+                  <div style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "0.25rem" }}>{app.charges.walletLoading}</div>
+                </div>
+                <div style={{ borderBottom: "1px solid var(--border-color)", paddingBottom: "0.75rem" }}>
+                  <strong style={{ fontSize: "0.95rem", color: "var(--text-primary)" }}>Bank Transfer / Outgoing Payout</strong>
+                  <div style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "0.25rem" }}>{app.charges.bankTransfer}</div>
+                </div>
+                <div>
+                  <strong style={{ fontSize: "0.95rem", color: "var(--text-primary)" }}>Card Transactions</strong>
+                  <div style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "0.25rem" }}>{app.charges.cardPayments}</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        {/* Section 3: Key Features */}
+        <section id="features" style={{ scrollMarginTop: "80px" }}>
+          <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+            <h3 style={{ fontSize: "1.3rem", fontWeight: "800", color: "var(--text-primary)" }}>Key Features & Capabilities</h3>
+            <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "-1rem" }}>
+              Core functionalities that define the user experience and transactions pipeline in the {app.name} app.
+            </p>
+            {app.keyFeatures && app.keyFeatures.length > 0 ? (
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1.25rem" }}>
+                {app.keyFeatures.map((feat: string, index: number) => (
+                  <div key={index} style={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: "0.85rem",
+                    padding: "1rem",
+                    borderRadius: "12px",
+                    background: "rgba(255, 255, 255, 0.02)",
+                    border: "1px solid var(--border-color)",
+                    transition: "transform 0.2s, box-shadow 0.2s"
+                  }} className="hover-card">
+                    <span style={{ color: "var(--primary)", fontSize: "1.2rem", lineHeight: "1" }}>⚡</span>
+                    <span style={{ color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: "1.4" }}>{feat}</span>
+                  </div>
                 ))}
-              </ul>
-            </div>
-
-            <div className="card" style={{ borderLeft: "4px solid #ef4444" }}>
-              <h3 style={{ fontSize: "1.2rem", marginBottom: "1.25rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                <span style={{ color: "#ef4444" }}>🔴</span> Cons / Limitations
-              </h3>
-              <ul style={{ display: "flex", flexDirection: "column", gap: "0.85rem", paddingLeft: "1rem", color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.4 }}>
-                {app.cons.map((con: any, index: number) => (
-                  <li key={index}>{con}</li>
-                ))}
-              </ul>
-            </div>
+              </div>
+            ) : (
+              <p style={{ color: "var(--text-muted)", fontSize: "0.9rem" }}>No specific key features cataloged yet.</p>
+            )}
           </div>
+        </section>
 
-        </div>
-      )}
+        {/* Section 4: Specs */}
+        <section id="specs" style={{ scrollMarginTop: "80px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+            <h3 style={{ fontSize: "1.3rem", fontWeight: "800", color: "var(--text-primary)" }}>Specs (Pros & Cons)</h3>
+            <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "-1rem" }}>
+              Key advantages and limitations of utilizing {app.name} for daily transactions.
+            </p>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem" }} className="m-flex-column">
+              <div className="card" style={{ borderLeft: "4px solid #10b981" }}>
+                <h3 style={{ fontSize: "1.2rem", marginBottom: "1.25rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  <span style={{ color: "#10b981" }}>🟢</span> Pros / Advantages
+                </h3>
+                <ul style={{ display: "flex", flexDirection: "column", gap: "0.85rem", paddingLeft: "1rem", color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.4 }}>
+                  {app.pros.map((pro: any, index: number) => (
+                    <li key={index}>{pro}</li>
+                  ))}
+                </ul>
+              </div>
 
-      {activeTab === "fees" && (
-        <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-          <h3 style={{ fontSize: "1.3rem" }}>Standard Transaction Charges</h3>
-          <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "-1rem" }}>
-            Charges billed dynamically to your account based on payment funding method.
-          </p>
-
-          <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-            <div style={{ borderBottom: "1px solid var(--border-color)", paddingBottom: "0.75rem" }}>
-              <strong style={{ fontSize: "0.95rem", color: "var(--text-primary)" }}>Wallet Loading Charges</strong>
-              <div style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "0.25rem" }}>{app.charges.walletLoading}</div>
-            </div>
-            <div style={{ borderBottom: "1px solid var(--border-color)", paddingBottom: "0.75rem" }}>
-              <strong style={{ fontSize: "0.95rem", color: "var(--text-primary)" }}>Bank Transfer / Outgoing Payout Charges</strong>
-              <div style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "0.25rem" }}>{app.charges.bankTransfer}</div>
-            </div>
-            <div>
-              <strong style={{ fontSize: "0.95rem", color: "var(--text-primary)" }}>Card Transaction Charges</strong>
-              <div style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "0.25rem" }}>{app.charges.cardPayments}</div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {activeTab === "reviews" && (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "2.5rem" }} className="m-flex-column">
-          
-          {/* Rating Breakdown */}
-          <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1.5rem", height: "fit-content" }}>
-            <h3 style={{ fontSize: "1.2rem", borderBottom: "1px solid var(--border-color)", paddingBottom: "0.5rem" }}>Expert Rating Score</h3>
-            <div>
-              <div className="flex-between" style={{ fontSize: "0.85rem", marginBottom: "0.25rem" }}>
-                <span>Transaction Speed</span>
-                <strong style={{ color: "var(--success)" }}>{app.categoryRatings.speed} / 5.0</strong>
-              </div>
-              <div style={{ height: "4px", background: "rgba(255,255,255,0.05)", borderRadius: "99px" }}>
-                <div style={{ height: "100%", background: "var(--success)", width: `${app.categoryRatings.speed * 20}%` }}></div>
-              </div>
-            </div>
-            <div>
-              <div className="flex-between" style={{ fontSize: "0.85rem", marginBottom: "0.25rem" }}>
-                <span>Interface Usability</span>
-                <strong style={{ color: "var(--primary)" }}>{app.categoryRatings.usability} / 5.0</strong>
-              </div>
-              <div style={{ height: "4px", background: "rgba(255,255,255,0.05)", borderRadius: "99px" }}>
-                <div style={{ height: "100%", background: "var(--primary)", width: `${app.categoryRatings.usability * 20}%` }}></div>
-              </div>
-            </div>
-            <div>
-              <div className="flex-between" style={{ fontSize: "0.85rem", marginBottom: "0.25rem" }}>
-                <span>Security Infrastructure</span>
-                <strong style={{ color: "var(--warning)" }}>{app.categoryRatings.security} / 5.0</strong>
-              </div>
-              <div style={{ height: "4px", background: "rgba(255,255,255,0.05)", borderRadius: "99px" }}>
-                <div style={{ height: "100%", background: "var(--warning)", width: `${app.categoryRatings.security * 20}%` }}></div>
+              <div className="card" style={{ borderLeft: "4px solid #ef4444" }}>
+                <h3 style={{ fontSize: "1.2rem", marginBottom: "1.25rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  <span style={{ color: "#ef4444" }}>🔴</span> Cons / Limitations
+                </h3>
+                <ul style={{ display: "flex", flexDirection: "column", gap: "0.85rem", paddingLeft: "1rem", color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.4 }}>
+                  {app.cons.map((con: any, index: number) => (
+                    <li key={index}>{con}</li>
+                  ))}
+                </ul>
               </div>
             </div>
           </div>
+        </section>
 
-          {/* Detailed Review text */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "1.75rem" }}>
-            <div className="card">
-              <h4 style={{ color: "var(--primary)", fontSize: "1.1rem", marginBottom: "0.5rem" }}>Interface & User Experience Review</h4>
-              <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.5 }}>{app.detailedReview.interface}</p>
+        {/* Section 5: Reviews */}
+        <section id="reviews" style={{ scrollMarginTop: "80px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "2.5rem" }} className="m-flex-column">
+            
+            {/* Rating Breakdown */}
+            <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1.5rem", height: "fit-content" }}>
+              <h3 style={{ fontSize: "1.2rem", borderBottom: "1px solid var(--border-color)", paddingBottom: "0.5rem" }}>Expert Rating Score</h3>
+              <div>
+                <div className="flex-between" style={{ fontSize: "0.85rem", marginBottom: "0.25rem" }}>
+                  <span>Transaction Speed</span>
+                  <strong style={{ color: "var(--success)" }}>{app.categoryRatings.speed} / 5.0</strong>
+                </div>
+                <div style={{ height: "4px", background: "rgba(255,255,255,0.05)", borderRadius: "99px" }}>
+                  <div style={{ height: "100%", background: "var(--success)", width: `${app.categoryRatings.speed * 20}%` }}></div>
+                </div>
+              </div>
+              <div>
+                <div className="flex-between" style={{ fontSize: "0.85rem", marginBottom: "0.25rem" }}>
+                  <span>Interface Usability</span>
+                  <strong style={{ color: "var(--primary)" }}>{app.categoryRatings.usability} / 5.0</strong>
+                </div>
+                <div style={{ height: "4px", background: "rgba(255,255,255,0.05)", borderRadius: "99px" }}>
+                  <div style={{ height: "100%", background: "var(--primary)", width: `${app.categoryRatings.usability * 20}%` }}></div>
+                </div>
+              </div>
+              <div>
+                <div className="flex-between" style={{ fontSize: "0.85rem", marginBottom: "0.25rem" }}>
+                  <span>Security Infrastructure</span>
+                  <strong style={{ color: "var(--warning)" }}>{app.categoryRatings.security} / 5.0</strong>
+                </div>
+                <div style={{ height: "4px", background: "rgba(255,255,255,0.05)", borderRadius: "99px" }}>
+                  <div style={{ height: "100%", background: "var(--warning)", width: `${app.categoryRatings.security * 20}%` }}></div>
+                </div>
+              </div>
             </div>
-            <div className="card">
-              <h4 style={{ color: "var(--success)", fontSize: "1.1rem", marginBottom: "0.5rem" }}>Charges & Fee Transparency</h4>
-              <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.5 }}>{app.detailedReview.charges}</p>
+
+            {/* Detailed Review text */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "1.75rem" }}>
+              <div className="card">
+                <h4 style={{ color: "var(--primary)", fontSize: "1.1rem", marginBottom: "0.5rem" }}>Interface & User Experience Review</h4>
+                <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.5 }}>{app.detailedReview.interface}</p>
+              </div>
+              <div className="card">
+                <h4 style={{ color: "var(--success)", fontSize: "1.1rem", marginBottom: "0.5rem" }}>Charges & Fee Transparency</h4>
+                <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.5 }}>{app.detailedReview.charges}</p>
+              </div>
+              <div className="card">
+                <h4 style={{ color: "var(--warning)", fontSize: "1.1rem", marginBottom: "0.5rem" }}>Onboarding & Setup Speed</h4>
+                <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.5 }}>{app.detailedReview.onboarding}</p>
+              </div>
+              <div className="card">
+                <h4 style={{ color: "var(--text-primary)", fontSize: "1.1rem", marginBottom: "0.5rem" }}>Security Controls & Shielding</h4>
+                <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.5 }}>{app.detailedReview.security}</p>
+              </div>
             </div>
-            <div className="card">
-              <h4 style={{ color: "var(--warning)", fontSize: "1.1rem", marginBottom: "0.5rem" }}>Onboarding & Setup Speed</h4>
-              <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.5 }}>{app.detailedReview.onboarding}</p>
-            </div>
-            <div className="card">
-              <h4 style={{ color: "var(--text-primary)", fontSize: "1.1rem", marginBottom: "0.5rem" }}>Security Controls & Shielding</h4>
-              <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.5 }}>{app.detailedReview.security}</p>
-            </div>
+
           </div>
+        </section>
 
-        </div>
-      )}
-
+      </div>
     </div>
   );
 }

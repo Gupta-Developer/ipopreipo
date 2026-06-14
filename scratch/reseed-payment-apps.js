@@ -1,65 +1,28 @@
-export interface AppLimits {
-  dailyLimit: string;
-  transactionLimit: string;
+const fs = require('fs');
+const path = require('path');
+const { Pool } = require('@neondatabase/serverless');
+
+// Load environment variables from .env.local
+const envPath = path.join(__dirname, '..', '.env.local');
+let databaseUrl = '';
+if (fs.existsSync(envPath)) {
+  const envContent = fs.readFileSync(envPath, 'utf8');
+  const match = envContent.match(/DATABASE_URL=["']?([^"'\r\n]+)["']?/);
+  if (match) {
+    databaseUrl = match[1];
+  }
 }
 
-export interface AppCharges {
-  walletLoading: string;
-  bankTransfer: string;
-  cardPayments: string;
-  joiningBonus?: string;
-  paymentSuccessRate?: string;
-  firstTransactionCashback?: string;
-  chargesOnRecharge?: string;
-  
-  // Visual Detailed Charges fields
-  standardUpi?: string;
-  upiRuPay?: string;
-  mobileRecharges?: string;
-  utilityBills?: string;
-  walletLoadingFees?: string;
+if (!databaseUrl) {
+  console.error("DATABASE_URL not found in .env.local");
+  process.exit(1);
 }
 
-export interface PaymentAppDetail {
-  slug: string;
-  name: string;
-  rating: number;
-  activeUsers: string;
-  likes: number;
-  country: string; // "India", "United States", "United Kingdom"
-  countrySlug: string; // "india", "united-states", "united-kingdom"
-  type: string;
-  logoColor: string;
-  logoLetter: string;
-  summary: string;
-  features: {
-    upi: boolean;
-    wallet: boolean;
-    bankTransfer: boolean;
-    cards: boolean;
-    international: boolean;
-  };
-  keyFeatures?: string[];
-  charges: AppCharges;
-  limits: AppLimits;
-  platforms: string[];
-  pros: string[];
-  cons: string[];
-  categoryRatings: {
-    speed: number;
-    usability: number;
-    security: number;
-  };
-  detailedReview: {
-    interface: string;
-    charges: string;
-    onboarding: string;
-    security: string;
-    cashbackRewards?: string;
-  };
-}
+const pool = new Pool({
+  connectionString: databaseUrl,
+});
 
-export const PAYMENT_APPS_DATA: PaymentAppDetail[] = [
+const PAYMENT_APPS_DATA = [
   // --- INDIA PAYMENT APPS ---
   {
     slug: "phonepe",
@@ -381,3 +344,52 @@ export const PAYMENT_APPS_DATA: PaymentAppDetail[] = [
     }
   }
 ];
+
+async function main() {
+  try {
+    console.log("Truncating payment_apps table...");
+    await pool.query("TRUNCATE TABLE payment_apps RESTART IDENTITY;");
+
+    console.log("Seeding updated payment apps...");
+    for (const app of PAYMENT_APPS_DATA) {
+      await pool.query(
+        `INSERT INTO payment_apps (
+          slug, name, rating, active_users, likes, country, country_slug, type,
+          logo_color, logo_letter, summary, features, charges, limits,
+          platforms, pros, cons, category_ratings, detailed_review, detailed_article, status, added_by
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)`,
+        [
+          app.slug,
+          app.name,
+          app.rating,
+          app.activeUsers,
+          app.likes,
+          app.country,
+          app.countrySlug,
+          app.type,
+          app.logoColor,
+          app.logoLetter,
+          app.summary,
+          JSON.stringify(app.features),
+          JSON.stringify(app.charges),
+          JSON.stringify(app.limits),
+          app.platforms,
+          app.pros,
+          app.cons,
+          JSON.stringify(app.categoryRatings),
+          JSON.stringify(app.detailedReview),
+          app.detailedArticle ? JSON.stringify(app.detailedArticle) : null,
+          "approved",
+          "seed@ipopreipo.com",
+        ]
+      );
+    }
+    console.log("Reseed completed successfully!");
+  } catch (err) {
+    console.error("Reseed failed:", err);
+  } finally {
+    await pool.end();
+  }
+}
+
+main();
