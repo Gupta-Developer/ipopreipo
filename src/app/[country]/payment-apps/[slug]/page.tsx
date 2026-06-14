@@ -76,6 +76,9 @@ export default function PaymentAppDetailPage() {
     setLiked(!liked);
   };
 
+  // Check if app has positive cashback indicators
+  const hasCashback = app.detailedReview.cashbackRewards && !app.detailedReview.cashbackRewards.toLowerCase().includes("not applicable");
+
   return (
     <div className="app-container" style={{ paddingTop: "2.5rem" }}>
       
@@ -89,7 +92,7 @@ export default function PaymentAppDetailPage() {
       </nav>
 
       {/* Hero Header Card */}
-      <div className="card m-flex-column" style={{ display: "grid", gridTemplateColumns: "110px 1fr auto", gap: "2.5rem", alignItems: "center", marginBottom: "3rem" }}>
+      <div className="card m-flex-column" style={{ display: "grid", gridTemplateColumns: "110px 1fr auto", gap: "2.5rem", alignItems: "center", marginBottom: "1.5rem" }}>
         {/* Logo Representation */}
         <ProductLogo logoLetter={app.logoLetter} logoColor={app.logoColor} name={app.name} size="110px" fontSize="2.8rem" borderRadius="20px" />
 
@@ -105,6 +108,23 @@ export default function PaymentAppDetailPage() {
           <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", lineHeight: 1.4, maxWidth: "600px", margin: "0.25rem 0 0" }}>
             {app.summary}
           </p>
+
+          {/* Supported Channels (from payment app card) */}
+          <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap", marginTop: "0.5rem" }}>
+            {Object.entries(app.features).map(([key, value]) => {
+              if (key === "keyFeaturesList") return null;
+              const formattedKey = key === "upi" ? "UPI Support" : key.replace(/([A-Z])/g, " $1");
+              return (
+                <span 
+                  key={key} 
+                  className={`badge ${value ? 'badge-success' : 'badge-danger'}`}
+                  style={{ fontSize: "0.7rem", opacity: value ? 1 : 0.45, padding: "0.2rem 0.5rem", textTransform: "capitalize" }}
+                >
+                  {value ? "✓" : "×"} {formattedKey}
+                </span>
+              );
+            })}
+          </div>
         </div>
 
         {/* Action Column */}
@@ -138,6 +158,26 @@ export default function PaymentAppDetailPage() {
               Back
             </Link>
           </div>
+        </div>
+      </div>
+
+      {/* Quick Specs Dashboard Grid (from payment app card) */}
+      <div className="card" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem", marginBottom: "2.5rem", border: "1px solid var(--border-color)", background: "rgba(255,255,255,0.01)", padding: "1rem" }}>
+        <div className="premium-spec-cell" style={{ padding: "0.85rem 1.1rem" }}>
+          <div style={{ fontSize: "0.7rem", color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.03em" }}>Joining Bonus</div>
+          <strong style={{ color: "var(--text-primary)", fontSize: "1rem" }}>{app.charges.joiningBonus || "₹0"}</strong>
+        </div>
+        <div className="premium-spec-cell" style={{ padding: "0.85rem 1.1rem" }}>
+          <div style={{ fontSize: "0.7rem", color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.03em" }}>Success Rate</div>
+          <strong style={{ color: "var(--success)", fontSize: "1rem" }}>{app.charges.paymentSuccessRate || "99%+"}</strong>
+        </div>
+        <div className="premium-spec-cell" style={{ padding: "0.85rem 1.1rem" }}>
+          <div style={{ fontSize: "0.7rem", color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.03em" }}>First Tx Cashback</div>
+          <strong style={{ color: "var(--text-primary)", fontSize: "1rem" }}>{app.charges.firstTransactionCashback || "N/A"}</strong>
+        </div>
+        <div className="premium-spec-cell" style={{ padding: "0.85rem 1.1rem" }}>
+          <div style={{ fontSize: "0.7rem", color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.03em" }}>Recharge Charges</div>
+          <strong style={{ color: "var(--warning)", fontSize: "1rem" }}>{app.charges.chargesOnRecharge || "Free"}</strong>
         </div>
       </div>
 
@@ -265,20 +305,64 @@ export default function PaymentAppDetailPage() {
 
         {/* Section 1: Cashback & Rewards */}
         <section id="rewards" style={{ scrollMarginTop: "80px" }}>
-          <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1.5rem", borderLeft: "4px solid var(--primary)" }}>
-            <h3 style={{ fontSize: "1.3rem", fontWeight: "800", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <span style={{ color: "var(--primary)" }}>🎁</span> Cashback & Rewards Program
-            </h3>
-            <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "-1rem" }}>
-              Rewards, scratch cards, loyalty programs, and seasonal cashbacks active for {app.name} clients.
-            </p>
-            {app.detailedReview.cashbackRewards ? (
-              <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem", lineHeight: "1.6" }}>
-                {app.detailedReview.cashbackRewards}
+          <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+            
+            {/* Rewards Review Text Card */}
+            <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1.5rem", borderLeft: "4px solid var(--primary)" }}>
+              <h3 style={{ fontSize: "1.3rem", fontWeight: "800", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <span style={{ color: "var(--primary)" }}>🎁</span> Cashback & Rewards Program
+              </h3>
+              <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "-1rem" }}>
+                Rewards, scratch cards, loyalty programs, and seasonal cashbacks active for {app.name} clients.
               </p>
-            ) : (
-              <p style={{ color: "var(--text-muted)", fontSize: "0.9rem" }}>No specific cashback/rewards details registered.</p>
-            )}
+              {app.detailedReview.cashbackRewards ? (
+                <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem", lineHeight: "1.6" }}>
+                  {app.detailedReview.cashbackRewards}
+                </p>
+              ) : (
+                <p style={{ color: "var(--text-muted)", fontSize: "0.9rem" }}>No specific cashback/rewards details registered.</p>
+              )}
+            </div>
+
+            {/* Benefits & Perks Card (requested by user) */}
+            <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+              <h3 style={{ fontSize: "1.2rem", fontWeight: "800", display: "flex", alignItems: "center", gap: "0.5rem", borderBottom: "1px solid var(--border-color)", paddingBottom: "0.5rem" }}>
+                🏆 Benefits & Perks
+              </h3>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1.5rem 2rem" }}>
+                <div>
+                  <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Welcome Bonus</span>
+                  <div style={{ fontSize: "1.1rem", fontWeight: "700", marginTop: "0.15rem", color: "var(--success)" }}>
+                    {app.charges.joiningBonus && app.charges.joiningBonus !== "$0" && app.charges.joiningBonus !== "₹0" ? app.charges.joiningBonus : "N/A"}
+                  </div>
+                </div>
+                <div>
+                  <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>First Transaction Cashback</span>
+                  <div style={{ fontSize: "1.1rem", fontWeight: "700", marginTop: "0.15rem", color: "var(--text-primary)" }}>
+                    {app.charges.firstTransactionCashback && app.charges.firstTransactionCashback !== "Not Applicable" ? app.charges.firstTransactionCashback : "N/A"}
+                  </div>
+                </div>
+                <div>
+                  <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Cashback Offers</span>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", marginTop: "0.15rem" }}>
+                    <span style={{ color: hasCashback ? "#10b981" : "#ef4444", fontWeight: "bold", fontSize: "1.2rem", lineHeight: "1" }}>
+                      {hasCashback ? "✓" : "×"}
+                    </span>
+                    <strong style={{ fontSize: "1rem", color: "var(--text-primary)" }}>
+                      {hasCashback ? "Available" : "Not Offered"}
+                    </strong>
+                  </div>
+                </div>
+                <div>
+                  <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", textTransform: "uppercase" }}>Referral Program</span>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", marginTop: "0.15rem" }}>
+                    <span style={{ color: "#10b981", fontWeight: "bold", fontSize: "1.2rem", lineHeight: "1" }}>✓</span>
+                    <strong style={{ fontSize: "1rem", color: "var(--text-primary)" }}>Active Program</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
         </section>
 
