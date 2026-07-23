@@ -1,0 +1,59 @@
+export type CardCategory = "all" | "lifetime_free" | "cashback" | "travel" | "rewards" | "fuel";
+
+export interface CreditCardData {
+  id: string;
+  slug: string;
+  name: string;
+  issuer: string;
+  issuerLogo?: string;
+  category: CardCategory[];
+  rating: number; // 1 to 5
+  joiningFee: number; // in ₹ (0 for lifetime free)
+  annualFee: number; // in ₹
+  annualFeeWaiverCondition: string; // e.g. "Waived on spends of ₹1.0 Lakh/year"
+  rewardRate: string; // e.g. "5% Cashback on Amazon & Flipkart"
+  keyPrivileges: string[];
+  minIncomePerMonth: number; // in ₹
+  recommendedCreditScore: number; // e.g. 750
+  pros: string[];
+  cons: string[];
+  applyUrl: string;
+  isPopular?: boolean;
+}
+
+export interface PaymentAppData {
+  id: string;
+  slug: string;
+  name: string;
+  developer: string;
+  logoUrl?: string;
+  downloadsTier: string; // e.g. "500M+ Downloads"
+  playStoreRating: number; // 1 to 5
+  appStoreRating: number; // 1 to 5
+  upiLiteSupport: boolean;
+  ruPayUpiSupport: boolean;
+  creditScoreCheckFree: boolean;
+  cashbackPolicy: string;
+  keyFeatures: string[];
+  pros: string[];
+  cons: string[];
+  downloadUrl: string;
+}
+
+export interface BankData {
+  id: string;
+  slug: string;
+  name: string;
+  type: "Private Sector Bank" | "Public Sector Bank" | "Small Finance Bank";
+  logoUrl?: string;
+  savingsInterestRate: string; // e.g. "3.00% - 7.00% p.a."
+  minBalanceRequirement: string; // e.g. "₹0 (Zero Balance) or ₹10,000"
+  fdInterestRatePeak: string; // e.g. "7.75% p.a. (Senior Citizens: 8.25%)"
+  rating: number; // 1 to 5
+  branchCount: string; // e.g. "8,700+ Branches"
+  atmCount: string; // e.g. "20,000+ ATMs"
+  digitalBankingScore: string; // e.g. "4.8/5 (NetBanking & Mobile App)"
+  pros: string[];
+  cons: string[];
+  openAccountUrl: string;
+}

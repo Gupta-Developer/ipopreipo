@@ -9,6 +9,9 @@ import {
   CheckCircle2, 
   Percent, 
   Briefcase,
+  CreditCard,
+  Smartphone,
+  Building2,
   Menu,
   X
 } from "lucide-react";
@@ -73,53 +76,63 @@ export const Navbar: React.FC = () => {
         <div className="hidden lg:flex items-center gap-1 font-semibold text-xs text-slate-700">
           <Link
             href="/"
-            className="px-3 py-2 rounded-md hover:bg-slate-100 hover:text-blue-700 transition-colors flex items-center gap-1.5"
+            className="px-2.5 py-2 rounded-md hover:bg-slate-100 hover:text-blue-700 transition-colors flex items-center gap-1"
           >
             <Sparkles className="w-3.5 h-3.5 text-blue-700" />
-            Mainboard IPOs
-          </Link>
-
-          <Link
-            href="/?tab=sme"
-            className="px-3 py-2 rounded-md hover:bg-slate-100 hover:text-blue-700 transition-colors"
-          >
-            SME Segment
+            IPOs
           </Link>
 
           <Link
             href="/pre-ipo"
-            className="px-3 py-2 rounded-md hover:bg-amber-50 hover:text-amber-800 text-amber-700 font-bold transition-colors flex items-center gap-1.5"
+            className="px-2.5 py-2 rounded-md hover:bg-amber-50 hover:text-amber-800 text-amber-700 font-bold transition-colors flex items-center gap-1"
           >
             <Percent className="w-3.5 h-3.5 text-amber-600" />
-            Pre-IPO Shares
+            Pre-IPO
           </Link>
 
           <Link
             href="/anchor-lockins"
-            className="px-3 py-2 rounded-md hover:bg-slate-100 hover:text-blue-700 transition-colors flex items-center gap-1.5"
+            className="px-2.5 py-2 rounded-md hover:bg-slate-100 hover:text-blue-700 transition-colors flex items-center gap-1"
           >
             <Lock className="w-3.5 h-3.5 text-indigo-600" />
-            Anchor Lock-Ins
+            Anchor Expiries
           </Link>
 
           <Link
             href="/allotment"
-            className="px-3 py-2 rounded-md hover:bg-slate-100 hover:text-blue-700 transition-colors flex items-center gap-1.5"
+            className="px-2.5 py-2 rounded-md hover:bg-slate-100 hover:text-blue-700 transition-colors flex items-center gap-1"
           >
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-            Allotment Status
+            Allotment
           </Link>
 
           <Link
-            href="/buybacks"
-            className="px-3 py-2 rounded-md hover:bg-slate-100 hover:text-blue-700 transition-colors"
+            href="/credit-cards"
+            className="px-2.5 py-2 rounded-md hover:bg-slate-100 hover:text-blue-700 transition-colors flex items-center gap-1 text-slate-900 font-bold"
           >
-            Buybacks
+            <CreditCard className="w-3.5 h-3.5 text-blue-700" />
+            Credit Cards
+          </Link>
+
+          <Link
+            href="/payment-apps"
+            className="px-2.5 py-2 rounded-md hover:bg-slate-100 hover:text-blue-700 transition-colors flex items-center gap-1"
+          >
+            <Smartphone className="w-3.5 h-3.5 text-emerald-600" />
+            Payment Apps
+          </Link>
+
+          <Link
+            href="/banks"
+            className="px-2.5 py-2 rounded-md hover:bg-slate-100 hover:text-blue-700 transition-colors flex items-center gap-1"
+          >
+            <Building2 className="w-3.5 h-3.5 text-slate-700" />
+            Banks
           </Link>
 
           <Link
             href="/brokers"
-            className="px-3 py-2 rounded-md hover:bg-slate-100 hover:text-blue-700 transition-colors flex items-center gap-1.5"
+            className="px-2.5 py-2 rounded-md hover:bg-slate-100 hover:text-blue-700 transition-colors flex items-center gap-1"
           >
             <Briefcase className="w-3.5 h-3.5 text-slate-600" />
             Brokers
@@ -130,10 +143,10 @@ export const Navbar: React.FC = () => {
         <div className="flex items-center gap-3">
           <Link
             href="/allotment"
-            className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold bg-blue-900 hover:bg-blue-800 text-white shadow-sm transition-all"
+            className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold bg-blue-900 hover:bg-blue-800 text-white shadow-sm transition-all"
           >
             <CheckCircle2 className="w-3.5 h-3.5" />
-            Check Allotment
+            Allotment Status
           </Link>
 
           {/* Mobile Hamburger Toggle */}
@@ -150,46 +163,28 @@ export const Navbar: React.FC = () => {
       {/* Mobile Dropdown Menu */}
       {mobileMenuOpen && (
         <div className="lg:hidden px-4 py-3 border-t border-slate-200 bg-slate-50 flex flex-col gap-2 text-sm text-slate-800">
-          <Link
-            onClick={() => setMobileMenuOpen(false)}
-            href="/"
-            className="px-3 py-2 rounded-md hover:bg-slate-200"
-          >
+          <Link onClick={() => setMobileMenuOpen(false)} href="/" className="px-3 py-2 rounded-md hover:bg-slate-200">
             Mainboard &amp; SME IPOs
           </Link>
-          <Link
-            onClick={() => setMobileMenuOpen(false)}
-            href="/pre-ipo"
-            className="px-3 py-2 rounded-md hover:bg-slate-200 text-amber-700 font-bold"
-          >
+          <Link onClick={() => setMobileMenuOpen(false)} href="/pre-ipo" className="px-3 py-2 rounded-md hover:bg-slate-200 text-amber-700 font-bold">
             Pre-IPO Unlisted Shares
           </Link>
-          <Link
-            onClick={() => setMobileMenuOpen(false)}
-            href="/anchor-lockins"
-            className="px-3 py-2 rounded-md hover:bg-slate-200"
-          >
-            Anchor Lock-In Expiry Tracker
+          <Link onClick={() => setMobileMenuOpen(false)} href="/credit-cards" className="px-3 py-2 rounded-md hover:bg-slate-200 text-blue-700 font-bold">
+            Credit Cards Comparison
           </Link>
-          <Link
-            onClick={() => setMobileMenuOpen(false)}
-            href="/allotment"
-            className="px-3 py-2 rounded-md hover:bg-slate-200"
-          >
+          <Link onClick={() => setMobileMenuOpen(false)} href="/payment-apps" className="px-3 py-2 rounded-md hover:bg-slate-200">
+            UPI &amp; Payment Apps
+          </Link>
+          <Link onClick={() => setMobileMenuOpen(false)} href="/banks" className="px-3 py-2 rounded-md hover:bg-slate-200">
+            Banks &amp; Savings Accounts
+          </Link>
+          <Link onClick={() => setMobileMenuOpen(false)} href="/anchor-lockins" className="px-3 py-2 rounded-md hover:bg-slate-200">
+            Anchor Lock-In Tracker
+          </Link>
+          <Link onClick={() => setMobileMenuOpen(false)} href="/allotment" className="px-3 py-2 rounded-md hover:bg-slate-200">
             Allotment Status Checker
           </Link>
-          <Link
-            onClick={() => setMobileMenuOpen(false)}
-            href="/buybacks"
-            className="px-3 py-2 rounded-md hover:bg-slate-200"
-          >
-            Share Buybacks
-          </Link>
-          <Link
-            onClick={() => setMobileMenuOpen(false)}
-            href="/brokers"
-            className="px-3 py-2 rounded-md hover:bg-slate-200"
-          >
+          <Link onClick={() => setMobileMenuOpen(false)} href="/brokers" className="px-3 py-2 rounded-md hover:bg-slate-200">
             Broker Comparisons
           </Link>
         </div>

@@ -19,21 +19,21 @@ export const Footer: React.FC = () => {
               </span>
             </div>
             <p className="text-slate-400 leading-relaxed text-xs">
-              <strong>ipopreipo.com</strong> is a professional financial intelligence portal for tracking Indian Mainboard IPOs, SME IPOs, exchange bidding data, grey market rates (GMP), anchor lock-in release timelines, and pre-IPO equities.
+              <strong>ipopreipo.com</strong> is a comprehensive financial intelligence portal for tracking Indian IPOs, Pre-IPO unlisted shares, credit card offers, payment apps, commercial banks, and stockbroker comparisons.
             </p>
             <div className="flex items-center gap-2 text-[11px] text-slate-400 mt-1">
               <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              Verified Financial Market Data
+              Verified Financial Intelligence
             </div>
           </div>
 
           {/* Col 2: Fast Links */}
           <div>
-            <h4 className="font-bold text-white mb-3 text-sm">Quick Navigation</h4>
+            <h4 className="font-bold text-white mb-3 text-sm">IPO &amp; Equity</h4>
             <ul className="space-y-2">
               <li>
                 <Link href="/" className="hover:text-white transition-colors">
-                  Mainboard IPO List
+                  Mainboard IPO Tracker
                 </Link>
               </li>
               <li>
@@ -59,48 +59,33 @@ export const Footer: React.FC = () => {
             </ul>
           </div>
 
-          {/* Col 3: Key Registrars & Resources */}
+          {/* Col 3: Banking & Products */}
           <div>
-            <h4 className="font-bold text-white mb-3 text-sm">IPO Registrars</h4>
+            <h4 className="font-bold text-white mb-3 text-sm">Financial Products</h4>
             <ul className="space-y-2 text-slate-400">
               <li>
-                <a
-                  href="https://linkintime.co.in"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="hover:text-white flex items-center gap-1"
-                >
-                  Link Intime Portal <ArrowUpRight className="w-3 h-3 text-slate-500" />
-                </a>
+                <Link href="/credit-cards" className="hover:text-white text-blue-400 font-semibold">
+                  Best Credit Cards in India
+                </Link>
               </li>
               <li>
-                <a
-                  href="https://kfintech.com"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="hover:text-white flex items-center gap-1"
-                >
-                  KFintech Portal <ArrowUpRight className="w-3 h-3 text-slate-500" />
-                </a>
+                <Link href="/payment-apps" className="hover:text-white">
+                  UPI &amp; Payment Apps
+                </Link>
               </li>
               <li>
-                <a
-                  href="https://bigshareonline.com"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="hover:text-white flex items-center gap-1"
-                >
-                  Bigshare Services <ArrowUpRight className="w-3 h-3 text-slate-500" />
-                </a>
-              </li>
-              <li>
-                <Link href="/buybacks" className="hover:text-white">
-                  Share Buybacks Calendar
+                <Link href="/banks" className="hover:text-white">
+                  Top Savings &amp; Commercial Banks
                 </Link>
               </li>
               <li>
                 <Link href="/brokers" className="hover:text-white">
-                  Best Stock Brokers for IPO
+                  Stock Broker Comparison
+                </Link>
+              </li>
+              <li>
+                <Link href="/buybacks" className="hover:text-white">
+                  Share Buybacks Calendar
                 </Link>
               </li>
             </ul>
@@ -110,7 +95,7 @@ export const Footer: React.FC = () => {
           <div>
             <h4 className="font-bold text-white mb-3 text-sm">Subscribe to ipopreipo.com</h4>
             <p className="text-slate-400 mb-3">
-              Get instant GMP updates, bidding alerts, and allotment notices directly to your inbox.
+              Get instant GMP updates, bidding alerts, credit card deals, and allotment notices directly to your inbox.
             </p>
             <div className="flex gap-2">
               <input
@@ -128,7 +113,7 @@ export const Footer: React.FC = () => {
         {/* Disclaimer */}
         <div className="pt-6 text-[11px] text-slate-400 space-y-2 leading-relaxed">
           <p>
-            <strong>Disclaimer:</strong> Investments in equity shares and initial public offerings (IPOs) are subject to market risks. Grey Market Premium (GMP) data provided on <strong>ipopreipo.com</strong> is purely informational and based on unofficial market quotes. It does not constitute financial advice or official listing price guarantees. Always consult a certified financial advisor before making investment decisions.
+            <strong>Disclaimer:</strong> Financial product comparison and IPO data provided on <strong>ipopreipo.com</strong> is purely informational. Credit card approval and banking terms depend on individual bank eligibility criteria. Always consult a certified financial advisor before making investment or loan commitments.
           </p>
           <p className="text-center text-slate-500 pt-4">
             © {new Date().getFullYear()} <strong>ipopreipo.com</strong>. All rights reserved.
