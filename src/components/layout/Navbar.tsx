@@ -5,7 +5,6 @@ import Link from "next/link";
 import { 
   TrendingUp, 
   Sparkles, 
-  Lock, 
   Percent, 
   Briefcase,
   CreditCard,
@@ -90,14 +89,6 @@ export const Navbar: React.FC = () => {
           </Link>
 
           <Link
-            href="/anchor-lockins"
-            className="px-2.5 py-2 rounded-md hover:bg-slate-100 hover:text-blue-700 transition-colors flex items-center gap-1"
-          >
-            <Lock className="w-3.5 h-3.5 text-indigo-600" />
-            Anchor Expiries
-          </Link>
-
-          <Link
             href="/credit-cards"
             className="px-2.5 py-2 rounded-md hover:bg-slate-100 hover:text-blue-700 transition-colors flex items-center gap-1 text-slate-900 font-bold"
           >
@@ -160,9 +151,6 @@ export const Navbar: React.FC = () => {
           </Link>
           <Link onClick={() => setMobileMenuOpen(false)} href="/banks" className="px-3 py-2 rounded-md hover:bg-slate-200">
             Banks &amp; Savings Accounts
-          </Link>
-          <Link onClick={() => setMobileMenuOpen(false)} href="/anchor-lockins" className="px-3 py-2 rounded-md hover:bg-slate-200">
-            Anchor Lock-In Tracker
           </Link>
           <Link onClick={() => setMobileMenuOpen(false)} href="/brokers" className="px-3 py-2 rounded-md hover:bg-slate-200">
             Broker Comparisons
