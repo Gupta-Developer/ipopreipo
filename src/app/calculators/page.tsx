@@ -72,7 +72,6 @@ export default function CalculatorsPage() {
 
   // 3. Pre-IPO CAGR
   const [preIpoBuy, setPreIpoBuy] = useState<number>(250);
-  const [preIpoQty, setPreIpoQty] = useState<number={500}>({500} as any);
   const [preIpoQtyNum, setPreIpoQtyNum] = useState<number>(500);
   const [preIpoTarget, setPreIpoTarget] = useState<number>(450);
   const [preIpoMonths, setPreIpoMonths] = useState<number>(18);
