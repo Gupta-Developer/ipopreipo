@@ -410,10 +410,7 @@ export default function IPOCalendarPage() {
                               {ev.eventTitle}
                             </span>
 
-                            <Badge
-                              text={ev.category === "sme" ? "SME IPO" : "Mainboard"}
-                              variant={ev.category === "sme" ? "warning" : "info"}
-                            />
+                            <Badge category={ev.category} />
                           </div>
 
                           {/* Company Name */}
