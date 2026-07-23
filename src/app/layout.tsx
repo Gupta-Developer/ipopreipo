@@ -1,32 +1,18 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import { AuthProvider } from "@/context/AuthContext";
+import { Navbar } from "@/components/layout/Navbar";
+import { Footer } from "@/components/layout/Footer";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: "--font-inter",
 });
 
 export const metadata: Metadata = {
-  title: "ipopreipo.com | World's Biggest IPO, Pre-IPO, Broker & Credit Card Platform",
-  description: "Compare IPOs, Pre-IPOs, stock brokers, and credit cards across every country. Institutional-grade tracking, GMP data, allotment search, brokerage calculators and financial tools — all in one place.",
-  keywords: "IPO, Pre-IPO, stock brokers, credit cards, GMP, allotment, brokerage, India, US, UK",
-  authors: [{ name: "ipopreipo.com" }],
-  metadataBase: new URL("https://ipopreipo.com"),
-  openGraph: {
-    siteName: "ipopreipo.com",
-    title: "ipopreipo.com | IPO, Pre-IPO, Brokers & Credit Cards",
-    description: "The world's biggest platform for IPOs, Pre-IPOs, Brokers and Credit Cards across every country.",
-    type: "website",
-  },
+  title: "IPOPreIPO.com | Live IPO GMP, Bidding & Pre-IPO Analytics",
+  description: "Professional financial portal for tracking Indian Mainboard IPOs, SME IPOs, real-time exchange bidding, grey market premiums (GMP), anchor lock-in dates, and unlisted pre-IPO equities.",
+  keywords: "IPOPreIPO, IPOPreIPO.com, Live IPO GMP, Pre-IPO Shares, Upcoming IPOs 2026, SME IPO List, Anchor Lock-in Expiry, IPO Allotment Status Check",
 };
 
 export default function RootLayout({
@@ -35,13 +21,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" data-theme="light" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <body>
-        <AuthProvider>
-          <Navbar />
-          {children}
-          <Footer />
-        </AuthProvider>
+    <html
+      lang="en"
+      className={`${inter.variable} h-full antialiased`}
+    >
+      <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 font-sans selection:bg-blue-600 selection:text-white">
+        <Navbar />
+        <main className="flex-1 w-full">{children}</main>
+        <Footer />
       </body>
     </html>
   );

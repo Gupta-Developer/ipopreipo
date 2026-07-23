@@ -1,0 +1,278 @@
+import React from "react";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { 
+  CheckCircle2, 
+  ArrowLeft, 
+  Calendar, 
+  Layers, 
+  Building2, 
+  Award,
+  ExternalLink,
+  Users,
+  ShieldAlert
+} from "lucide-react";
+import { MOCK_IPOS } from "@/data/mockIpos";
+import { Badge } from "@/components/common/Badge";
+import { GMPCard } from "@/components/common/GMPCard";
+import { SubscriptionTable } from "@/components/common/SubscriptionTable";
+import { Calculator } from "@/components/common/Calculator";
+
+interface PageProps {
+  params: Promise<{ slug: string }>;
+}
+
+export default async function IPODetailPage({ params }: PageProps) {
+  const resolvedParams = await params;
+  const ipo = MOCK_IPOS.find((i) => i.slug === resolvedParams.slug);
+
+  if (!ipo) {
+    notFound();
+  }
+
+  return (
+    <div className="min-h-screen max-w-7xl mx-auto px-4 py-8 space-y-6">
+      {/* Back Button */}
+      <Link
+        href="/"
+        className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        Back to Dashboard
+      </Link>
+
+      {/* Main Corporate Header */}
+      <div className="p-6 sm:p-8 rounded-xl bg-white border border-slate-200 shadow-sm space-y-6">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+          <div className="space-y-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge status={ipo.status} />
+              <Badge category={ipo.category} />
+              <span className="text-xs text-slate-600 font-semibold px-2 py-0.5 rounded bg-slate-100 border border-slate-200">
+                {ipo.exchange}
+              </span>
+            </div>
+
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+              {ipo.name}
+            </h1>
+            <p className="text-xs text-slate-500">
+              Lead Managers: {ipo.leadManagers.join(", ")} | Registrar: {ipo.registrarName}
+            </p>
+          </div>
+
+          <div className="shrink-0 w-full sm:w-auto">
+            <a
+              href={ipo.registrarCheckUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="w-full sm:w-auto px-4 py-2.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-2 transition-all"
+            >
+              <CheckCircle2 className="w-4 h-4" />
+              Check Allotment Status
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          </div>
+        </div>
+
+        {/* Quick Metrics Bar */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-slate-100 text-xs">
+          <div>
+            <span className="text-slate-500 block">Price Band:</span>
+            <strong className="text-base font-extrabold text-slate-900">₹{ipo.priceBandMin} - ₹{ipo.priceBandMax}</strong>
+          </div>
+          <div>
+            <span className="text-slate-500 block">Lot Size:</span>
+            <strong className="text-base font-extrabold text-slate-900">{ipo.lotSize} Shares (₹{ipo.minInvestment.toLocaleString("en-IN")})</strong>
+          </div>
+          <div>
+            <span className="text-slate-500 block">Issue Size:</span>
+            <strong className="text-base font-extrabold text-slate-900">₹{ipo.issueSizeTotalCr} Cr</strong>
+          </div>
+          <div>
+            <span className="text-slate-500 block">Subscription:</span>
+            <strong className="text-base font-extrabold text-blue-700">{ipo.totalSubscription}x Total</strong>
+          </div>
+        </div>
+      </div>
+
+      {/* Grid: Details & Tables */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Left Col */}
+        <div className="lg:col-span-8 space-y-6">
+          {/* Key Dates Table */}
+          <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-sm space-y-3">
+            <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-blue-700" />
+              IPO Timetable &amp; Key Dates
+            </h3>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+              <div className="p-3 rounded bg-slate-50 border border-slate-200">
+                <span className="text-slate-500 block">Bidding Opens</span>
+                <strong className="text-slate-900 font-bold">{ipo.openDate}</strong>
+              </div>
+              <div className="p-3 rounded bg-slate-50 border border-slate-200">
+                <span className="text-slate-500 block">Bidding Closes</span>
+                <strong className="text-slate-900 font-bold">{ipo.closeDate}</strong>
+              </div>
+              <div className="p-3 rounded bg-slate-50 border border-slate-200">
+                <span className="text-slate-500 block">Allotment Date</span>
+                <strong className="text-purple-700 font-bold">{ipo.allotmentDate}</strong>
+              </div>
+              <div className="p-3 rounded bg-slate-50 border border-slate-200">
+                <span className="text-slate-500 block">Refund Initiation</span>
+                <strong className="text-slate-900 font-bold">{ipo.refundDate}</strong>
+              </div>
+              <div className="p-3 rounded bg-slate-50 border border-slate-200">
+                <span className="text-slate-500 block">Demat Credit</span>
+                <strong className="text-slate-900 font-bold">{ipo.dematCreditDate}</strong>
+              </div>
+              <div className="p-3 rounded bg-slate-50 border border-slate-200">
+                <span className="text-slate-500 block">Exchange Listing</span>
+                <strong className="text-emerald-700 font-bold">{ipo.listingDate}</strong>
+              </div>
+            </div>
+          </div>
+
+          {/* Live Subscription */}
+          <div className="space-y-2">
+            <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <Users className="w-4 h-4 text-blue-700" />
+              Live Bidding Subscription Status
+            </h3>
+            <SubscriptionTable
+              totalSubscription={ipo.totalSubscription}
+              qibSubscription={ipo.qibSubscription}
+              niiSubscription={ipo.niiSubscription}
+              sNiiSubscription={ipo.sNiiSubscription}
+              bNiiSubscription={ipo.bNiiSubscription}
+              retailSubscription={ipo.retailSubscription}
+            />
+          </div>
+
+          {/* Lot Size Table */}
+          {ipo.lotSizes && (
+            <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-sm space-y-3">
+              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <Layers className="w-4 h-4 text-blue-700" />
+                Lot Size &amp; Application Limits
+              </h3>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
+                    <tr>
+                      <th className="py-2.5 px-3">Application Category</th>
+                      <th className="py-2.5 px-3">Min Lots</th>
+                      <th className="py-2.5 px-3">Total Shares</th>
+                      <th className="py-2.5 px-3 text-right">Min Amount (₹)</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 text-slate-800">
+                    {ipo.lotSizes.map((item, idx) => (
+                      <tr key={idx} className="hover:bg-slate-50">
+                        <td className="py-2.5 px-3 font-medium">{item.applicationCategory}</td>
+                        <td className="py-2.5 px-3">{item.lots} Lot</td>
+                        <td className="py-2.5 px-3">{item.shares} Shares</td>
+                        <td className="py-2.5 px-3 text-right font-bold text-slate-900">
+                          ₹{item.amount.toLocaleString("en-IN")}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Financials Table */}
+          {ipo.financials && (
+            <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-sm space-y-3">
+              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <Building2 className="w-4 h-4 text-emerald-700" />
+                Financial Performance Trends
+              </h3>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
+                    <tr>
+                      <th className="py-2.5 px-3">Financial Year</th>
+                      <th className="py-2.5 px-3">Revenue (₹ Cr)</th>
+                      <th className="py-2.5 px-3">Profit After Tax (₹ Cr)</th>
+                      <th className="py-2.5 px-3">Net Worth (₹ Cr)</th>
+                      <th className="py-2.5 px-3 text-right">RONW (%)</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 text-slate-800">
+                    {ipo.financials.map((fin, idx) => (
+                      <tr key={idx} className="hover:bg-slate-50">
+                        <td className="py-2.5 px-3 font-bold text-slate-900">{fin.year}</td>
+                        <td className="py-2.5 px-3">₹{fin.revenue} Cr</td>
+                        <td className="py-2.5 px-3 text-emerald-700 font-bold">₹{fin.pat} Cr</td>
+                        <td className="py-2.5 px-3">₹{fin.netWorth} Cr</td>
+                        <td className="py-2.5 px-3 text-right font-semibold">{fin.ronw}%</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Right Col */}
+        <div className="lg:col-span-4 space-y-6">
+          <GMPCard
+            gmp={ipo.gmp}
+            gmpPercent={ipo.gmpPercent}
+            expectedListingPrice={ipo.expectedListingPrice}
+            priceBandMax={ipo.priceBandMax}
+            updatedTime={ipo.gmpUpdatedTime}
+          />
+
+          {/* Analyst Scorecard */}
+          <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-sm space-y-3 text-xs">
+            <div className="flex justify-between items-center">
+              <span className="font-bold text-slate-700 flex items-center gap-1">
+                <Award className="w-4 h-4 text-amber-600" />
+                ANALYST RECOMMENDATION
+              </span>
+              <span className="font-bold px-2 py-0.5 rounded bg-blue-50 text-blue-800">
+                {ipo.rating} / 5.0
+              </span>
+            </div>
+
+            <div className="p-2.5 rounded bg-slate-50 border border-slate-200 text-center font-extrabold text-emerald-700">
+              {ipo.recommendation}
+            </div>
+
+            <div className="space-y-1 pt-1">
+              <span className="font-bold text-slate-800 block">Key Strengths:</span>
+              <ul className="space-y-1 text-slate-600 list-disc list-inside">
+                {ipo.highlights.map((h, i) => (
+                  <li key={i}>{h}</li>
+                ))}
+              </ul>
+            </div>
+
+            {ipo.risks && ipo.risks.length > 0 && (
+              <div className="space-y-1 pt-2 border-t border-slate-100">
+                <span className="font-bold text-rose-700 flex items-center gap-1">
+                  <ShieldAlert className="w-3.5 h-3.5" />
+                  Key Risks:
+                </span>
+                <ul className="space-y-1 text-slate-600 list-disc list-inside">
+                  {ipo.risks.map((r, i) => (
+                    <li key={i}>{r}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+
+          <Calculator defaultLotSize={ipo.lotSize} defaultPrice={ipo.priceBandMax} defaultGmp={ipo.gmp} />
+        </div>
+      </div>
+    </div>
+  );
+}
