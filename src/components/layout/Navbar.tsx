@@ -335,7 +335,7 @@ export const Navbar: React.FC = () => {
 
                     <Link
                       onClick={() => setIpoMenuOpen(false)}
-                      href="/?tab=upcoming"
+                      href="/calendar"
                       className="group flex items-start gap-2.5 p-2 rounded-lg hover:bg-white hover:shadow-xs transition-all"
                     >
                       <Calendar className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5" />
