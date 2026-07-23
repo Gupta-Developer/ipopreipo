@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { 
   TrendingUp, 
@@ -17,35 +17,106 @@ import { MOCK_IPOS } from "@/data/mockIpos";
 
 export const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [fontSize, setFontSize] = useState<"small" | "normal" | "large">("normal");
 
   const activeIpos = MOCK_IPOS.filter((i) => i.status === "live" || i.gmp > 0);
+
+  const changeFontSize = (size: "small" | "normal" | "large") => {
+    setFontSize(size);
+    if (typeof document !== "undefined") {
+      if (size === "small") {
+        document.documentElement.style.fontSize = "90%";
+      } else if (size === "large") {
+        document.documentElement.style.fontSize = "110%";
+      } else {
+        document.documentElement.style.fontSize = "100%";
+      }
+      try {
+        localStorage.setItem("user-font-size", size);
+      } catch (e) {
+        // ignore quota or SSR errors
+      }
+    }
+  };
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("user-font-size") as "small" | "normal" | "large";
+      if (saved && (saved === "small" || saved === "normal" || saved === "large")) {
+        changeFontSize(saved);
+      }
+    } catch (e) {
+      // ignore
+    }
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 w-full flex flex-col bg-white border-b border-slate-200 shadow-sm">
       {/* Top Ticker Bar */}
       <div className="bg-slate-900 text-slate-300 text-xs py-1.5 border-b border-slate-800 overflow-hidden relative">
-        <div className="max-w-7xl mx-auto px-4 flex items-center gap-2">
-          <span className="shrink-0 flex items-center gap-1 font-bold text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded text-[11px]">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-            LIVE GMP TICKER:
-          </span>
+        <div className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4">
+          {/* Left Ticker */}
+          <div className="flex items-center gap-2 overflow-hidden flex-1">
+            <span className="shrink-0 flex items-center gap-1 font-bold text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded text-[11px]">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+              LIVE GMP TICKER:
+            </span>
 
-          <div className="overflow-hidden relative w-full flex items-center">
-            <div className="animate-ticker flex items-center gap-8 text-[11px]">
-              {activeIpos.map((ipo) => (
-                <Link
-                  key={ipo.id}
-                  href={`/ipo/${ipo.slug}`}
-                  className="hover:text-white transition-colors flex items-center gap-2"
-                >
-                  <span className="font-semibold text-slate-100">{ipo.name}</span>
-                  <span className="text-emerald-400 font-bold">
-                    GMP: +₹{ipo.gmp} (+{ipo.gmpPercent.toFixed(1)}%)
-                  </span>
-                  <span className="text-slate-400">| Sub: {ipo.totalSubscription}x</span>
-                </Link>
-              ))}
+            <div className="overflow-hidden relative w-full flex items-center">
+              <div className="animate-ticker flex items-center gap-8 text-[11px]">
+                {activeIpos.map((ipo) => (
+                  <Link
+                    key={ipo.id}
+                    href={`/ipo/${ipo.slug}`}
+                    className="hover:text-white transition-colors flex items-center gap-2"
+                  >
+                    <span className="font-semibold text-slate-100">{ipo.name}</span>
+                    <span className="text-emerald-400 font-bold">
+                      GMP: +₹{ipo.gmp} (+{ipo.gmpPercent.toFixed(1)}%)
+                    </span>
+                    <span className="text-slate-400">| Sub: {ipo.totalSubscription}x</span>
+                  </Link>
+                ))}
+              </div>
             </div>
+          </div>
+
+          {/* Accessibility Font Size Resizer: A- A A+ */}
+          <div className="shrink-0 flex items-center gap-0.5 bg-slate-800 border border-slate-700/80 rounded px-1 py-0.5 text-[11px] font-bold">
+            <span className="text-slate-400 px-1 hidden sm:inline text-[10px] uppercase">Font:</span>
+            <button
+              onClick={() => changeFontSize("small")}
+              className={`px-1.5 py-0.5 rounded transition-all ${
+                fontSize === "small"
+                  ? "bg-blue-600 text-white font-black shadow-xs"
+                  : "text-slate-300 hover:text-white hover:bg-slate-700"
+              }`}
+              title="Decrease Font Size (A-)"
+            >
+              A-
+            </button>
+            <button
+              onClick={() => changeFontSize("normal")}
+              className={`px-1.5 py-0.5 rounded transition-all ${
+                fontSize === "normal"
+                  ? "bg-blue-600 text-white font-black shadow-xs"
+                  : "text-slate-300 hover:text-white hover:bg-slate-700"
+              }`}
+              title="Default Font Size (A)"
+            >
+              A
+            </button>
+            <button
+              onClick={() => changeFontSize("large")}
+              className={`px-1.5 py-0.5 rounded transition-all ${
+                fontSize === "large"
+                  ? "bg-blue-600 text-white font-black shadow-xs"
+                  : "text-slate-300 hover:text-white hover:bg-slate-700"
+              }`}
+              title="Increase Font Size (A+)"
+            >
+              A+
+            </button>
           </div>
         </div>
       </div>
