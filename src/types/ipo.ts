@@ -156,8 +156,19 @@ export interface BuybackData {
   status: "Upcoming" | "Active" | "Closed";
 }
 
+export interface BrokerFeeDetail {
+  label: string;
+  value: string;
+}
+
+export interface BrokerFAQ {
+  question: string;
+  answer: string;
+}
+
 export interface BrokerData {
   id: string;
+  slug: string;
   name: string;
   logoUrl?: string;
   type: "Discount Broker" | "Full-Service Broker";
@@ -172,4 +183,9 @@ export interface BrokerData {
   pros: string[];
   cons: string[];
   openAccountUrl: string;
+
+  // Review Details
+  overview?: string;
+  feeDetails?: BrokerFeeDetail[];
+  faqs?: BrokerFAQ[];
 }

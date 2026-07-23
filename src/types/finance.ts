@@ -1,5 +1,25 @@
 export type CardCategory = "all" | "lifetime_free" | "cashback" | "travel" | "rewards" | "fuel";
 
+export interface ReviewFeeDetail {
+  label: string;
+  value: string;
+}
+
+export interface ReviewEligibilityDetail {
+  label: string;
+  value: string;
+}
+
+export interface ReviewFAQ {
+  question: string;
+  answer: string;
+}
+
+export interface ReviewRatingCategory {
+  category: string;
+  score: number; // out of 5
+}
+
 export interface CreditCardData {
   id: string;
   slug: string;
@@ -19,6 +39,13 @@ export interface CreditCardData {
   cons: string[];
   applyUrl: string;
   isPopular?: boolean;
+
+  // Detailed Review Fields
+  overview?: string;
+  feeDetails?: ReviewFeeDetail[];
+  eligibility?: ReviewEligibilityDetail[];
+  ratingBreakdown?: ReviewRatingCategory[];
+  faqs?: ReviewFAQ[];
 }
 
 export interface PaymentAppData {
@@ -38,6 +65,13 @@ export interface PaymentAppData {
   pros: string[];
   cons: string[];
   downloadUrl: string;
+
+  // Detailed Review Fields
+  overview?: string;
+  feeDetails?: ReviewFeeDetail[];
+  eligibility?: ReviewEligibilityDetail[];
+  ratingBreakdown?: ReviewRatingCategory[];
+  faqs?: ReviewFAQ[];
 }
 
 export interface BankData {
@@ -56,4 +90,11 @@ export interface BankData {
   pros: string[];
   cons: string[];
   openAccountUrl: string;
+
+  // Detailed Review Fields
+  overview?: string;
+  feeDetails?: ReviewFeeDetail[];
+  eligibility?: ReviewEligibilityDetail[];
+  ratingBreakdown?: ReviewRatingCategory[];
+  faqs?: ReviewFAQ[];
 }

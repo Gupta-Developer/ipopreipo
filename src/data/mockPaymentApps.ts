@@ -28,7 +28,24 @@ export const MOCK_PAYMENT_APPS: PaymentAppData[] = [
     cons: [
       "Direct wallet cashbacks replaced largely by merchant vouchers."
     ],
-    downloadUrl: "https://www.phonepe.com"
+    downloadUrl: "https://www.phonepe.com",
+    overview: "PhonePe is India's leading UPI payments app processing billions of transactions monthly. It supports PIN-less UPI Lite payments, RuPay credit card linking, FASTag management, and mutual fund investments.",
+    feeDetails: [
+      { label: "UPI Bank Transfers", value: "₹0 (Free)" },
+      { label: "UPI Lite Transactions", value: "₹0 (Free)" },
+      { label: "Mobile Recharges Platform Fee", value: "₹1 to ₹3 per recharge" },
+      { label: "Credit Card Bill Payments Fee", value: "₹0 (Free)" }
+    ],
+    eligibility: [
+      { label: "Requirements", value: "Indian Mobile Number linked with Bank Account" },
+      { label: "Debit Card Needed?", value: "Yes, required for 1st time UPI PIN setup (or Aadhaar OTP)" }
+    ],
+    faqs: [
+      {
+        question: "How do I setup UPI Lite on PhonePe?",
+        answer: "Go to Profile > UPI Lite > Add Funds (up to ₹2,000) from your bank account to enable instant PIN-less payments up to ₹500."
+      }
+    ]
   },
   {
     id: "p2",
@@ -57,7 +74,18 @@ export const MOCK_PAYMENT_APPS: PaymentAppData[] = [
     cons: [
       "Occasional bank server timeout errors during peak hours."
     ],
-    downloadUrl: "https://pay.google.com"
+    downloadUrl: "https://pay.google.com",
+    overview: "Google Pay (GPay) utilizes Google's secure infrastructure to deliver fast, direct-to-bank UPI transfers, split-bill tracking, and zero-clutter digital payments across India.",
+    feeDetails: [
+      { label: "UPI Payments", value: "₹0 (Free)" },
+      { label: "Bill Payments", value: "₹0 (Free)" }
+    ],
+    faqs: [
+      {
+        question: "Where is Google Pay cashback credited?",
+        answer: "Cashback earned on Google Pay scratch cards is credited directly into your linked primary bank account within 24 hours."
+      }
+    ]
   },
   {
     id: "p3",
@@ -86,7 +114,18 @@ export const MOCK_PAYMENT_APPS: PaymentAppData[] = [
     cons: [
       "Requires credit score of 750+ to join platform."
     ],
-    downloadUrl: "https://cred.club"
+    downloadUrl: "https://cred.club",
+    overview: "CRED is an exclusive financial platform for high-credit individuals offering credit card bill management, rewards, free credit score analysis, and CRED Pay UPI.",
+    feeDetails: [
+      { label: "Membership Fee", value: "₹0 (Free for 750+ Credit Score)" },
+      { label: "Credit Card Bill Payments", value: "₹0 (Free)" }
+    ],
+    faqs: [
+      {
+        question: "What credit score is required to join CRED?",
+        answer: "A CIBIL score of 750 or higher is required to get access to CRED."
+      }
+    ]
   },
   {
     id: "p4",
@@ -113,6 +152,16 @@ export const MOCK_PAYMENT_APPS: PaymentAppData[] = [
     cons: [
       "App home screen can feel slightly crowded."
     ],
-    downloadUrl: "https://paytm.com"
+    downloadUrl: "https://paytm.com",
+    overview: "Paytm is India's pioneer digital payment app, offering comprehensive UPI transfers, utility bill payments, movie tickets, and transit cards.",
+    feeDetails: [
+      { label: "UPI Bank Money Transfers", value: "₹0 (Free)" }
+    ],
+    faqs: [
+      {
+        question: "How do I link my RuPay Credit Card on Paytm UPI?",
+        answer: "Go to Profile > Add Credit Card > Select your bank issuing the RuPay credit card > Generate UPI PIN."
+      }
+    ]
   }
 ];

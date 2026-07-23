@@ -1,5 +1,6 @@
 import React from "react";
-import { Building2, Star, CheckCircle2, ExternalLink, ShieldCheck } from "lucide-react";
+import Link from "next/link";
+import { Building2, Star, CheckCircle2, ExternalLink, ChevronRight } from "lucide-react";
 import { MOCK_BANKS } from "@/data/mockBanks";
 
 export default function BanksPage() {
@@ -29,14 +30,16 @@ export default function BanksPage() {
               <th className="py-3 px-4">Min Balance (MAB)</th>
               <th className="py-3 px-4">Peak FD Interest Rate</th>
               <th className="py-3 px-4">Digital Banking Rating</th>
-              <th className="py-3 px-4 text-right">Account Opening</th>
+              <th className="py-3 px-4 text-right">Action</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 text-slate-800">
             {MOCK_BANKS.map((bank) => (
               <tr key={bank.id} className="hover:bg-slate-50">
                 <td className="py-4 px-4 font-bold text-slate-900">
-                  <div className="text-base font-extrabold">{bank.name}</div>
+                  <div className="text-base font-extrabold hover:text-blue-700">
+                    <Link href={`/banks/${bank.slug}`}>{bank.name}</Link>
+                  </div>
                   <span className="text-xs text-blue-700 font-medium">{bank.type}</span>
                   <span className="text-[11px] text-slate-400 block mt-0.5">{bank.branchCount} | {bank.atmCount}</span>
                 </td>
@@ -62,14 +65,22 @@ export default function BanksPage() {
                 </td>
 
                 <td className="py-4 px-4 text-right">
-                  <a
-                    href={bank.openAccountUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-900 hover:bg-blue-800 text-white font-bold text-xs shadow-sm transition-all"
-                  >
-                    Open Account <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
+                  <div className="flex justify-end gap-2">
+                    <Link
+                      href={`/banks/${bank.slug}`}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition-all"
+                    >
+                      Review <ChevronRight className="w-3.5 h-3.5" />
+                    </Link>
+                    <a
+                      href={bank.openAccountUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-900 hover:bg-blue-800 text-white font-bold text-xs shadow-sm transition-all"
+                    >
+                      Open <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
                 </td>
               </tr>
             ))}
