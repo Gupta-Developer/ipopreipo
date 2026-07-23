@@ -32,6 +32,11 @@ export const Footer: React.FC = () => {
             <h4 className="font-bold text-white mb-3 text-sm">IPO &amp; Equity</h4>
             <ul className="space-y-2">
               <li>
+                <Link href="/calculators" className="hover:text-white text-emerald-400 font-semibold transition-colors">
+                  Financial &amp; IPO Calculators
+                </Link>
+              </li>
+              <li>
                 <Link href="/calendar" className="hover:text-white text-blue-400 font-semibold transition-colors">
                   IPO Calendar &amp; Schedule
                 </Link>

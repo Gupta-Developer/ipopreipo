@@ -374,6 +374,14 @@ export const Navbar: React.FC = () => {
           </Link>
 
           <Link
+            href="/calculators"
+            className="px-2.5 py-2 rounded-md hover:bg-blue-50 text-blue-700 font-bold transition-colors flex items-center gap-1"
+          >
+            <BarChart3 className="w-3.5 h-3.5 text-blue-700" />
+            Calculators
+          </Link>
+
+          <Link
             href="/brokers"
             className="px-2.5 py-2 rounded-md hover:bg-slate-100 hover:text-blue-700 transition-colors flex items-center gap-1"
           >
