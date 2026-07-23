@@ -25,6 +25,23 @@ export default function Home() {
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
 
+  // Sync filters from URL search params (e.g. from Mega Menu links)
+  useEffect(() => {
+    const handleUrlParams = () => {
+      if (typeof window !== "undefined") {
+        const params = new URLSearchParams(window.location.search);
+        const tabParam = params.get("tab");
+        const categoryParam = params.get("category");
+        if (tabParam) setSelectedTab(tabParam);
+        if (categoryParam) setCategoryFilter(categoryParam);
+      }
+    };
+
+    handleUrlParams();
+    window.addEventListener("popstate", handleUrlParams);
+    return () => window.removeEventListener("popstate", handleUrlParams);
+  }, []);
+
   // Filtering Logic
   const filteredIpos = MOCK_IPOS.filter((ipo) => {
     if (categoryFilter === "mainboard" && ipo.category !== "mainboard") return false;
