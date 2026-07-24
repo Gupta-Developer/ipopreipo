@@ -24,14 +24,15 @@ import {
   UserCheck,
   User,
   LogOut,
-  Bookmark
+  Bookmark,
+  ShieldCheck
 } from "lucide-react";
 import { MOCK_IPOS } from "@/data/mockIpos";
 import { useAuth } from "@/context/AuthContext";
 import AuthModal from "@/components/auth/AuthModal";
 
 export const Navbar: React.FC = () => {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout, switchRole } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [ipoMenuOpen, setIpoMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -482,21 +483,107 @@ export const Navbar: React.FC = () => {
             <div className="relative" ref={userDropdownRef}>
               <button
                 onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                className="flex items-center gap-2 pl-2 pr-3 py-1 rounded-full bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-200 transition-all font-bold text-xs"
+                className="flex items-center gap-2 pl-2 pr-3 py-1 rounded-full bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-200 transition-all font-bold text-xs shadow-2xs"
               >
                 <div className="w-6 h-6 rounded-full bg-blue-900 text-white font-black text-[11px] flex items-center justify-center">
                   {user.name.charAt(0).toUpperCase()}
                 </div>
-                <span className="max-w-[100px] truncate">{user.name}</span>
-                <ChevronDown className="w-3.5 h-3.5 text-blue-700" />
+                <div className="flex flex-col text-left">
+                  <span className="max-w-[90px] truncate leading-tight">{user.name}</span>
+                  <span className="text-[9px] font-black uppercase text-blue-700 tracking-wider">
+                    {user.role || "Retail"}
+                  </span>
+                </div>
+                <ChevronDown className="w-3 h-3 text-blue-700" />
               </button>
 
               {userDropdownOpen && (
-                <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl border border-slate-200 shadow-2xl p-2 z-50 space-y-1 animate-in fade-in zoom-in duration-100 text-xs">
-                  <div className="px-3 py-2 border-b border-slate-100">
-                    <span className="font-extrabold text-slate-900 block">{user.name}</span>
+                <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl border border-slate-200 shadow-2xl p-3 z-50 space-y-2 animate-in fade-in zoom-in duration-100 text-xs">
+                  <div className="px-2 py-1.5 border-b border-slate-100">
+                    <div className="flex items-center justify-between">
+                      <span className="font-extrabold text-slate-900 block truncate">{user.name}</span>
+                      <span className="px-2 py-0.5 rounded-md bg-blue-100 text-blue-800 text-[9px] font-black uppercase">
+                        {user.role || "investor"}
+                      </span>
+                    </div>
                     <span className="text-[11px] text-slate-500 truncate block">{user.email}</span>
                   </div>
+
+                  {/* 1-Click Demo Role Switcher Inside Menu */}
+                  <div className="p-2 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1.5">
+                    <span className="text-[10px] font-black text-amber-700 uppercase tracking-wider block">
+                      ⚡ 1-CLICK DEMO ROLE SWITCH
+                    </span>
+                    <div className="grid grid-cols-2 gap-1 text-[10px] font-bold">
+                      <button
+                        onClick={() => { switchRole("investor"); setUserDropdownOpen(false); }}
+                        className={`p-1.5 rounded-lg border text-center transition-all ${
+                          user.role === "investor"
+                            ? "bg-blue-700 text-white border-blue-700"
+                            : "bg-white text-slate-700 border-slate-200 hover:bg-blue-50"
+                        }`}
+                      >
+                        Retail
+                      </button>
+
+                      <button
+                        onClick={() => { switchRole("hni"); setUserDropdownOpen(false); }}
+                        className={`p-1.5 rounded-lg border text-center transition-all ${
+                          user.role === "hni"
+                            ? "bg-purple-700 text-white border-purple-700"
+                            : "bg-white text-slate-700 border-slate-200 hover:bg-purple-50"
+                        }`}
+                      >
+                        B-HNI
+                      </button>
+
+                      <button
+                        onClick={() => { switchRole("editor"); setUserDropdownOpen(false); }}
+                        className={`p-1.5 rounded-lg border text-center transition-all ${
+                          user.role === "editor"
+                            ? "bg-emerald-700 text-white border-emerald-700"
+                            : "bg-white text-slate-700 border-slate-200 hover:bg-emerald-50"
+                        }`}
+                      >
+                        Editor
+                      </button>
+
+                      <button
+                        onClick={() => { switchRole("admin"); setUserDropdownOpen(false); }}
+                        className={`p-1.5 rounded-lg border text-center transition-all ${
+                          user.role === "admin"
+                            ? "bg-amber-600 text-white border-amber-600"
+                            : "bg-white text-slate-700 border-slate-200 hover:bg-amber-50"
+                        }`}
+                      >
+                        Admin
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Direct Portal Shortcuts */}
+                  {user.role === "editor" && (
+                    <Link
+                      href="/editor"
+                      onClick={() => setUserDropdownOpen(false)}
+                      className="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-50 text-emerald-900 font-extrabold border border-emerald-200 hover:bg-emerald-100"
+                    >
+                      <Sparkles className="w-4 h-4 text-emerald-600" />
+                      Open Editorial Desk (/editor)
+                    </Link>
+                  )}
+
+                  {user.role === "admin" && (
+                    <Link
+                      href="/admin"
+                      onClick={() => setUserDropdownOpen(false)}
+                      className="flex items-center gap-2 px-3 py-2 rounded-xl bg-amber-50 text-amber-900 font-extrabold border border-amber-200 hover:bg-amber-100"
+                    >
+                      <ShieldCheck className="w-4 h-4 text-amber-600" />
+                      Open Admin Portal (/admin)
+                    </Link>
+                  )}
+
                   <Link
                     href="/profile"
                     onClick={() => setUserDropdownOpen(false)}
@@ -505,6 +592,7 @@ export const Navbar: React.FC = () => {
                     <User className="w-4 h-4 text-blue-700" />
                     My Investor Profile
                   </Link>
+
                   <Link
                     href="/profile"
                     onClick={() => setUserDropdownOpen(false)}
@@ -513,6 +601,7 @@ export const Navbar: React.FC = () => {
                     <Bookmark className="w-4 h-4 text-amber-600" />
                     Saved Watchlist
                   </Link>
+
                   <div className="pt-1 border-t border-slate-100">
                     <button
                       onClick={() => { logout(); setUserDropdownOpen(false); }}
@@ -526,13 +615,15 @@ export const Navbar: React.FC = () => {
               )}
             </div>
           ) : (
-            <button
-              onClick={() => setAuthModalOpen(true)}
-              className="px-4 py-1.5 rounded-full bg-blue-900 hover:bg-blue-800 text-white font-bold text-xs transition-all shadow-xs flex items-center gap-1.5"
-            >
-              <User className="w-3.5 h-3.5" />
-              Sign In
-            </button>
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => setAuthModalOpen(true)}
+                className="px-3.5 py-1.5 rounded-full bg-blue-900 hover:bg-blue-800 text-white font-bold text-xs transition-all shadow-xs flex items-center gap-1.5"
+              >
+                <User className="w-3.5 h-3.5" />
+                Sign In
+              </button>
+            </div>
           )}
 
           {/* Auth Modal Component */}

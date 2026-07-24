@@ -11,7 +11,7 @@ interface AuthModalProps {
 }
 
 export default function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalProps) {
-  const { login, signup, googleLogin } = useAuth();
+  const { login, signup, googleLogin, switchRole } = useAuth();
   const [mode, setMode] = useState<"login" | "signup" | "forgot">(initialMode);
 
   // Form Fields
@@ -98,6 +98,78 @@ export default function AuthModal({ isOpen, onClose, initialMode = "login" }: Au
             {mode === "signup" && "Join over 2,50,000+ investors tracking live GMP and allotment odds."}
             {mode === "forgot" && "Enter your registered email to receive a password reset link."}
           </p>
+        </div>
+
+        {/* 1-Click Quick Demo Role Switcher */}
+        <div className="p-3.5 rounded-xl bg-gradient-to-r from-amber-500/10 via-blue-500/10 to-emerald-500/10 border border-amber-500/20 space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-black uppercase text-amber-700 tracking-wider flex items-center gap-1">
+              <Sparkles className="w-3 h-3 text-amber-600" />
+              ⚡ 1-Click Quick Demo Login (No Password)
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-1.5 text-[11px] font-bold">
+            <button
+              type="button"
+              onClick={() => {
+                switchRole("investor");
+                onClose();
+              }}
+              className="p-2 rounded-lg bg-white border border-slate-200 hover:border-blue-500 hover:bg-blue-50 text-slate-800 text-left transition-all shadow-xs flex items-center justify-between group"
+            >
+              <div>
+                <span className="font-extrabold text-blue-900 block leading-tight">👤 Retail Investor</span>
+                <span className="text-[9px] text-slate-500 font-normal">Rahul Sharma</span>
+              </div>
+              <ArrowRight className="w-3 h-3 text-slate-400 group-hover:text-blue-600 shrink-0" />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                switchRole("hni");
+                onClose();
+              }}
+              className="p-2 rounded-lg bg-white border border-slate-200 hover:border-purple-500 hover:bg-purple-50 text-slate-800 text-left transition-all shadow-xs flex items-center justify-between group"
+            >
+              <div>
+                <span className="font-extrabold text-purple-900 block leading-tight">💼 B-HNI Investor</span>
+                <span className="text-[9px] text-slate-500 font-normal">Singhania HNI</span>
+              </div>
+              <ArrowRight className="w-3 h-3 text-slate-400 group-hover:text-purple-600 shrink-0" />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                switchRole("editor");
+                onClose();
+              }}
+              className="p-2 rounded-lg bg-white border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50 text-slate-800 text-left transition-all shadow-xs flex items-center justify-between group"
+            >
+              <div>
+                <span className="font-extrabold text-emerald-900 block leading-tight">✍️ Financial Editor</span>
+                <span className="text-[9px] text-slate-500 font-normal">Priya (/editor)</span>
+              </div>
+              <ArrowRight className="w-3 h-3 text-slate-400 group-hover:text-emerald-600 shrink-0" />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                switchRole("admin");
+                onClose();
+              }}
+              className="p-2 rounded-lg bg-white border border-slate-200 hover:border-amber-500 hover:bg-amber-50 text-slate-800 text-left transition-all shadow-xs flex items-center justify-between group"
+            >
+              <div>
+                <span className="font-extrabold text-amber-900 block leading-tight">🛡️ Super Admin</span>
+                <span className="text-[9px] text-slate-500 font-normal">Admin (/admin)</span>
+              </div>
+              <ArrowRight className="w-3 h-3 text-slate-400 group-hover:text-amber-600 shrink-0" />
+            </button>
+          </div>
         </div>
 
         {/* Mode Switcher Tabs */}
