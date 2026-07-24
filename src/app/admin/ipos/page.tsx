@@ -135,7 +135,6 @@ export default function AdminIposPage() {
         dematCreditDate: "2026-08-02",
         listingDate: "2026-08-03",
         retailSubscription: 14.5,
-        hniSubscription: 32.8,
         niiSubscription: 32.8,
         qibSubscription: 88.2,
         totalSubscription: 45.2,
