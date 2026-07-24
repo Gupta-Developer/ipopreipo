@@ -10,7 +10,14 @@ import {
   Award,
   ExternalLink,
   Users,
-  ShieldAlert
+  ShieldAlert,
+  BarChart3,
+  Phone,
+  Mail,
+  Globe,
+  MapPin,
+  UserCheck,
+  Briefcase
 } from "lucide-react";
 import { MOCK_IPOS } from "@/data/mockIpos";
 import { Badge } from "@/components/common/Badge";
@@ -163,17 +170,17 @@ export default async function IPODetailPage({ params }: PageProps) {
                   <thead className="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
                     <tr>
                       <th className="py-2.5 px-3">Application Category</th>
-                      <th className="py-2.5 px-3">Min Lots</th>
-                      <th className="py-2.5 px-3">Total Shares</th>
-                      <th className="py-2.5 px-3 text-right">Min Amount (₹)</th>
+                      <th className="py-2.5 px-3">Lots</th>
+                      <th className="py-2.5 px-3">Shares</th>
+                      <th className="py-2.5 px-3 text-right">Amount (₹)</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 text-slate-800">
                     {ipo.lotSizes.map((item, idx) => (
                       <tr key={idx} className="hover:bg-slate-50">
-                        <td className="py-2.5 px-3 font-medium">{item.applicationCategory}</td>
-                        <td className="py-2.5 px-3">{item.lots} Lot</td>
-                        <td className="py-2.5 px-3">{item.shares} Shares</td>
+                        <td className="py-2.5 px-3 font-medium text-slate-900">{item.applicationCategory}</td>
+                        <td className="py-2.5 px-3 font-semibold">{item.lots}</td>
+                        <td className="py-2.5 px-3">{item.shares.toLocaleString("en-IN")}</td>
                         <td className="py-2.5 px-3 text-right font-bold text-slate-900">
                           ₹{item.amount.toLocaleString("en-IN")}
                         </td>
@@ -218,6 +225,133 @@ export default async function IPODetailPage({ params }: PageProps) {
               </div>
             </div>
           )}
+
+          {/* Peer Comparison Table */}
+          {ipo.peerComparison && (
+            <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-sm space-y-3">
+              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <BarChart3 className="w-4 h-4 text-blue-700" />
+                Industry Peer Valuation Comparison
+              </h3>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
+                    <tr>
+                      <th className="py-2.5 px-3">S. No.</th>
+                      <th className="py-2.5 px-3">Company Name</th>
+                      <th className="py-2.5 px-3 text-center">Face Value (₹)</th>
+                      <th className="py-2.5 px-3 text-right">P/E Ratio</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 text-slate-800">
+                    {ipo.peerComparison.map((peer, idx) => (
+                      <tr key={idx} className="hover:bg-slate-50">
+                        <td className="py-2.5 px-3 font-semibold text-slate-500">{idx + 1}</td>
+                        <td className="py-2.5 px-3 font-bold text-slate-900">{peer.companyName}</td>
+                        <td className="py-2.5 px-3 text-center font-medium">₹{peer.faceValue}</td>
+                        <td className="py-2.5 px-3 text-right font-bold text-blue-700">{peer.peRatio.toFixed(2)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Company Contact Information & Registrar & Lead Managers */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {/* Company Contact Info */}
+            <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-sm space-y-3">
+              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-2">
+                <Building2 className="w-4 h-4 text-blue-700" />
+                Company Contact Information
+              </h3>
+              <div className="space-y-2 text-xs text-slate-700">
+                <strong className="text-slate-900 block text-sm font-bold">{ipo.companyName}</strong>
+                {ipo.companyAddress && (
+                  <div className="flex items-start gap-2">
+                    <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" />
+                    <span>{ipo.companyAddress}</span>
+                  </div>
+                )}
+                {ipo.companyPhone && (
+                  <div className="flex items-center gap-2">
+                    <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <span className="font-semibold text-slate-900">{ipo.companyPhone}</span>
+                  </div>
+                )}
+                {ipo.companyEmail && (
+                  <div className="flex items-center gap-2">
+                    <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <a href={`mailto:${ipo.companyEmail}`} className="text-blue-700 hover:underline">{ipo.companyEmail}</a>
+                  </div>
+                )}
+                {ipo.companyWebsite && (
+                  <div className="flex items-center gap-2 pt-1">
+                    <Globe className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <a href={ipo.companyWebsite} target="_blank" rel="noreferrer" className="text-blue-700 font-bold hover:underline flex items-center gap-1">
+                      Official Website <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Registrar & Lead Managers Info */}
+            <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-sm space-y-4">
+              {/* Registrar */}
+              <div className="space-y-2 text-xs">
+                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-2">
+                  <UserCheck className="w-4 h-4 text-emerald-700" />
+                  IPO Registrar
+                </h3>
+                <strong className="text-slate-900 block text-sm font-bold">{ipo.registrarName}</strong>
+                {ipo.registrarPhone && (
+                  <div className="flex items-center gap-2 text-slate-700">
+                    <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <span>{ipo.registrarPhone}</span>
+                  </div>
+                )}
+                {ipo.registrarEmail && (
+                  <div className="flex items-center gap-2 text-slate-700">
+                    <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <a href={`mailto:${ipo.registrarEmail}`} className="text-blue-700 hover:underline">{ipo.registrarEmail}</a>
+                  </div>
+                )}
+                <div className="flex gap-3 pt-1">
+                  <a
+                    href={ipo.registrarCheckUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 font-bold text-emerald-700 hover:underline"
+                  >
+                    Check Allotment <ExternalLink className="w-3 h-3" />
+                  </a>
+                  <a
+                    href={ipo.registrarWebsite}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 text-slate-500 hover:text-slate-900"
+                  >
+                    Registrar Portal <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+              </div>
+
+              {/* Lead Managers */}
+              <div className="space-y-2 text-xs pt-3 border-t border-slate-100">
+                <h3 className="font-bold text-slate-900 flex items-center gap-2">
+                  <Briefcase className="w-4 h-4 text-indigo-700" />
+                  Lead Manager(s)
+                </h3>
+                <ul className="space-y-1 text-slate-700 list-disc list-inside font-medium">
+                  {ipo.leadManagers.map((lm, idx) => (
+                    <li key={idx}>{lm}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Right Col */}

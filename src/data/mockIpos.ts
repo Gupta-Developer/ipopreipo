@@ -172,18 +172,18 @@ export const MOCK_IPOS: IPOData[] = [
     category: "mainboard",
     status: "upcoming",
     exchange: "BSE & NSE",
-    priceBandMin: 285,
-    priceBandMax: 300,
-    lotSize: 50,
-    minInvestment: 15000,
+    priceBandMin: 405,
+    priceBandMax: 425,
+    lotSize: 35,
+    minInvestment: 14875,
     issueSizeTotalCr: 1850.0,
     freshIssueCr: 1200.0,
     ofsCr: 650.0,
     faceValue: 5,
     gmp: 65,
-    gmpPercent: 21.67,
+    gmpPercent: 15.29,
     gmpUpdatedTime: "2 hours ago",
-    expectedListingPrice: 365,
+    expectedListingPrice: 490,
     totalSubscription: 0,
     qibSubscription: 0,
     niiSubscription: 0,
@@ -209,9 +209,11 @@ export const MOCK_IPOS: IPOData[] = [
       "Dependency on government solar tariffs and grid connection policies."
     ],
     lotSizes: [
-      { applicationCategory: "Retail", lots: 1, shares: 50, amount: 15000 },
-      { applicationCategory: "sHNI (Min)", lots: 14, shares: 700, amount: 210000 },
-      { applicationCategory: "bHNI (Min)", lots: 67, shares: 3350, amount: 1005000 }
+      { applicationCategory: "Retail (Min)", lots: 1, shares: 35, amount: 14875 },
+      { applicationCategory: "Retail (Max)", lots: 13, shares: 455, amount: 193375 },
+      { applicationCategory: "S-HNI (Min)", lots: 14, shares: 490, amount: 208250 },
+      { applicationCategory: "S-HNI (Max)", lots: 67, shares: 2345, amount: 996625 },
+      { applicationCategory: "B-HNI (Min)", lots: 68, shares: 2380, amount: 1011500 }
     ],
     financials: [
       { year: "FY24", revenue: 890.0, pat: 92.0, netWorth: 410.0, eps: 12.5, ronw: 22.4 },
@@ -313,6 +315,69 @@ export const MOCK_IPOS: IPOData[] = [
     ],
     risks: [
       "Global solar cell price volatility."
+    ]
+  },
+  {
+    id: "7",
+    slug: "lohia-corp",
+    name: "Lohia Corp Limited IPO",
+    companyName: "Lohia Corp Limited",
+    category: "mainboard",
+    status: "upcoming",
+    exchange: "BSE & NSE",
+    priceBandMin: 220,
+    priceBandMax: 235,
+    lotSize: 60,
+    minInvestment: 14100,
+    issueSizeTotalCr: 600.0,
+    freshIssueCr: 600.0,
+    ofsCr: 0,
+    faceValue: 10,
+    gmp: 32,
+    gmpPercent: 13.62,
+    gmpUpdatedTime: "Just now",
+    expectedListingPrice: 267,
+    totalSubscription: 0,
+    qibSubscription: 0,
+    niiSubscription: 0,
+    retailSubscription: 0,
+    openDate: "2026-08-05",
+    closeDate: "2026-08-07",
+    allotmentDate: "2026-08-10",
+    refundDate: "2026-08-11",
+    dematCreditDate: "2026-08-11",
+    listingDate: "2026-08-12",
+    registrarName: "KFin Technologies Limited",
+    registrarWebsite: "https://www.kfintech.com",
+    registrarCheckUrl: "https://ris.kfintech.com/ipostatus/",
+    registrarPhone: "+91-40-67162222 / 1800-309-4001",
+    registrarEmail: "einward.ris@kfintech.com",
+    leadManagers: ["ICICI Securities Limited", "IIFL Securities Limited"],
+    companyAddress: "D-3A, Panki Industrial Estate, Kanpur - 208022, Uttar Pradesh, India",
+    companyPhone: "+91-512-3045100",
+    companyEmail: "investors@lohiagroup.com",
+    companyWebsite: "https://www.lohiagroup.com",
+    recommendation: "Apply for Long Term",
+    rating: 4.3,
+    highlights: [
+      "Global leader in machinery for flexible woven plastic packaging.",
+      "Presence in over 85 countries with robust export order book."
+    ],
+    risks: [
+      "Fluctuations in foreign exchange rates & global capital expenditure cycles."
+    ],
+    lotSizes: [
+      { applicationCategory: "Retail (Min)", lots: 1, shares: 60, amount: 14100 },
+      { applicationCategory: "Retail (Max)", lots: 14, shares: 840, amount: 197400 },
+      { applicationCategory: "S-HNI (Min)", lots: 15, shares: 900, amount: 211500 },
+      { applicationCategory: "B-HNI (Min)", lots: 71, shares: 4260, amount: 1001100 }
+    ],
+    peerComparison: [
+      { companyName: "Rajoo Engineers Limited", faceValue: 1, peRatio: 18.27 },
+      { companyName: "LMW Limited", faceValue: 10, peRatio: 134.25 },
+      { companyName: "Mamata Machinery Limited", faceValue: 10, peRatio: 62.07 },
+      { companyName: "Jyoti CNC Automation Limited", faceValue: 2, peRatio: 54.60 },
+      { companyName: "Windsor Machines Limited", faceValue: 2, peRatio: 2561.00 }
     ]
   }
 ];
