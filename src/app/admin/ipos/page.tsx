@@ -65,9 +65,9 @@ export default function AdminIposPage() {
     setFormPriceMin(ipo.priceBandMin);
     setFormPriceMax(ipo.priceBandMax);
     setFormLotSize(ipo.lotSize);
-    setFormIssueSize(ipo.issueSizeCr);
+    setFormIssueSize(ipo.issueSizeTotalCr || 850);
     setFormGmp(ipo.gmp);
-    setFormStatus(ipo.status);
+    setFormStatus(ipo.status === "closed" || ipo.status === "allotment_out" ? "listed" : ipo.status);
     setShowCreateModal(true);
   };
 
@@ -98,7 +98,7 @@ export default function AdminIposPage() {
                 priceBandMin: formPriceMin,
                 priceBandMax: formPriceMax,
                 lotSize: formLotSize,
-                issueSizeCr: formIssueSize,
+                issueSizeTotalCr: formIssueSize,
                 gmp: formGmp,
                 gmpPercent: gmpPct,
                 status: formStatus
@@ -114,25 +114,32 @@ export default function AdminIposPage() {
         companyName: formName + " Limited",
         slug,
         category: formCategory,
-        issueSizeCr: formIssueSize,
+        issueSizeTotalCr: formIssueSize,
+        freshIssueCr: formIssueSize,
+        ofsCr: 0,
+        faceValue: 10,
         priceBandMin: formPriceMin,
         priceBandMax: formPriceMax,
         lotSize: formLotSize,
+        minInvestment: formPriceMax * formLotSize,
         cutoffPrice: formPriceMax,
         gmp: formGmp,
         gmpPercent: gmpPct,
+        gmpUpdatedTime: "Just now",
+        expectedListingPrice: formPriceMax + formGmp,
         status: formStatus,
-        dates: {
-          biddingOpen: "2026-07-28",
-          biddingClose: "2026-07-30",
-          allotmentDate: "2026-07-31",
-          listingDate: "2026-08-03"
-        },
+        exchange: formCategory === "sme" ? "NSE Emerge" : "BSE & NSE",
+        openDate: "2026-07-28",
+        closeDate: "2026-07-30",
+        allotmentDate: "2026-07-31",
+        refundDate: "2026-08-01",
+        dematCreditDate: "2026-08-02",
+        listingDate: "2026-08-03",
         retailSubscription: 14.5,
         hniSubscription: 32.8,
+        niiSubscription: 32.8,
         qibSubscription: 88.2,
         totalSubscription: 45.2,
-        listingGainEstimatePct: gmpPct,
         strengths: ["Strong revenue growth", "High promoter holding"],
         risks: ["Client concentration risk"],
         registrarName: "Link Intime India Private Ltd",
@@ -236,7 +243,7 @@ export default function AdminIposPage() {
                     ₹{ipo.priceBandMin} - ₹{ipo.priceBandMax}
                   </td>
                   <td className="py-3 px-3 font-semibold text-slate-800">
-                    ₹{ipo.issueSizeCr} Cr
+                    ₹{ipo.issueSizeTotalCr || 850} Cr
                   </td>
                   <td className="py-3 px-3">
                     <span className="font-extrabold text-emerald-700">+₹{ipo.gmp} ({ipo.gmpPercent.toFixed(1)}%)</span>
