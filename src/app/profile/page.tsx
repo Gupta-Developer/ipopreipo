@@ -19,7 +19,7 @@ import {
   Layers,
   Award
 } from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth, UserProfile } from "@/context/AuthContext";
 import { MOCK_IPOS } from "@/data/mockIpos";
 import { Badge } from "@/components/common/Badge";
 
@@ -32,7 +32,7 @@ export default function ProfilePage() {
   const [phone, setPhone] = useState<string>(user?.phone || "");
   const [panNumber, setPanNumber] = useState<string>(user?.panNumber || "ABCDE1234F");
   const [dematDpId, setDematDpId] = useState<string>(user?.dematDpId || "1208160012345678");
-  const [category, setCategory] = useState<"Retail" | "S-HNI" | "B-HNI" | "QIB" | "Pre-IPO Investor">(user?.investorCategory || "Retail");
+  const [category, setCategory] = useState<UserProfile["investorCategory"]>(user?.investorCategory || "Retail");
 
   if (!user && !isAuthenticated) {
     return (
