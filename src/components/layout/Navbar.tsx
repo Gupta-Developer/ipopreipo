@@ -38,6 +38,7 @@ export const Navbar: React.FC = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [fontSize, setFontSize] = useState<"small" | "normal" | "large">("normal");
+  const [fontToast, setFontToast] = useState<string>("");
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
@@ -55,6 +56,14 @@ export const Navbar: React.FC = () => {
       } catch (e) {
         // ignore
       }
+
+      const labels = {
+        small: "Font size set to Compact (88%)",
+        normal: "Font size set to Standard (100%)",
+        large: "Font size set to Large (115%)"
+      };
+      setFontToast(labels[size]);
+      setTimeout(() => setFontToast(""), 2200);
     }
   };
 
@@ -119,41 +128,48 @@ export const Navbar: React.FC = () => {
           </div>
 
           {/* Accessibility Font Size Resizer: A- A A+ */}
-          <div className="shrink-0 flex items-center gap-0.5 bg-slate-800 border border-slate-700/80 rounded px-1 py-0.5 text-[11px] font-bold">
-            <span className="text-slate-400 px-1 hidden sm:inline text-[10px] uppercase">Font:</span>
-            <button
-              onClick={() => changeFontSize("small")}
-              className={`px-1.5 py-0.5 rounded transition-all ${
-                fontSize === "small"
-                  ? "bg-blue-600 text-white font-black shadow-xs"
-                  : "text-slate-300 hover:text-white hover:bg-slate-700"
-              }`}
-              title="Decrease Font Size (A-)"
-            >
-              A-
-            </button>
-            <button
-              onClick={() => changeFontSize("normal")}
-              className={`px-1.5 py-0.5 rounded transition-all ${
-                fontSize === "normal"
-                  ? "bg-blue-600 text-white font-black shadow-xs"
-                  : "text-slate-300 hover:text-white hover:bg-slate-700"
-              }`}
-              title="Default Font Size (A)"
-            >
-              A
-            </button>
-            <button
-              onClick={() => changeFontSize("large")}
-              className={`px-1.5 py-0.5 rounded transition-all ${
-                fontSize === "large"
-                  ? "bg-blue-600 text-white font-black shadow-xs"
-                  : "text-slate-300 hover:text-white hover:bg-slate-700"
-              }`}
-              title="Increase Font Size (A+)"
-            >
-              A+
-            </button>
+          <div className="shrink-0 flex items-center gap-1.5">
+            {fontToast && (
+              <span className="text-[10px] font-extrabold text-blue-300 bg-blue-950/90 border border-blue-700/60 px-2.5 py-0.5 rounded-full animate-fade-in shadow-xs hidden sm:inline-block">
+                {fontToast}
+              </span>
+            )}
+            <div className="flex items-center gap-0.5 bg-slate-800 border border-slate-700/80 rounded px-1 py-0.5 text-[11px] font-bold">
+              <span className="text-slate-400 px-1 hidden sm:inline text-[10px] uppercase">Font:</span>
+              <button
+                onClick={() => changeFontSize("small")}
+                className={`px-1.5 py-0.5 rounded transition-all ${
+                  fontSize === "small"
+                    ? "bg-blue-600 text-white font-black shadow-xs ring-1 ring-blue-400"
+                    : "text-slate-300 hover:text-white hover:bg-slate-700"
+                }`}
+                title="Decrease Font Size (A-)"
+              >
+                A-
+              </button>
+              <button
+                onClick={() => changeFontSize("normal")}
+                className={`px-1.5 py-0.5 rounded transition-all ${
+                  fontSize === "normal"
+                    ? "bg-blue-600 text-white font-black shadow-xs ring-1 ring-blue-400"
+                    : "text-slate-300 hover:text-white hover:bg-slate-700"
+                }`}
+                title="Default Font Size (A)"
+              >
+                A
+              </button>
+              <button
+                onClick={() => changeFontSize("large")}
+                className={`px-1.5 py-0.5 rounded transition-all ${
+                  fontSize === "large"
+                    ? "bg-blue-600 text-white font-black shadow-xs ring-1 ring-blue-400"
+                    : "text-slate-300 hover:text-white hover:bg-slate-700"
+                }`}
+                title="Increase Font Size (A+)"
+              >
+                A+
+              </button>
+            </div>
           </div>
         </div>
       </div>
