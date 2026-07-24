@@ -264,7 +264,7 @@ export default function ProfilePage() {
                     <div className="flex items-center justify-between text-xs py-2 border-y border-slate-100">
                       <div>
                         <span className="text-slate-500 block text-[10px]">Price Band</span>
-                        <strong className="text-slate-900 font-bold">₹{ipo.priceRange[0]} - ₹{ipo.priceRange[1]}</strong>
+                        <strong className="text-slate-900 font-bold">₹{ipo.priceBandMin} - ₹{ipo.priceBandMax}</strong>
                       </div>
                       <div>
                         <span className="text-slate-500 block text-[10px]">Estimated GMP</span>
