@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Percent, Plus, Edit, Trash2, CheckCircle2, Search, X } from "lucide-react";
-import { MOCK_PRE_IPOS, PreIPOData } from "@/data/mockPreIpos";
+import { MOCK_PRE_IPOS, PreIPOData } from "@/data/mockPreIpo";
 
 export default function AdminPreIpoPage() {
   const [preIpos, setPreIpos] = useState<PreIPOData[]>(MOCK_PRE_IPOS);
