@@ -2,7 +2,8 @@
 
 import React, { useState } from "react";
 import { Percent, Plus, Edit, Trash2, CheckCircle2, Search, X } from "lucide-react";
-import { MOCK_PRE_IPOS, PreIPOData } from "@/data/mockPreIpo";
+import { MOCK_PRE_IPOS } from "@/data/mockPreIpo";
+import { PreIPOData } from "@/types/ipo";
 
 export default function AdminPreIpoPage() {
   const [preIpos, setPreIpos] = useState<PreIPOData[]>(MOCK_PRE_IPOS);
@@ -18,7 +19,7 @@ export default function AdminPreIpoPage() {
   const [minLotShares, setMinLotShares] = useState(100);
 
   const filteredItems = preIpos.filter((item) =>
-    item.name.toLowerCase().includes(searchQuery.toLowerCase())
+    (item.companyName || "").toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleOpenCreate = () => {
@@ -32,10 +33,10 @@ export default function AdminPreIpoPage() {
 
   const handleOpenEdit = (item: PreIPOData) => {
     setEditingItem(item);
-    setName(item.name);
+    setName(item.companyName);
     setSector(item.sector);
-    setPricePerShare(item.pricePerShare);
-    setMinLotShares(item.minLotShares);
+    setPricePerShare(item.estimatedPrice);
+    setMinLotShares(item.minSharesToBuy);
     setShowModal(true);
   };
 
@@ -57,10 +58,10 @@ export default function AdminPreIpoPage() {
           item.id === editingItem.id
             ? {
                 ...item,
-                name,
+                companyName: name,
                 sector,
-                pricePerShare,
-                minLotShares,
+                estimatedPrice: pricePerShare,
+                minSharesToBuy: minLotShares,
                 minInvestmentAmount: pricePerShare * minLotShares
               }
             : item
@@ -71,17 +72,20 @@ export default function AdminPreIpoPage() {
       const newItem: PreIPOData = {
         id: "preipo-" + Date.now(),
         slug: name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
-        name,
+        companyName: name,
         sector,
-        pricePerShare,
-        minLotShares,
+        description: `${name} unlisted shares and pre-IPO details.`,
+        estimatedPrice: pricePerShare,
+        faceValue: 10,
+        minSharesToBuy: minLotShares,
         minInvestmentAmount: pricePerShare * minLotShares,
         valuationCr: 12500,
-        revenueGrowthPercent: 32.5,
-        ebitdaMarginPercent: 18.2,
+        fundingRaisedCr: 500,
+        keyInvestors: ["Promoter Group"],
+        revenueLastFyCr: 1200,
+        patLastFyCr: 150,
         expectedIpoTimeline: "Q4 2026",
-        highlights: ["Strong profitability", "Market leader"],
-        status: "Active"
+        status: "Available"
       };
       setPreIpos([newItem, ...preIpos]);
       setSuccessToast("New Pre-IPO share listed live!");
@@ -148,12 +152,12 @@ export default function AdminPreIpoPage() {
               {filteredItems.map((item) => (
                 <tr key={item.id} className="hover:bg-slate-50">
                   <td className="py-3 px-3">
-                    <strong className="text-slate-900 font-extrabold block">{item.name}</strong>
+                    <strong className="text-slate-900 font-extrabold block">{item.companyName}</strong>
                     <span className="text-[10px] text-slate-400">{item.slug}</span>
                   </td>
                   <td className="py-3 px-3 font-semibold text-slate-700">{item.sector}</td>
-                  <td className="py-3 px-3 font-extrabold text-slate-900">₹{item.pricePerShare}</td>
-                  <td className="py-3 px-3 font-bold text-slate-700">{item.minLotShares} Shares</td>
+                  <td className="py-3 px-3 font-extrabold text-slate-900">₹{item.estimatedPrice}</td>
+                  <td className="py-3 px-3 font-bold text-slate-700">{item.minSharesToBuy} Shares</td>
                   <td className="py-3 px-3 font-black text-amber-700">₹{item.minInvestmentAmount.toLocaleString("en-IN")}</td>
                   <td className="py-3 px-3 text-right">
                     <div className="flex justify-end gap-1.5">
@@ -184,7 +188,7 @@ export default function AdminPreIpoPage() {
           <div className="bg-white rounded-2xl border border-slate-200 max-w-md w-full p-6 space-y-5 shadow-2xl relative animate-in fade-in zoom-in duration-150">
             <div className="flex justify-between items-center border-b border-slate-100 pb-3">
               <h3 className="text-base font-extrabold text-slate-900">
-                {editingItem ? `Edit ${editingItem.name}` : "Add Pre-IPO Stock"}
+                {editingItem ? `Edit ${editingItem.companyName}` : "Add Pre-IPO Stock"}
               </h3>
               <button onClick={() => setShowModal(false)} className="p-1 text-slate-400 hover:text-slate-700">
                 <X className="w-5 h-5" />
