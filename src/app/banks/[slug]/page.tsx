@@ -13,6 +13,7 @@ import {
   HelpCircle
 } from "lucide-react";
 import { MOCK_BANKS } from "@/data/mockBanks";
+import UserReviewsSection from "@/components/common/UserReviewsSection";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -162,6 +163,15 @@ export default async function BankDetailPage({ params }: PageProps) {
               </div>
             </div>
           )}
+
+          {/* User Reviews Section */}
+          <UserReviewsSection
+            entityId={bank.id}
+            entityName={bank.name}
+            entityType="bank"
+            initialRating={bank.rating}
+            initialReviews={bank.userReviews}
+          />
         </div>
 
         {/* Right Col */}

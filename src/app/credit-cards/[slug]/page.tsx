@@ -15,6 +15,7 @@ import {
   Layers
 } from "lucide-react";
 import { MOCK_CREDIT_CARDS } from "@/data/mockCreditCards";
+import UserReviewsSection from "@/components/common/UserReviewsSection";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -186,6 +187,15 @@ export default async function CreditCardDetailPage({ params }: PageProps) {
               </div>
             </div>
           )}
+
+          {/* User Reviews Section */}
+          <UserReviewsSection
+            entityId={card.id}
+            entityName={card.name}
+            entityType="credit_card"
+            initialRating={card.rating}
+            initialReviews={card.userReviews}
+          />
         </div>
 
         {/* Right Col */}

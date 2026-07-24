@@ -14,6 +14,7 @@ import {
   BarChart3
 } from "lucide-react";
 import { MOCK_BROKERS } from "@/data/mockBrokers";
+import UserReviewsSection from "@/components/common/UserReviewsSection";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -156,6 +157,15 @@ export default async function BrokerDetailPage({ params }: PageProps) {
               </div>
             </div>
           )}
+
+          {/* User Reviews Section */}
+          <UserReviewsSection
+            entityId={broker.id}
+            entityName={broker.name}
+            entityType="broker"
+            initialRating={broker.rating}
+            initialReviews={broker.userReviews}
+          />
         </div>
 
         {/* Right Col */}

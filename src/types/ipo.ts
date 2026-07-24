@@ -10,7 +10,7 @@ export interface SubscriptionDetail {
 }
 
 export interface LotSizeDetail {
-  applicationCategory: "Retail" | "sHNI (Min)" | "sHNI (Max)" | "bHNI (Min)" | "bHNI (Max)";
+  applicationCategory: string;
   lots: number;
   shares: number;
   amount: number;
@@ -33,6 +33,14 @@ export interface AnchorInvestorAlloc {
   amount: number; // in ₹ Cr
   lockInExpiry30Days: string; // ISO date
   lockInExpiry90Days: string; // ISO date
+}
+
+export interface PeerComparisonDetail {
+  companyName: string;
+  faceValue: number;
+  peRatio: number;
+  ronw?: number;
+  eps?: number;
 }
 
 export interface IPOData {
@@ -87,7 +95,15 @@ export interface IPOData {
   registrarName: string;
   registrarWebsite: string;
   registrarCheckUrl: string;
+  registrarPhone?: string;
+  registrarEmail?: string;
   leadManagers: string[];
+
+  // Company Contact Information
+  companyAddress?: string;
+  companyPhone?: string;
+  companyEmail?: string;
+  companyWebsite?: string;
 
   // Strategic Insights
   recommendation: "May Apply" | "Apply for Listing Gain" | "Apply for Long Term" | "Avoid" | "Neutral";
@@ -99,6 +115,7 @@ export interface IPOData {
   subscriptionBreakdown?: SubscriptionDetail[];
   lotSizes?: LotSizeDetail[];
   financials?: FinancialMetric[];
+  peerComparison?: PeerComparisonDetail[];
   anchorInvestors?: AnchorInvestorAlloc[];
   prospectusUrl?: string;
   drhpUrl?: string;
@@ -166,6 +183,8 @@ export interface BrokerFAQ {
   answer: string;
 }
 
+import { UserReview } from "./finance";
+
 export interface BrokerData {
   id: string;
   slug: string;
@@ -188,4 +207,5 @@ export interface BrokerData {
   overview?: string;
   feeDetails?: BrokerFeeDetail[];
   faqs?: BrokerFAQ[];
+  userReviews?: UserReview[];
 }

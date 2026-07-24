@@ -20,6 +20,19 @@ export interface ReviewRatingCategory {
   score: number; // out of 5
 }
 
+export interface UserReview {
+  id: string;
+  userName: string;
+  userTitle?: string; // e.g. "Verified Cardholder", "Trader", "Customer"
+  rating: number; // 1 to 5
+  date: string; // e.g. "2026-07-24"
+  headline: string;
+  comment: string;
+  proTag?: string;
+  conTag?: string;
+  helpfulCount: number;
+}
+
 export interface CreditCardData {
   id: string;
   slug: string;
@@ -46,6 +59,7 @@ export interface CreditCardData {
   eligibility?: ReviewEligibilityDetail[];
   ratingBreakdown?: ReviewRatingCategory[];
   faqs?: ReviewFAQ[];
+  userReviews?: UserReview[];
 }
 
 export interface PaymentAppData {
@@ -72,6 +86,7 @@ export interface PaymentAppData {
   eligibility?: ReviewEligibilityDetail[];
   ratingBreakdown?: ReviewRatingCategory[];
   faqs?: ReviewFAQ[];
+  userReviews?: UserReview[];
 }
 
 export interface BankData {
@@ -97,4 +112,5 @@ export interface BankData {
   eligibility?: ReviewEligibilityDetail[];
   ratingBreakdown?: ReviewRatingCategory[];
   faqs?: ReviewFAQ[];
+  userReviews?: UserReview[];
 }
