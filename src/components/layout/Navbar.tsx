@@ -48,13 +48,8 @@ export const Navbar: React.FC = () => {
   const changeFontSize = (size: "small" | "normal" | "large") => {
     setFontSize(size);
     if (typeof document !== "undefined") {
-      if (size === "small") {
-        document.documentElement.style.fontSize = "90%";
-      } else if (size === "large") {
-        document.documentElement.style.fontSize = "110%";
-      } else {
-        document.documentElement.style.fontSize = "100%";
-      }
+      document.documentElement.setAttribute("data-font-size", size);
+      document.documentElement.style.fontSize = ""; // Ensure layout rem geometry is preserved
       try {
         localStorage.setItem("user-font-size", size);
       } catch (e) {

@@ -17,6 +17,19 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Controlled Font Resizing System (A-, A, A+) */
+html[data-font-size="small"] body {
+  font-size: 92%;
+}
+
+html[data-font-size="normal"] body {
+  font-size: 100%;
+}
+
+html[data-font-size="large"] body {
+  font-size: 108%;
+}
+
 /* Minimalist Clean Card */
 .clean-card {
   background-color: #ffffff;
