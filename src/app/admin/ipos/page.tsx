@@ -122,7 +122,6 @@ export default function AdminIposPage() {
         priceBandMax: formPriceMax,
         lotSize: formLotSize,
         minInvestment: formPriceMax * formLotSize,
-        cutoffPrice: formPriceMax,
         gmp: formGmp,
         gmpPercent: gmpPct,
         gmpUpdatedTime: "Just now",
