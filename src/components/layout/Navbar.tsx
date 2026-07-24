@@ -22,18 +22,26 @@ import {
   Award,
   Home,
   UserCheck,
-  User
+  User,
+  LogOut,
+  Bookmark
 } from "lucide-react";
 import { MOCK_IPOS } from "@/data/mockIpos";
+import { useAuth } from "@/context/AuthContext";
+import AuthModal from "@/components/auth/AuthModal";
 
 export const Navbar: React.FC = () => {
+  const { user, isAuthenticated, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [ipoMenuOpen, setIpoMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [fontSize, setFontSize] = useState<"small" | "normal" | "large">("normal");
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
   const megaMenuRef = useRef<HTMLDivElement>(null);
+  const userDropdownRef = useRef<HTMLDivElement>(null);
   const activeIpos = MOCK_IPOS.filter((i) => i.status === "live" || i.gmp > 0);
 
   const changeFontSize = (size: "small" | "normal" | "large") => {
@@ -469,11 +477,69 @@ export const Navbar: React.FC = () => {
             )}
           </div>
 
-          {/* Login Button */}
-          <button className="px-4 py-1.5 rounded-full bg-blue-900 hover:bg-blue-800 text-white font-bold text-xs transition-all shadow-xs flex items-center gap-1.5">
-            <User className="w-3.5 h-3.5" />
-            Login
-          </button>
+          {/* User Auth Section */}
+          {isAuthenticated && user ? (
+            <div className="relative" ref={userDropdownRef}>
+              <button
+                onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                className="flex items-center gap-2 pl-2 pr-3 py-1 rounded-full bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-200 transition-all font-bold text-xs"
+              >
+                <div className="w-6 h-6 rounded-full bg-blue-900 text-white font-black text-[11px] flex items-center justify-center">
+                  {user.name.charAt(0).toUpperCase()}
+                </div>
+                <span className="max-w-[100px] truncate">{user.name}</span>
+                <ChevronDown className="w-3.5 h-3.5 text-blue-700" />
+              </button>
+
+              {userDropdownOpen && (
+                <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl border border-slate-200 shadow-2xl p-2 z-50 space-y-1 animate-in fade-in zoom-in duration-100 text-xs">
+                  <div className="px-3 py-2 border-b border-slate-100">
+                    <span className="font-extrabold text-slate-900 block">{user.name}</span>
+                    <span className="text-[11px] text-slate-500 truncate block">{user.email}</span>
+                  </div>
+                  <Link
+                    href="/profile"
+                    onClick={() => setUserDropdownOpen(false)}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 text-slate-700 font-medium"
+                  >
+                    <User className="w-4 h-4 text-blue-700" />
+                    My Investor Profile
+                  </Link>
+                  <Link
+                    href="/profile"
+                    onClick={() => setUserDropdownOpen(false)}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 text-slate-700 font-medium"
+                  >
+                    <Bookmark className="w-4 h-4 text-amber-600" />
+                    Saved Watchlist
+                  </Link>
+                  <div className="pt-1 border-t border-slate-100">
+                    <button
+                      onClick={() => { logout(); setUserDropdownOpen(false); }}
+                      className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-rose-50 text-rose-700 font-bold"
+                    >
+                      <LogOut className="w-4 h-4 text-rose-600" />
+                      Sign Out
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button
+              onClick={() => setAuthModalOpen(true)}
+              className="px-4 py-1.5 rounded-full bg-blue-900 hover:bg-blue-800 text-white font-bold text-xs transition-all shadow-xs flex items-center gap-1.5"
+            >
+              <User className="w-3.5 h-3.5" />
+              Sign In
+            </button>
+          )}
+
+          {/* Auth Modal Component */}
+          <AuthModal
+            isOpen={authModalOpen}
+            onClose={() => setAuthModalOpen(false)}
+          />
 
           {/* Mobile Hamburger Toggle */}
           <button
