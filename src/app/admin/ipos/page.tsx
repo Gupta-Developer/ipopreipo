@@ -138,10 +138,14 @@ export default function AdminIposPage() {
         niiSubscription: 32.8,
         qibSubscription: 88.2,
         totalSubscription: 45.2,
-        strengths: ["Strong revenue growth", "High promoter holding"],
+        highlights: ["Strong revenue growth", "High promoter holding"],
         risks: ["Client concentration risk"],
+        recommendation: "Apply for Listing Gain",
+        rating: 4.5,
         registrarName: "Link Intime India Private Ltd",
-        registrarLink: "https://linkintime.co.in"
+        registrarWebsite: "https://linkintime.co.in",
+        registrarCheckUrl: "https://linkintime.co.in/initial_offer/public-issues.html",
+        leadManagers: ["Kotak Mahindra Capital", "ICICI Securities"]
       };
       setIpos([newIpo, ...ipos]);
       setSuccessToast("New IPO created and published live!");
